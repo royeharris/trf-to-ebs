@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-35</title>
+    <title>EBS Transaction Recorder v0-36</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -11,11 +11,9 @@
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 0.5fr; gap: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
-        input[readonly] { background-color: #f1f2f6; color: var(--primary); font-weight: bold; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -27,7 +25,7 @@
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.62rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
     </style>
@@ -35,7 +33,7 @@
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-35</h3>
+    <h3>EBS Entry v0-36</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -43,18 +41,17 @@
         <div><label>Date C</label><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div>
     </div>
 
-    <div class="grid-3" style="margin-top:10px;">
+    <div class="grid" style="margin-top:10px;">
         <div><label>F/U B</label><select id="colB" onchange="handleFUChange()"><option value="aj - ad-hoc">aj - ad-hoc</option><option value="aj - adjustment">aj - adjustment</option><option value="c - selected">c - selected</option><option value="F - fixed">F - fixed</option><option value="h - highlight">h - highlight</option><option value="I - income">I - income</option><option value="o - other">o - other</option><option value="p - Planned">p - Planned</option><option value="S - Support">S - Support</option><option value="u - unplanned">u - unplanned</option><option value="v" selected>v - variable</option><option value="xf - transfer">xf - transfer</option></select></div>
         <div><label>Category F</label><select id="colF" required><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Accounting fee">Accounting fee</option><option value="Ad-hoc">Ad-hoc</option><option value="Adjustment">Adjustment</option><option value="Advertising">Advertising</option><option value="Arundel Str">Arundel Str</option><option value="Bank charges">Bank charges</option><option value="Budget repay">Budget repay</option><option value="Buffer">Buffer</option><option value="Car">Car</option><option value="Card payment">Card payment</option><option value="Cigarettes">Cigarettes</option><option value="Citroen car tax">Citroen car tax</option><option value="Citroen fuel">Citroen fuel</option><option value="Citroen insurance">Citroen insurance</option><option value="Citroen MoT">Citroen MoT</option><option value="Citroen other">Citroen other</option><option value="Citroen service">Citroen service</option><option value="Clothing">Clothing</option><option value="Computer accessories">Computer accessories</option><option value="Computer consumables">Computer consumables</option><option value="Computer hardware">Computer hardware</option><option value="Consulting fee">Consulting fee</option><option value="Consumables">Consumables</option><option value="Corporation tax">Corporation tax</option><option value="Cosmetics">Cosmetics</option><option value="Dawlish Court">Dawlish Court</option><option value="Debit orders">Debit orders</option><option value="Delivery costs">Delivery costs</option><option value="Dentist">Dentist</option><option value="Deposit">Deposit</option><option value="Director loan">Director loan</option><option value="Dividend">Dividend</option><option value="Eat out">Eat out</option><option value="Education">Education</option><option value="Electricity">Electricity</option><option value="Entertainment">Entertainment</option><option value="Expenses">Expenses</option><option value="Extra">Extra</option><option value="Fees">Fees</option><option value="FlexiPay payment">FlexiPay payment</option><option value="Food">Food</option><option value="Gifts">Gifts</option><option value="Groceries">Groceries</option><option value="Haircut">Haircut</option><option value="Hardware">Hardware</option><option value="Health">Health</option><option value="Home">Home</option><option value="Income">Income</option><option value="Insurance">Insurance</option><option value="Interest">Interest</option><option value="Internet">Internet</option><option value="Investment">Investment</option><option value="Jose motorbike">Jose motorbike</option><option value="Jose salary">Jose salary</option><option value="Land purchase">Land purchase</option><option value="Loan receive">Loan receive</option><option value="Loan interest">Loan interest</option><option value="Loan repay">Loan repay</option><option value="Luggage">Luggage</option><option value="Maid">Maid</option><option value="Miscellaneous">Miscellaneous</option><option value="Mobile">Mobile</option><option value="Mobile phone">Mobile phone</option><option value="Monthly">Monthly</option><option value="Music subs">Music subs</option><option value="NI">NI</option><option value="Office accessories">Office accessories</option><option value="Office equipment">Office equipment</option><option value="Office supplies">Office supplies</option><option value="Other">Other</option><option value="P tax">P tax</option><option value="Parking">Parking</option><option value="Personal tax">Personal tax</option><option value="Peter salary">Peter salary</option><option value="Phone accessories">Phone accessories</option><option value="Phone costs">Phone costs</option><option value="Portman Place">Portman Place</option><option value="Postage">Postage</option><option value="Refund">Refund</option><option value="Rent">Rent</option><option value="Roy">Roy</option><option value="Roy dividend">Roy dividend</option><option value="Roy salary">Roy salary</option><option value="Services">Services</option><option value="Shoes">Shoes</option><option value="Smoke">Smoke</option><option value="Software">Software</option><option value="Software subs">Software subs</option><option value="Storage">Storage</option><option value="Support">Support</option><option value="Support weekly">Support weekly</option><option value="Support monthly">Support monthly</option><option value="Support home">Support home</option><option value="Support rent">Support rent</option><option value="Support Samara">Support Samara</option><option value="Support unplanned">Support unplanned</option><option value="Sweets">Sweets</option><option value="Take-out food">Take-out food</option><option value="Taxi">Taxi</option><option value="Toiletries">Toiletries</option><option value="Transfer">Transfer</option><option value="Transport">Transport</option><option value="Travel">Travel</option><option value="Tut">Tut</option><option value="Unknown">Unknown</option><option value="VAT">VAT</option><option value="Visa">Visa</option><option value="Vitamins">Vitamins</option><option value="Water & Lights">Water & Lights</option><option value="Wine">Wine</option><option value="Wood cutting">Wood cutting</option></select></div>
-        <div><label>Type E</label><input type="text" id="colE" readonly value="--"></div>
     </div>
 
     <div class="grid" style="margin-top:10px;">
         <div><label>From H</label><select id="colH" required onchange="calcType()"><option value="" disabled selected>-- Select From --</option>
-            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cash plus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
         <div><label>To I</label><select id="colI" required onchange="calcType()"><option value="" disabled selected>-- Select To --</option>
-            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cash plus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
     </div>
 
@@ -77,14 +74,13 @@
     </div>
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
+    <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
-    // Independent AA Lookup List
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
-
-    let tokenClient, gapiInited = false, gsiInited = false;
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
+    let tokenClient, gapiInited = false, gsiInited = false;
 
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
@@ -93,14 +89,13 @@
     function calcType() {
         const fromVal = document.getElementById('colH').value;
         const toVal = document.getElementById('colI').value;
-        const fieldE = document.getElementById('colE');
-        if (!fromVal || !toVal) { fieldE.value = "--"; return; }
-        const fromAA = AA_LIST.includes(fromVal);
-        const toAA = AA_LIST.includes(toVal);
-        if (fromAA && toAA) fieldE.value = "xfer";
-        else if (!fromAA && toAA) fieldE.value = "In";
-        else if (fromAA && !toAA) fieldE.value = "zOut";
-        else fieldE.value = "zOut"; // Default
+        if (!fromVal || !toVal) { document.getElementById('bgTypeE').value = "--"; return; }
+        const fromAA = AA_LIST.includes(fromVal), toAA = AA_LIST.includes(toVal);
+        let valE = "zOut";
+        if (fromAA && toAA) valE = "xfer";
+        else if (!fromAA && toAA) valE = "In";
+        document.getElementById('bgTypeE').value = valE;
+        if (valE === "xfer") document.getElementById('colB').value = "xf - transfer";
     }
 
     function handleDateChange() {
@@ -109,8 +104,7 @@
         document.getElementById('colCDisp').innerText = `${days[date.getDay()]} ${date.getDate()} ${mos[date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
     }
 
-    function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; calcType(); }
-
+    function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); };
 
     function calc() {
@@ -122,21 +116,22 @@
     }
 
     function saveRow() {
-        if (document.getElementById('colE').value === "--") return alert("Error: Select From/To accounts to set Type E.");
+        const typeE = document.getElementById('bgTypeE').value;
+        if (typeE === "--") return alert("Error: Select From/To accounts.");
         const cat = document.getElementById('colF').value, frm = document.getElementById('colH').value, to = document.getElementById('colI').value, raw = document.getElementById('colC').value;
         if(!cat || !frm || !to || !raw) return alert("Selection Missing");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", document.getElementById('colE').value, cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", typeE, cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; renderPreview();
     }
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let html = '<table><tr><th>F/U</th><th>Date</th><th>Cat</th><th>From</th><th>To</th><th>N</th><th>F</th><th>S</th><th>Cur</th><th>Total</th><th></th></tr>';
+        let html = '<table><tr><th>F/U</th><th>Date</th><th>Type</th><th>Cat</th><th>From</th><th>To</th><th>N</th><th>F</th><th>S</th><th>Cur</th><th>Total</th><th></th></tr>';
         data.forEach((r, i) => {
             const date = new Date(r[2]);
             const dStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()]} ${date.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
-            html += `<tr><td>${r[1]}</td><td>${dStr}</td><td>${r[5].substring(0,10)}</td><td>${r[7].substring(0,10)}</td><td>${r[8].substring(0,10)}</td><td>${r[10]?"✓":""}</td><td>${r[11]}</td><td>${r[14]}</td><td>${r[23]}</td><td>${r[22]}</td><td><button onclick="deleteRow(${i})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            html += `<tr><td>${r[1]}</td><td>${dStr}</td><td>${r[4]}</td><td>${r[5].substring(0,8)}</td><td>${r[7].substring(0,8)}</td><td>${r[8].substring(0,8)}</td><td>${r[10]?"✓":""}</td><td>${r[11]}</td><td>${r[14]}</td><td>${r[23]}</td><td>${r[22]}</td><td><button onclick="deleteRow(${i})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = html + '</table>';
     }
@@ -154,6 +149,9 @@
     async function copyForSheets() { const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if(!data.length) return; let body = data.map(r => { let rc = [...r]; rc[2] = `'${getFormattedDate(r[2], 'output')}`; rc[19] = `'${rc[19]}`; rc[21] = `'${rc[21]}`; rc[22] = `'${rc[22]}`; return rc.slice(0, 26).join(";"); }).join("\n"); await navigator.clipboard.writeText(body); alert("Synced!"); }
     function deleteRow(i) { let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(data)); renderPreview(); }
     function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
+    renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client"
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</body>
+</html>
