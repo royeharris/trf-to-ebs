@@ -3,38 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-39</title>
+    <title>EBS Transaction Recorder v0-40</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
         :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 0.5fr; gap: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
+        input[readonly] { background-color: #f1f2f6; color: var(--primary); font-weight: bold; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-copy { background: #e67e22; }
         .btn-sync { background: #2980b9; }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
-        #auth_status { font-size: 0.65rem; margin-bottom: 10px; text-align: center; color: #7f8c8d; font-weight: bold; }
-        .preview-wrap { overflow-x: auto; margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px; }
+        #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
+        .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.62rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
-        #debug_log { margin-top: 15px; padding: 10px; background: #fdf2f2; font-family: monospace; font-size: 0.6rem; border-radius: 4px; display: none; color: #c0392b; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-39</h3>
+    <h3>EBS Entry v0-40</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -43,7 +44,7 @@
     </div>
 
     <div class="grid" style="margin-top:10px;">
-        <div><label>F/U B</label><select id="colB" onchange="handleManualFU()"><option value="aj - ad-hoc">aj - ad-hoc</option><option value="aj - adjustment">aj - adjustment</option><option value="c - selected">c - selected</option><option value="F - fixed">F - fixed</option><option value="h - highlight">h - highlight</option><option value="I - income">I - income</option><option value="o - other">o - other</option><option value="p - Planned">p - Planned</option><option value="S - Support">S - Support</option><option value="u - unplanned">u - unplanned</option><option value="v" selected>v - variable</option><option value="xf - transfer">xf - transfer</option></select></div>
+        <div><label>F/U B</label><select id="colB" onchange="handleFUChange()"><option value="aj - ad-hoc">aj - ad-hoc</option><option value="aj - adjustment">aj - adjustment</option><option value="c - selected">c - selected</option><option value="F - fixed">F - fixed</option><option value="h - highlight">h - highlight</option><option value="I - income">I - income</option><option value="o - other">o - other</option><option value="p - Planned">p - Planned</option><option value="S - Support">S - Support</option><option value="u - unplanned">u - unplanned</option><option value="v" selected>v - variable</option><option value="xf - transfer">xf - transfer</option></select></div>
         <div><label>Category F</label><select id="colF" required><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Accounting fee">Accounting fee</option><option value="Ad-hoc">Ad-hoc</option><option value="Adjustment">Adjustment</option><option value="Advertising">Advertising</option><option value="Arundel Str">Arundel Str</option><option value="Bank charges">Bank charges</option><option value="Budget repay">Budget repay</option><option value="Buffer">Buffer</option><option value="Car">Car</option><option value="Card payment">Card payment</option><option value="Cigarettes">Cigarettes</option><option value="Citroen car tax">Citroen car tax</option><option value="Citroen fuel">Citroen fuel</option><option value="Citroen insurance">Citroen insurance</option><option value="Citroen MoT">Citroen MoT</option><option value="Citroen other">Citroen other</option><option value="Citroen service">Citroen service</option><option value="Clothing">Clothing</option><option value="Computer accessories">Computer accessories</option><option value="Computer consumables">Computer consumables</option><option value="Computer hardware">Computer hardware</option><option value="Consulting fee">Consulting fee</option><option value="Consumables">Consumables</option><option value="Corporation tax">Corporation tax</option><option value="Cosmetics">Cosmetics</option><option value="Dawlish Court">Dawlish Court</option><option value="Debit orders">Debit orders</option><option value="Delivery costs">Delivery costs</option><option value="Dentist">Dentist</option><option value="Deposit">Deposit</option><option value="Director loan">Director loan</option><option value="Dividend">Dividend</option><option value="Eat out">Eat out</option><option value="Education">Education</option><option value="Electricity">Electricity</option><option value="Entertainment">Entertainment</option><option value="Expenses">Expenses</option><option value="Extra">Extra</option><option value="Fees">Fees</option><option value="FlexiPay payment">FlexiPay payment</option><option value="Food">Food</option><option value="Gifts">Gifts</option><option value="Groceries">Groceries</option><option value="Haircut">Haircut</option><option value="Hardware">Hardware</option><option value="Health">Health</option><option value="Home">Home</option><option value="Income">Income</option><option value="Insurance">Insurance</option><option value="Interest">Interest</option><option value="Internet">Internet</option><option value="Investment">Investment</option><option value="Jose motorbike">Jose motorbike</option><option value="Jose salary">Jose salary</option><option value="Land purchase">Land purchase</option><option value="Loan receive">Loan receive</option><option value="Loan interest">Loan interest</option><option value="Loan repay">Loan repay</option><option value="Luggage">Luggage</option><option value="Maid">Maid</option><option value="Miscellaneous">Miscellaneous</option><option value="Mobile">Mobile</option><option value="Mobile phone">Mobile phone</option><option value="Monthly">Monthly</option><option value="Music subs">Music subs</option><option value="NI">NI</option><option value="Office accessories">Office accessories</option><option value="Office equipment">Office equipment</option><option value="Office supplies">Office supplies</option><option value="Other">Other</option><option value="P tax">P tax</option><option value="Parking">Parking</option><option value="Personal tax">Personal tax</option><option value="Peter salary">Peter salary</option><option value="Phone accessories">Phone accessories</option><option value="Phone costs">Phone costs</option><option value="Portman Place">Portman Place</option><option value="Postage">Postage</option><option value="Refund">Refund</option><option value="Rent">Rent</option><option value="Roy">Roy</option><option value="Roy dividend">Roy dividend</option><option value="Roy salary">Roy salary</option><option value="Services">Services</option><option value="Shoes">Shoes</option><option value="Smoke">Smoke</option><option value="Software">Software</option><option value="Software subs">Software subs</option><option value="Storage">Storage</option><option value="Support">Support</option><option value="Support weekly">Support weekly</option><option value="Support monthly">Support monthly</option><option value="Support home">Support home</option><option value="Support rent">Support rent</option><option value="Support Samara">Support Samara</option><option value="Support unplanned">Support unplanned</option><option value="Sweets">Sweets</option><option value="Take-out food">Take-out food</option><option value="Taxi">Taxi</option><option value="Toiletries">Toiletries</option><option value="Transfer">Transfer</option><option value="Transport">Transport</option><option value="Travel">Travel</option><option value="Tut">Tut</option><option value="Unknown">Unknown</option><option value="VAT">VAT</option><option value="Visa">Visa</option><option value="Vitamins">Vitamins</option><option value="Water & Lights">Water & Lights</option><option value="Wine">Wine</option><option value="Wood cutting">Wood cutting</option></select></div>
     </div>
 
@@ -77,7 +78,6 @@
 
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
-    <div id="debug_log"></div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
@@ -87,9 +87,9 @@
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
     let tokenClient, gapiInited = false, gsiInited = false;
 
-    function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) { logError(e); } }); }
+    function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) {} }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
-    function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Ready to Sync"; document.getElementById('sync_btn').disabled = false; } }
+    function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; } }
 
     function calcType() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
@@ -102,7 +102,7 @@
         if (valE === "xfer") { document.getElementById('colB').value = "xf - transfer"; document.getElementById('colF').value = "Transfer"; }
     }
 
-    function handleManualFU() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
+    function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
     function handleDateChange() {
         const d = new Date(document.getElementById('colC').value);
         document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} '${String(d.getFullYear()).substr(-2)}`;
@@ -120,8 +120,8 @@
 
     function saveRow() {
         const typeE = document.getElementById('bgTypeE').value;
-        if (typeE === "--") return alert("Error: Must select From H and To I to determine Type E.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
+        if (typeE === "--") return alert("Error: Select From and To accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
@@ -138,17 +138,16 @@
     }
 
     async function handleSync() {
-        const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return alert("Nothing to sync.");
+        const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
             const vals = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
-            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Sync Successful!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (e) { logError(e); alert("Sync Error."); }
+            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (e) { alert("Sync Error."); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
 
-    function logError(e) { const log = document.getElementById('debug_log'); log.innerText = JSON.stringify(e); log.style.display = 'block'; }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
-    function copyForSheets() { alert("Use Send to Sheets for direct export."); }
+    function copyForSheets() { alert("Use Sync for direct export."); }
     function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
     renderPreview();
 </script>
