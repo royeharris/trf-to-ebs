@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-32-01</title>
+    <title>EBS Transaction Recorder v0-32-02</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -18,6 +18,7 @@
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-copy { background: #e67e22; }
         .btn-sync { background: #2980b9; }
@@ -40,7 +41,7 @@
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-32-01</h3>
+    <h3>EBS Entry v0-32-02</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -77,7 +78,7 @@
     <div class="actions">
         <button class="btn-save" onclick="saveRow()">Stage Transaction</button>
         <button class="btn-copy" onclick="copyForSheets()">Copy for Sheets</button>
-        <button class="btn-sync" id="sync_btn" onclick="handleSync()">Send to Sheets</button>
+        <button class="btn-sync" id="sync_btn" onclick="handleSync()" disabled>Send to Sheets</button>
     </div>
 
     <div class="preview-wrap"><div id="previewArea"></div></div>
@@ -98,9 +99,29 @@
     let wipeConfirmed = false;
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
 
-    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC] }); gapiInited = true; checkReady(); }); }
+    function gapiLoaded() {
+        gapi.load('client', async () => {
+            try {
+                await gapi.client.init({ apiKey: API_KEY });
+                await gapi.client.load('sheets', 'v4');
+                gapiInited = true;
+                checkReady();
+            } catch (err) { logError(err); }
+        });
+    }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: '' }); gsiInited = true; checkReady(); }
-    function checkReady() { if (gapiInited && gsiInited) document.getElementById('auth_status').innerText = "Bridge Status: Ready to Sync"; }
+    function checkReady() { 
+        if (gapiInited && gsiInited) {
+            document.getElementById('auth_status').innerText = "Bridge Status: Ready to Sync";
+            document.getElementById('sync_btn').disabled = false;
+        } 
+    }
+
+    function logError(err) {
+        const debug = document.getElementById('debug_log');
+        debug.innerText = "Error: " + (err.result?.error?.message || err.message || JSON.stringify(err));
+        debug.style.display = 'block';
+    }
 
     function truncate(s, n) { return s && s.length > n ? s.slice(0, n - 3) + "..." : (s || ""); }
     function getFormattedDate(rawDate, mode) {
@@ -116,7 +137,7 @@
     function handleDateChange() { document.getElementById('colCDisp').innerText = getFormattedDate(document.getElementById('colC').value, 'display'); }
     function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
 
-    window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); };
+    window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); };
 
     function calc() {
         const t = parseFloat(document.getElementById('colT').value) || 0, u = parseFloat(document.getElementById('colM').value) || 1, v = parseFloat(document.getElementById('colV').value) || 0;
@@ -146,12 +167,12 @@
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return alert("Empty");
         const debug = document.getElementById('debug_log'); debug.style.display = 'none';
         tokenClient.callback = async (resp) => {
-            if (resp.error !== undefined) { debug.innerText = JSON.stringify(resp); debug.style.display = 'block'; return; }
+            if (resp.error !== undefined) { logError(resp); return; }
             try {
                 const values = data.map(r => { let rc = [...r]; rc[2] = getFormattedDate(r[2], 'output'); return rc.slice(0, 26); });
                 await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: values } });
                 alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview();
-            } catch (err) { debug.innerText = "Error: " + (err.result?.error?.message || err.message); debug.style.display = 'block'; alert("Sync Error. See log below."); }
+            } catch (err) { logError(err); alert("Sync Error. See log below."); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
@@ -161,5 +182,7 @@
     function clearData() { if(!wipeConfirmed) { wipeConfirmed = true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(() => { wipeConfirmed = false; document.getElementById('wipeBtn').classList.remove('active'); }, 3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; renderPreview(); } }
     renderPreview();
 </script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
