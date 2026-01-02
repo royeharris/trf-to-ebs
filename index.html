@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-34</title>
+    <title>EBS Transaction Recorder v0-35</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -35,7 +35,7 @@
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-34</h3>
+    <h3>EBS Entry v0-35</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -51,20 +51,10 @@
 
     <div class="grid" style="margin-top:10px;">
         <div><label>From H</label><select id="colH" required onchange="calcType()"><option value="" disabled selected>-- Select From --</option>
-            <optgroup label="Actual Accounts (AA)">
-                <option value="Bank Austria">Bank Austria</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option>
-            </optgroup>
-            <optgroup label="External Entities">
-                <option value="Adjustment">Adjustment</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon P">Amazon P</option><option value="AppsIT">AppsIT</option><option value="HMRC">HMRC</option><option value="Income">Income</option>
-            </optgroup>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cash plus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
         <div><label>To I</label><select id="colI" required onchange="calcType()"><option value="" disabled selected>-- Select To --</option>
-            <optgroup label="Actual Accounts (AA)">
-                <option value="Bank Austria">Bank Austria</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option>
-            </optgroup>
-            <optgroup label="Vendors/Entities">
-                <option value="1Password">1Password</option><option value="Amazon Music">Amazon Music</option><option value="Apple">Apple</option><option value="Booking.com">Booking.com</option><option value="Google Workspace">Google Workspace</option><option value="Microsoft">Microsoft</option><option value="Zoom">Zoom</option>
-            </optgroup>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cash plus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
     </div>
 
@@ -90,17 +80,15 @@
 </div>
 
 <script>
-    const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
+    // Independent AA Lookup List
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
 
-    let tokenClient;
-    let gapiInited = false;
-    let gsiInited = false;
+    let tokenClient, gapiInited = false, gsiInited = false;
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
 
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
-    function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Ready to Sync"; document.getElementById('sync_btn').disabled = false; } }
+    function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; } }
 
     function calcType() {
         const fromVal = document.getElementById('colH').value;
@@ -112,7 +100,7 @@
         if (fromAA && toAA) fieldE.value = "xfer";
         else if (!fromAA && toAA) fieldE.value = "In";
         else if (fromAA && !toAA) fieldE.value = "zOut";
-        else fieldE.value = "zOut";
+        else fieldE.value = "zOut"; // Default
     }
 
     function handleDateChange() {
@@ -134,11 +122,10 @@
     }
 
     function saveRow() {
-        const typeE = document.getElementById('colE').value;
-        if (typeE === "--") return alert("Error: Must select From and To accounts to determine Type E.");
+        if (document.getElementById('colE').value === "--") return alert("Error: Select From/To accounts to set Type E.");
         const cat = document.getElementById('colF').value, frm = document.getElementById('colH').value, to = document.getElementById('colI').value, raw = document.getElementById('colC').value;
         if(!cat || !frm || !to || !raw) return alert("Selection Missing");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", typeE, cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", document.getElementById('colE').value, cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; renderPreview();
     }
@@ -157,9 +144,9 @@
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
-            if (resp.error !== undefined) return console.error(resp);
+            if (resp.error !== undefined) return;
             const values = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
-            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: values } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (err) { alert("Sync Error."); }
+            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E', range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: values } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (err) { alert("Sync Error."); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
@@ -169,6 +156,4 @@
     function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-</body>
-</html>
+<script async defer src="https://accounts.google.com/gsi/client"
