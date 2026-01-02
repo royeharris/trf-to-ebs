@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-43</title>
+    <title>EBS Transaction Recorder v0-44</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -37,13 +37,12 @@
         .w-tiny { width: 15px; text-align: center; }
         .w-cur { width: 25px; text-align: center; } .w-tot { width: 50px; text-align: right; }
         .w-del { width: 25px; text-align: center; }
-        #debug_log { margin-top: 15px; padding: 10px; background: #fdf2f2; font-family: monospace; font-size: 0.6rem; border-radius: 4px; display: none; color: #c0392b; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-43</h3>
+    <h3>EBS Entry v0-44</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -89,13 +88,12 @@
 
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
-    <div id="debug_log"></div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
-    const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
+    const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
@@ -129,14 +127,14 @@
     function calc() {
         const t = parseFloat(document.getElementById('colT').value) || 0, u = parseFloat(document.getElementById('colM').value) || 1, v = parseFloat(document.getElementById('colV').value) || 0;
         const tot = ((t * u) + v).toFixed(2);
-        document.getElementById('symbol').innerText = symbols[document.getElementById('colX').value] || "";
         document.getElementById('totalDisp').innerText = tot;
         return tot;
     }
 
     function saveRow() {
-        if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select From and To accounts.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
+        const typeE = document.getElementById('bgTypeE').value;
+        if (typeE === "--") return alert("Error: Select From and To accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
@@ -163,8 +161,13 @@
                 return rc.slice(0, 26); 
             });
             try { 
-                const res = await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); 
-                alert("Success! Updated Range: " + res.result.updates.updatedRange); 
+                const res = await gapi.client.sheets.spreadsheets.values.append({ 
+                    spreadsheetId: SHEET_ID, 
+                    range: 'Sheet1', 
+                    valueInputOption: 'USER_ENTERED', 
+                    resource: { values: vals } 
+                }); 
+                alert("Success! Data appended to Sheet1."); 
                 renderPreview(); 
             } catch (e) { alert("Sync Error: " + (e.result?.error?.message || "Unknown")); }
         };
