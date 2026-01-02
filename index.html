@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-48</title>
+    <title>EBS Transaction Recorder v0-49</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -39,13 +39,12 @@
         .w-cur { width: 22px; text-align: center; } .w-tot { width: 45px; text-align: right; }
         .w-mnth { width: 35px; text-align: center; }
         .w-del { width: 22px; text-align: center; }
-        /* Center alignment for specific staging columns */
         .txt-center { text-align: center !important; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h3>EBS Entry v0-48</h3>
+    <h3>EBS Entry v0-49</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     <div class="grid">
         <div><label>Grouping A</label><select id="colA"><option value="Roy" selected>Roy</option><option value="Alek">Alek</option><option value="Haricom">Haricom</option><option value="Ev">Ev</option><option value="Flannagan">Flannagan</option><option value="Jose">Jose</option><option value="Peter">Peter</option><option value="Roy_Peter">Roy_Peter</option><option value="Xfer">Xfer</option><option value="Vanya">Vanya</option><option value="n/a">n/a</option></select></div>
@@ -70,7 +69,7 @@
     </div>
     <div class="grid-4" style="margin-top:10px">
         <div><label>Each T</label><input type="number" id="colT" placeholder="0.00" step="0.01" oninput="calc()"></div>
-        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="ZAR">ZAR</option><option value="CHF">CHF</option><option value="THB">THB</option><option value="RUR">RUB</option></select></div>
+        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="ZAR">ZAR</option><option value="CHF">CHF</option><option value="THB">THB</option><option value="RUR">RUB</option><option value="COP">COP</option></select></div>
         <div><label>Fees V</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Multiplier U</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
@@ -88,8 +87,8 @@
 <script>
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "EBS Entry v0-48";
-    const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
+    const VER = "EBS Entry v0-49";
+    const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
     function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) {} }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
@@ -147,6 +146,7 @@
     }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
     function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function copyForSheets() { alert("Use Sync for direct export."); }
     renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
