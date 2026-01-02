@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-42</title>
+    <title>EBS Transaction Recorder v0-43</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -15,7 +15,7 @@
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
-        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); border: none; background: transparent; }
+        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); text-align: center; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -27,7 +27,7 @@
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         .btn-clear.active { opacity: 1; border: 2px solid #000; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
-        #colCDisp { font-size: 0.85rem; color: var(--primary); margin-top: 4px; padding-left: 2px; }
+        #colCDisp { font-size: 0.85rem; color: var(--primary); margin-top: 4px; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.6rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -43,7 +43,7 @@
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-42</h3>
+    <h3>EBS Entry v0-43</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -155,12 +155,18 @@
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
-            const vals = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
+            const vals = data.map(r => { 
+                let rc = [...r]; 
+                const d = new Date(rc[2]); 
+                rc[2] = `'${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+                [19, 21, 22].forEach(i => rc[i] = `'${rc[i]}`); 
+                return rc.slice(0, 26); 
+            });
             try { 
                 const res = await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); 
-                alert("Success! Google updated range: " + res.result.updates.updatedRange); 
+                alert("Success! Updated Range: " + res.result.updates.updatedRange); 
                 renderPreview(); 
-            } catch (e) { alert("Sync Error: " + (e.result?.error?.message || "Unknown error")); }
+            } catch (e) { alert("Sync Error: " + (e.result?.error?.message || "Unknown")); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
