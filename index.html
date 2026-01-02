@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-41</title>
+    <title>EBS Transaction Recorder v0-42</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -11,9 +11,11 @@
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-date-type { display: grid; grid-template-columns: 0.7fr 0.3fr; gap: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
+        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); border: none; background: transparent; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -23,7 +25,9 @@
         .btn-copy { background: #e67e22; }
         .btn-sync { background: #2980b9; }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
+        .btn-clear.active { opacity: 1; border: 2px solid #000; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
+        #colCDisp { font-size: 0.85rem; color: var(--primary); margin-top: 4px; padding-left: 2px; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.6rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -33,17 +37,21 @@
         .w-tiny { width: 15px; text-align: center; }
         .w-cur { width: 25px; text-align: center; } .w-tot { width: 50px; text-align: right; }
         .w-del { width: 25px; text-align: center; }
+        #debug_log { margin-top: 15px; padding: 10px; background: #fdf2f2; font-family: monospace; font-size: 0.6rem; border-radius: 4px; display: none; color: #c0392b; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-41</h3>
+    <h3>EBS Entry v0-42</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
         <div><label>Grouping A</label><select id="colA"><option value="Roy" selected>Roy</option><option value="Alek">Alek</option><option value="Haricom">Haricom</option><option value="Ev">Ev</option><option value="Flannagan">Flannagan</option><option value="Jose">Jose</option><option value="Peter">Peter</option><option value="Roy_Peter">Roy_Peter</option><option value="Xfer">Xfer</option><option value="Vanya">Vanya</option><option value="n/a">n/a</option></select></div>
-        <div><label>Date C</label><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div>
+        <div class="grid-date-type">
+            <div><label>Date C</label><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div>
+            <div><label>Type E</label><div id="workTypeDisplay" class="type-display">--</div></div>
+        </div>
     </div>
 
     <div class="grid" style="margin-top:10px;">
@@ -81,13 +89,15 @@
 
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
+    <div id="debug_log"></div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
+    const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
-    let tokenClient, gapiInited = false, gsiInited = false;
+    let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
     function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) {} }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
@@ -95,12 +105,12 @@
 
     function calcType() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
-        const bgE = document.getElementById('bgTypeE');
-        if (!h || !i) { bgE.value = "--"; return; }
+        const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay');
+        if (!h || !i) { bgE.value = "--"; workE.innerText = "--"; return; }
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut";
         if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
-        bgE.value = valE;
+        bgE.value = valE; workE.innerText = valE;
         if (valE === "xfer") { document.getElementById('colB').value = "xf - transfer"; document.getElementById('colF').value = "Transfer"; }
     }
 
@@ -125,9 +135,8 @@
     }
 
     function saveRow() {
-        const typeE = document.getElementById('bgTypeE').value;
-        if (typeE === "--") return alert("Error: Select From and To accounts.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
+        if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select From and To accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
@@ -146,15 +155,18 @@
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
-            if (resp.error !== undefined) { alert("Authorization Blocked. Update Redirect URI in Cloud Console."); return; }
             const vals = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
-            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E', range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (e) { alert("Sync Error."); }
+            try { 
+                const res = await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); 
+                alert("Success! Google updated range: " + res.result.updates.updatedRange); 
+                renderPreview(); 
+            } catch (e) { alert("Sync Error: " + (e.result?.error?.message || "Unknown error")); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
 
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
-    function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
+    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
     renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
