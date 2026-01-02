@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-32-02</title>
+    <title>EBS Transaction Recorder v0-33</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -11,9 +11,11 @@
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 0.5fr; gap: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
+        input[readonly] { background-color: #f1f2f6; color: var(--primary); font-weight: bold; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -23,25 +25,18 @@
         .btn-copy { background: #e67e22; }
         .btn-sync { background: #2980b9; }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
-        .btn-clear.active { opacity: 1; border: 2px solid #000; }
-        #colCDisp { font-size: 0.75rem; color: var(--primary); font-weight: bold; margin-top: 4px; padding-left: 2px; }
+        #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.65rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
-        .col-fu, .col-note, .col-f, .col-s, .col-cur { width: 25px; text-align: center; }
-        .col-date { width: 85px; }
-        .col-cat, .col-acc { width: 85px; }
-        .col-total { width: 50px; text-align: right; }
-        .col-del { width: 30px; text-align: center; }
-        #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
-        #debug_log { margin-top: 15px; padding: 10px; background: #eee; font-family: monospace; font-size: 0.6rem; border-radius: 4px; display: none; color: #c0392b; overflow-x: auto; }
+        #debug_log { margin-top: 15px; padding: 10px; background: #fdf2f2; font-family: monospace; font-size: 0.6rem; border-radius: 4px; display: none; color: #c0392b; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-32-02</h3>
+    <h3>EBS Entry v0-33</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -49,38 +44,40 @@
         <div><label>Date C</label><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div>
     </div>
 
-    <div class="grid" style="margin-top:10px;">
+    <div class="grid-3" style="margin-top:10px;">
         <div><label>F/U B</label><select id="colB" onchange="handleFUChange()"><option value="aj - ad-hoc">aj - ad-hoc</option><option value="aj - adjustment">aj - adjustment</option><option value="c - selected">c - selected</option><option value="F - fixed">F - fixed</option><option value="h - highlight">h - highlight</option><option value="I - income">I - income</option><option value="o - other">o - other</option><option value="p - Planned">p - Planned</option><option value="S - Support">S - Support</option><option value="u - unplanned">u - unplanned</option><option value="v" selected>v - variable</option><option value="xf - transfer">xf - transfer</option></select></div>
         <div><label>Category F</label><select id="colF" required><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Accounting fee">Accounting fee</option><option value="Ad-hoc">Ad-hoc</option><option value="Adjustment">Adjustment</option><option value="Advertising">Advertising</option><option value="Arundel Str">Arundel Str</option><option value="Bank charges">Bank charges</option><option value="Budget repay">Budget repay</option><option value="Buffer">Buffer</option><option value="Car">Car</option><option value="Card payment">Card payment</option><option value="Cigarettes">Cigarettes</option><option value="Citroen car tax">Citroen car tax</option><option value="Citroen fuel">Citroen fuel</option><option value="Citroen insurance">Citroen insurance</option><option value="Citroen MoT">Citroen MoT</option><option value="Citroen other">Citroen other</option><option value="Citroen service">Citroen service</option><option value="Clothing">Clothing</option><option value="Computer accessories">Computer accessories</option><option value="Computer consumables">Computer consumables</option><option value="Computer hardware">Computer hardware</option><option value="Consulting fee">Consulting fee</option><option value="Consumables">Consumables</option><option value="Corporation tax">Corporation tax</option><option value="Cosmetics">Cosmetics</option><option value="Dawlish Court">Dawlish Court</option><option value="Debit orders">Debit orders</option><option value="Delivery costs">Delivery costs</option><option value="Dentist">Dentist</option><option value="Deposit">Deposit</option><option value="Director loan">Director loan</option><option value="Dividend">Dividend</option><option value="Eat out">Eat out</option><option value="Education">Education</option><option value="Electricity">Electricity</option><option value="Entertainment">Entertainment</option><option value="Expenses">Expenses</option><option value="Extra">Extra</option><option value="Fees">Fees</option><option value="FlexiPay payment">FlexiPay payment</option><option value="Food">Food</option><option value="Gifts">Gifts</option><option value="Groceries">Groceries</option><option value="Haircut">Haircut</option><option value="Hardware">Hardware</option><option value="Health">Health</option><option value="Home">Home</option><option value="Income">Income</option><option value="Insurance">Insurance</option><option value="Interest">Interest</option><option value="Internet">Internet</option><option value="Investment">Investment</option><option value="Jose motorbike">Jose motorbike</option><option value="Jose salary">Jose salary</option><option value="Land purchase">Land purchase</option><option value="Loan receive">Loan receive</option><option value="Loan interest">Loan interest</option><option value="Loan repay">Loan repay</option><option value="Luggage">Luggage</option><option value="Maid">Maid</option><option value="Miscellaneous">Miscellaneous</option><option value="Mobile">Mobile</option><option value="Mobile phone">Mobile phone</option><option value="Monthly">Monthly</option><option value="Music subs">Music subs</option><option value="NI">NI</option><option value="Office accessories">Office accessories</option><option value="Office equipment">Office equipment</option><option value="Office supplies">Office supplies</option><option value="Other">Other</option><option value="P tax">P tax</option><option value="Parking">Parking</option><option value="Personal tax">Personal tax</option><option value="Peter salary">Peter salary</option><option value="Phone accessories">Phone accessories</option><option value="Phone costs">Phone costs</option><option value="Portman Place">Portman Place</option><option value="Postage">Postage</option><option value="Refund">Refund</option><option value="Rent">Rent</option><option value="Roy">Roy</option><option value="Roy dividend">Roy dividend</option><option value="Roy salary">Roy salary</option><option value="Services">Services</option><option value="Shoes">Shoes</option><option value="Smoke">Smoke</option><option value="Software">Software</option><option value="Software subs">Software subs</option><option value="Storage">Storage</option><option value="Support">Support</option><option value="Support weekly">Support weekly</option><option value="Support monthly">Support monthly</option><option value="Support home">Support home</option><option value="Support rent">Support rent</option><option value="Support Samara">Support Samara</option><option value="Support unplanned">Support unplanned</option><option value="Sweets">Sweets</option><option value="Take-out food">Take-out food</option><option value="Taxi">Taxi</option><option value="Toiletries">Toiletries</option><option value="Transfer">Transfer</option><option value="Transport">Transport</option><option value="Travel">Travel</option><option value="Tut">Tut</option><option value="Unknown">Unknown</option><option value="VAT">VAT</option><option value="Visa">Visa</option><option value="Vitamins">Vitamins</option><option value="Water & Lights">Water & Lights</option><option value="Wine">Wine</option><option value="Wood cutting">Wood cutting</option></select></div>
+        <div><label>Type E</label><input type="text" id="colE" readonly value="zOut"></div>
     </div>
 
     <div class="grid" style="margin-top:10px;">
-        <div><label>From H</label><select id="colH" required><option value="" disabled selected>-- Select From --</option><option value="@HomeStore">@HomeStore</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon P">Amazon P</option><option value="AppsIT">AppsIT</option><option value="BAM clothing">BAM clothing</option><option value="Bank AU">Bank AU</option><option value="Bank Austria">Bank Austria</option><option value="Bantry Suites Hotel">Bantry Suites Hotel</option><option value="Binance">Binance</option><option value="Blue Bay Lodge">Blue Bay Lodge</option><option value="Bluu car rental">Bluu car rental</option><option value="Bryte Travel">Bryte Travel</option><option value="Cash GBP">Cash GBP</option><option value="Cash ZAR">Cash ZAR</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Caunce O Hara">Caunce O Hara</option><option value="Cc Enterprises">Cc Enterprises</option><option value="Computer Futures">Computer Futures</option><option value="Computer Futures extra">Computer Futures extra</option><option value="Damira Dental">Damira Dental</option><option value="DVDfab">DVDfab</option><option value="EE">EE</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB">FNB</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Foschini">Foschini</option><option value="Happy Pay">Happy Pay</option><option value="Harris Gordon">Happy Pay</option><option value="Harvest">Harvest</option><option value="Hertz">Hertz</option><option value="HMRC">HMRC</option><option value="Ian Kruger">Ian Kruger</option><option value="iwoca">iwoca</option><option value="Joan">Joan</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Lemon Squeezy">Lemon Squeezy</option><option value="Liam">Liam</option><option value="Linda">Linda</option><option value="Logan">Logan</option><option value="M Olivier">M Olivier</option><option value="Mariel">Mariel</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="PayPal P">PayPal P</option><option value="Paysend">Paysend</option><option value="Peter">Peter</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut">Revolut</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Revolut Peter">Revolut Peter</option><option value="Santander B">Santander B</option><option value="Santander loan">Santander loan</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Standard">Standard</option><option value="Starling">Starling</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="Stressfreecarrental">Stressfreecarrental</option><option value="TabXPert">TabXPert</option><option value="Takealot">Takealot</option><option value="TFG">TFG</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank">Tyme Bank</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Loan">Tyme Loan</option><option value="Vodafone">Vodafone</option><option value="Willem">Willem</option></select></div>
-        <div><label>To I</label><select id="colI" required><option value="" disabled selected>-- Select To --</option><option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="2CO.com">2CO.com</option><option value="Accomodation Galore">Accomodation Galore</option><option value="Acronis">Acronis</option><option value="Adexa Direct">Adexa Direct</option><option value="Adjustment">Adjustment</option><option value="Adult World">Adult World</option><option value="AirBnB">AirBnB</option><option value="Akkadu">Akkadu</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Aleksey Trofimov">Aleksey Trofimov</option><option value="Alex Hair">Alex Hair</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Alexander Scott">Alexander Scott</option><option value="Aloe Unique">Aloe Unique</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Anker">Anker</option><option value="Appest Limited">Appest Limited</option><option value="Apple">Apple</option><option value="Arnold's Restaurant">Arnold's Restaurant</option><option value="ARTINGADGET">ARTINGADGET</option><option value="AW Group">AW Group</option><option value="BAM clothing">BAM clothing</option><option value="Bank AU">Bank AU</option><option value="Bank Austria">Bank Austria</option><option value="Bantry Suites Hotel">Bantry Suites Hotel</option><option value="Bash">Bash</option><option value="Bellroy">Bellroy</option><option value="Best of Asia">Best of Asia</option><option value="Bitsum">Bitsum</option><option value="Black Medicine">Black Medicine</option><option value="Blue Bay Lodge">Blue Bay Lodge</option><option value="Bluu car rental">Bluu car rental</option><option value="Booking.com">Booking.com</option><option value="Boots">Boots</option><option value="British Airways">British Airways</option><option value="British Consultate">British Consultate</option><option value="Bryte Travel">Bryte Travel</option><option value="Build-It Hermanus">Build-It Hermanus</option><option value="Café">Café</option><option value="CalendarBridge">CalendarBridge</option><option value="CannaAfrica">CannaAfrica</option><option value="Capetown City Council">Capetown City Council</option><option value="Care to Beauty">Care to Beauty</option><option value="Cash GBP">Cash GBP</option><option value="Cash ZAR">Cash ZAR</option><option value="Cashplus">Cashplus</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Caunce O Hara">Caunce O Hara</option><option value="Cc Enterprises">Cc Enterprises</option><option value="Central Garage">Central Garage</option><option value="Checkers">Checkers</option><option value="Chessell Pottery">Chessell Pottery</option><option value="Cleverbridge AG">Cleverbridge AG</option><option value="CliCK cleaning">CliCK cleaning</option><option value="Clicks">Clicks</option><option value="Co-op">Co-op</option><option value="Cocoatech">Cocoatech</option><option value="Cosmetology">Cosmetology</option><option value="Cruise Easy">Cruise Easy</option><option value="Daan's Bakery">Daan's Bakery</option><option value="Dal Italia">Dal Italia</option><option value="Damira Dental Studio">Damira Dental Studio</option><option value="David (building manager)">David (building manager)</option><option value="Daylesford Organic">Daylesford Organic</option><option value="Deckr Store">Deckr Store</option><option value="Deepgram">Deepgram</option><option value="Deepl">Deepl</option><option value="Delicious">Delicious</option><option value="Dell Online">Dell Online</option><option value="DHL">DHL</option><option value="Dial-a-Bed">Dial-a-Bed</option><option value="Dischem">Dischem</option><option value="Distant Future Corp">Distant Future Corp</option><option value="Dutchgrowkits">Dutchgrowkits</option><option value="DVDfab">DVDfab</option><option value="DVLA">DVLA</option><option value="E-filing">E-filing</option><option value="Eagle Electric">Eagle Electric</option><option value="easeus">easeus</option><option value="EE">EE</option><option value="EM Client">EM Client</option><option value="EMAC">EMAC</option><option value="Endel">Endel</option><option value="eon-next">eon-next</option><option value="Escom">Escom</option><option value="Evgeniy Ulyukin">Evgeniy Ulyukin</option><option value="ExpressVPN">ExpressVPN</option><option value="EZDubs">EZDubs</option><option value="F4F">F4F</option><option value="Fabio's Ristorante">Fabio's Ristorante</option><option value="Fabtech Software">Fabtech Software</option><option value="Fantastik">Fantastik</option><option value="Fastspring">Fastspring</option><option value="Fireflies.ai">Fireflies.ai</option><option value="FlexiPay">FlexiPay</option><option value="FLM Hermanus">FLM Hermanus</option><option value="Fluid">Fluid</option><option value="Fluid MC">Fluid MC</option><option value="FNB">FNB</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Fone Shop Newport">Fone Shop Newport</option><option value="Friday Media Group">Friday Media Group</option><option value="FS Stardock">FS Stardock</option><option value="Funding Circle">Funding Circle</option><option value="Gadget Guard">Gadget Guard</option><option value="GNL">GNL</option><option value="Google Play">Google Play</option><option value="Google Workspace">Google Workspace</option><option value="Green Ways">Green Ways</option><option value="Greenscents">Greenscents</option><option value="Gumroad">Gumroad</option><option value="Halfords">Halfords</option><option value="Happy Pay">Happy Pay</option><option value="Harris Gordon">Happy Pay</option><option value="Harvest">Harvest</option><option value="Hertz">Hertz</option><option value="HMRC">HMRC</option><option value="Ian Kruger">Ian Kruger</option><option value="iwoca">iwoca</option><option value="Joan">Joan</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Lemon Squeezy">Lemon Squeezy</option><option value="Liam">Liam</option><option value="Linda">Linda</option><option value="Logan">Logan</option><option value="M Olivier">M Olivier</option><option value="Mariel">Mariel</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="PayPal P">PayPal P</option><option value="Paysend">Paysend</option><option value="Peter">Peter</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut">Revolut</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Revolut Peter">Revolut Peter</option><option value="Santander B">Santander B</option><option value="Santander loan">Santander loan</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Standard">Standard</option><option value="Starling">Starling</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="Stressfreecarrental">Stressfreecarrental</option><option value="TabXPert">TabXPert</option><option value="Takealot">Takealot</option><option value="TFG">TFG</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank">Tyme Bank</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Loan">Tyme Loan</option><option value="Vodafone">Vodafone</option><option value="Willem">Willem</option><option value="Winchester Mansions">Winchester Mansions</option><option value="Wine and Company">Wine and Company</option><option value="Wine Village">Wine Village</option><option value="Wondershare">Wondershare</option><option value="Woolworths">Woolworths</option><option value="Xai">Xai</option><option value="Yoco Wetsuits">Yoco Wetsuits</option><option value="Yoga Insurance">Yoga Insurance</option><option value="Yuppiechef">Yuppiechef</option><option value="Zoom">Zoom</option></select></div>
+        <div><label>From H</label><select id="colH" required onchange="calcType()"><option value="" disabled selected>-- Select From --</option>
+            <option value="TFG Money">TFG Money</option><option value="FNB Visa">FNB Visa</option><option value="FNB Budget">FNB Budget</option><option value="FlexiPay">FlexiPay</option><option value="Revolut P">Revolut P</option><option value="Santander P">Santander P</option><option value="Starling P">Starling P</option><option value="RBoS P">RBoS P</option><option value="Kraken P">Kraken P</option><option value="Cashplus P">Cashplus P</option><option value="Paysend">Paysend</option><option value="Bank Austria">Bank Austria</option><option value="Fluid MC">Fluid MC</option><option value="RBoS MC">RBoS MC</option><option value="Santander MC">Santander MC</option><option value="mobicred">mobicred</option><option value="Revolut B">Revolut B</option><option value="Santander B">Santander B</option><option value="Starling B">Starling B</option><option value="Kraken B">Kraken B</option><option value="Cashplus B">Cashplus B</option><option value="PayPal B">PayPal B</option><option value="Std Bank">Std Bank</option><option value="FNB Smart">FNB Smart</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Cash ZAR">Cash ZAR</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Std Peter">Std Peter</option>
+            <option value="Adjustment">Adjustment</option><option value="HMRC">HMRC</option><option value="Income">Income</option>
+        </select></div>
+        <div><label>To I</label><select id="colI" required onchange="calcType()"><option value="" disabled selected>-- Select To --</option>
+            <option value="TFG Money">TFG Money</option><option value="FNB Visa">FNB Visa</option><option value="FNB Budget">FNB Budget</option><option value="FlexiPay">FlexiPay</option><option value="Revolut P">Revolut P</option><option value="Santander P">Santander P</option><option value="Starling P">Starling P</option><option value="RBoS P">RBoS P</option><option value="Kraken P">Kraken P</option><option value="Cashplus P">Cashplus P</option><option value="Paysend">Paysend</option><option value="Bank Austria">Bank Austria</option><option value="Fluid MC">Fluid MC</option><option value="RBoS MC">RBoS MC</option><option value="Santander MC">Santander MC</option><option value="mobicred">mobicred</option><option value="Revolut B">Revolut B</option><option value="Santander B">Santander B</option><option value="Starling B">Starling B</option><option value="Kraken B">Kraken B</option><option value="Cashplus B">Cashplus B</option><option value="PayPal B">PayPal B</option><option value="Std Bank">Std Bank</option><option value="FNB Smart">FNB Smart</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Cash ZAR">Cash ZAR</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Std Peter">Std Peter</option>
+            <option value="1Password">1Password</option><option value="Amazon Music">Amazon Music</option><option value="Apple">Apple</option><option value="Google Workspace">Google Workspace</option><option value="Microsoft">Microsoft</option><option value="Zoom">Zoom</option>
+        </select></div>
     </div>
 
     <div style="margin-top:10px;"><label>Note K</label><textarea id="colK" rows="2"></textarea></div>
-    
     <div class="grid" style="margin-top:10px;">
         <div><label>Frequency F</label><select id="colFreq"><option value="u - Unplanned">u - Unplanned</option><option value="Q4 - Quarterly">Q4 - Quarterly</option><option value="K - Keep in credit">K - Keep in credit</option><option value="5 - 5-weekly">5 - 5-weekly</option><option value="Yr - Annual">Yr - Annual</option><option value="2Yr - 2 yearly">2Yr - 2 yearly</option><option value="M - Monthly">M - Monthly</option><option value="W - Weekly">W - Weekly</option><option value="Life - Lifetime">Life - Lifetime</option><option value="A - Ad-hoc" selected>A - Ad-hoc</option></select></div>
         <div><label>Status S</label><select id="colStatus"><option value="aa - archived">aa - archived</option><option value="aj - adjustment">aj - adjustment</option><option value="R - Review">R - Review</option><option value="V - Varies">V - Varies</option><option value="F - Fixed">F - Fixed</option><option value="N - Pending" selected>N - Pending</option><option value="P - Plan">P - Plan</option><option value="O - Open">O - Open</option><option value="n/a - n/a">n/a - n/a</option><option value="C - Cancelled">C - Cancelled</option><option value="A - Actual">A - Actual</option></select></div>
     </div>
-
     <div class="grid-4" style="margin-top:10px">
         <div><label>Each T</label><input type="number" id="colT" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="ZAR">ZAR</option><option value="CHF">CHF</option><option value="THB">THB</option><option value="RUR">RUB</option></select></div>
         <div><label>Fees V</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Multiplier U</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
-
     <div class="total-box"><label>Total W</label><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
-
     <div class="actions">
         <button class="btn-save" onclick="saveRow()">Stage Transaction</button>
         <button class="btn-copy" onclick="copyForSheets()">Copy for Sheets</button>
         <button class="btn-sync" id="sync_btn" onclick="handleSync()" disabled>Send to Sheets</button>
     </div>
-
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
     <div id="debug_log"></div>
@@ -90,52 +87,37 @@
     const API_KEY = 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM';
     const CLIENT_ID = '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com';
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
     const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+    const AA_LIST = ["TFG Money", "FNB Visa", "FNB Budget", "FlexiPay", "Revolut P", "Santander P", "Starling P", "RBoS P", "Kraken P", "Cashplus P", "Paysend", "Bank Austria", "Fluid MC", "RBoS MC", "Santander MC", "mobicred", "Revolut B", "Santander B", "Starling B", "Kraken B", "Cashplus B", "PayPal B", "Std Bank", "FNB Smart", "Tyme Bank Roy", "Cash ZAR", "Tyme Bank Peter", "Std Peter"];
 
     let tokenClient;
     let gapiInited = false;
     let gsiInited = false;
-    let wipeConfirmed = false;
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
 
-    function gapiLoaded() {
-        gapi.load('client', async () => {
-            try {
-                await gapi.client.init({ apiKey: API_KEY });
-                await gapi.client.load('sheets', 'v4');
-                gapiInited = true;
-                checkReady();
-            } catch (err) { logError(err); }
-        });
-    }
+    function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: API_KEY }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (err) { logError(err); } }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: '' }); gsiInited = true; checkReady(); }
-    function checkReady() { 
-        if (gapiInited && gsiInited) {
-            document.getElementById('auth_status').innerText = "Bridge Status: Ready to Sync";
-            document.getElementById('sync_btn').disabled = false;
-        } 
+    function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; } }
+
+    function calcType() {
+        const fromVal = document.getElementById('colH').value;
+        const toVal = document.getElementById('colI').value;
+        const fromAA = AA_LIST.includes(fromVal);
+        const toAA = AA_LIST.includes(toVal);
+        const fieldE = document.getElementById('colE');
+        if (fromAA && toAA) fieldE.value = "xfer";
+        else if (!fromAA && toAA) fieldE.value = "In";
+        else if (fromAA && !toAA) fieldE.value = "zOut";
+        else fieldE.value = "zOut"; // Default for non-AA to non-AA
     }
 
-    function logError(err) {
-        const debug = document.getElementById('debug_log');
-        debug.innerText = "Error: " + (err.result?.error?.message || err.message || JSON.stringify(err));
-        debug.style.display = 'block';
+    function handleDateChange() {
+        const date = new Date(document.getElementById('colC').value);
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], mos = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        document.getElementById('colCDisp').innerText = `${days[date.getDay()]} ${date.getDate()} ${mos[date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
     }
 
-    function truncate(s, n) { return s && s.length > n ? s.slice(0, n - 3) + "..." : (s || ""); }
-    function getFormattedDate(rawDate, mode) {
-        if (!rawDate) return "";
-        const [year, month, day] = rawDate.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
-        if (mode === 'display') {
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], mos = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return `${days[date.getDay()]} ${date.getDate()} ${mos[date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
-        }
-        return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
-    }
-    function handleDateChange() { document.getElementById('colCDisp').innerText = getFormattedDate(document.getElementById('colC').value, 'display'); }
-    function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
+    function handleFUChange() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; calcType(); }
 
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); };
 
@@ -148,38 +130,38 @@
     }
 
     function saveRow() {
-        const cat = document.getElementById('colF').value, frm = document.getElementById('colH').value, to = document.getElementById('colI').value, raw = document.getElementById('colC').value;
+        const cat = document.getElementById('colF').value, frm = document.getElementById('colH').value, to = document.getElementById('colI').value, raw = document.getElementById('colC').value, typeE = document.getElementById('colE').value;
         if(!cat || !frm || !to || !raw) return alert("Selection Missing");
         const tot = calc();
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", "", cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), tot, document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], raw, "", typeE, cat, "", frm, to, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), tot, document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
-        ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; calc(); renderPreview();
+        ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; renderPreview();
     }
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let html = '<table><tr><th class="col-fu">F/U</th><th class="col-date">Date</th><th class="col-cat">Cat</th><th class="col-acc">From</th><th class="col-acc">To</th><th class="col-note">N</th><th class="col-f">F</th><th class="col-s">S</th><th class="col-cur">Cur</th><th class="col-total">Total</th><th class="col-del"></th></tr>';
-        data.forEach((r, i) => { html += `<tr><td>${r[1]}</td><td>${getFormattedDate(r[2], 'display')}</td><td>${truncate(r[5], 15)}</td><td>${truncate(r[7], 15)}</td><td>${truncate(r[8], 15)}</td><td>${r[10]?"✓":""}</td><td>${r[11]}</td><td>${r[14]}</td><td>${r[23]==="RUB"?"₽":(symbols[r[23]]||r[23])}</td><td>${r[22]}</td><td><button onclick="deleteRow(${i})" style="background:red;padding:2px 5px;border:none;color:white;border-radius:4px;">X</button></td></tr>`; });
+        let html = '<table><tr><th>F/U</th><th>Date</th><th>Cat</th><th>From</th><th>To</th><th>N</th><th>F</th><th>S</th><th>Cur</th><th>Total</th><th></th></tr>';
+        data.forEach((r, i) => {
+            const date = new Date(r[2]);
+            const dStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()]} ${date.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
+            html += `<tr><td>${r[1]}</td><td>${dStr}</td><td>${r[5].substring(0,12)}</td><td>${r[7].substring(0,12)}</td><td>${r[8].substring(0,12)}</td><td>${r[10]?"✓":""}</td><td>${r[11]}</td><td>${r[14]}</td><td>${r[23]}</td><td>${r[22]}</td><td><button onclick="deleteRow(${i})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+        });
         document.getElementById('previewArea').innerHTML = html + '</table>';
     }
 
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return alert("Empty");
-        const debug = document.getElementById('debug_log'); debug.style.display = 'none';
         tokenClient.callback = async (resp) => {
-            if (resp.error !== undefined) { logError(resp); return; }
-            try {
-                const values = data.map(r => { let rc = [...r]; rc[2] = getFormattedDate(r[2], 'output'); return rc.slice(0, 26); });
-                await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: values } });
-                alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview();
-            } catch (err) { logError(err); alert("Sync Error. See log below."); }
+            if (resp.error !== undefined) { document.getElementById('debug_log').innerText = JSON.stringify(resp); document.getElementById('debug_log').style.display='block'; return; }
+            const values = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
+            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: values } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } 
+            catch (err) { document.getElementById('debug_log').innerText = JSON.stringify(err); document.getElementById('debug_log').style.display='block'; alert("Sync Error."); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
 
-    async function copyForSheets() { const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if(!data.length) return; let body = data.map(r => { let rc = [...r]; rc[2] = `'${getFormattedDate(r[2], 'output')}`; rc[19] = `'${rc[19]}`; rc[21] = `'${rc[21]}`; rc[22] = `'${rc[22]}`; return rc.slice(0, 26).join(";"); }).join("\n"); await navigator.clipboard.writeText(body); alert("Synced!"); }
     function deleteRow(i) { let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(data)); renderPreview(); }
-    function clearData() { if(!wipeConfirmed) { wipeConfirmed = true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(() => { wipeConfirmed = false; document.getElementById('wipeBtn').classList.remove('active'); }, 3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; renderPreview(); } }
+    function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
     renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
