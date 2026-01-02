@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-40-01</title>
+    <title>EBS Transaction Recorder v0-41</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -25,15 +25,20 @@
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.62rem; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.6rem; table-layout: fixed; }
+        th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
+        .w-fu { width: 22px; } .w-date { width: 75px; } .w-type { width: 35px; }
+        .w-cat { width: 70px; } .w-acc { width: 70px; }
+        .w-tiny { width: 15px; text-align: center; }
+        .w-cur { width: 25px; text-align: center; } .w-tot { width: 50px; text-align: right; }
+        .w-del { width: 25px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>EBS Entry v0-40-01</h3>
+    <h3>EBS Entry v0-41</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid">
@@ -48,10 +53,10 @@
 
     <div class="grid" style="margin-top:10px;">
         <div><label>From H</label><select id="colH" required onchange="calcType()"><option value="" disabled selected>-- Select From --</option>
-            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
         <div><label>To I</label><select id="colI" required onchange="calcType()"><option value="" disabled selected>-- Select To --</option>
-            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
+            <option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option>
         </select></div>
     </div>
 
@@ -81,7 +86,6 @@
 
 <script>
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
-    const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽" };
     let tokenClient, gapiInited = false, gsiInited = false;
 
@@ -109,9 +113,7 @@
     window.onload = () => { 
         document.getElementById('colC').value = new Date().toISOString().split('T')[0]; 
         document.getElementById('colStatus').value = "N - Pending"; 
-        handleDateChange(); 
-        gapiLoaded(); 
-        gisLoaded(); 
+        handleDateChange(); gapiLoaded(); gisLoaded(); 
     };
 
     function calc() {
@@ -124,19 +126,19 @@
 
     function saveRow() {
         const typeE = document.getElementById('bgTypeE').value;
-        if (typeE === "--") return alert("Error: Must select From and To accounts.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value === "RUR" ? "RUB" : document.getElementById('colX').value, "", ""];
+        if (typeE === "--") return alert("Error: Select From and To accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", typeE, document.getElementById('colF').value, "", document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", ""];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let html = '<table><tr><th>F/U</th><th>Date</th><th>Type</th><th>Cat</th><th>From</th><th>To</th><th>N</th><th>F</th><th>S</th><th>Cur</th><th>Total</th><th></th></tr>';
+        let html = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Cat</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur">Cur</th><th class="w-tot">Total</th><th class="w-del"></th></tr>';
         data.forEach((r, idx) => {
             const d = new Date(r[2]);
             const dS = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} '${String(d.getFullYear()).substr(-2)}`;
-            html += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5].substring(0,8)}</td><td>${r[7].substring(0,8)}</td><td>${r[8].substring(0,8)}</td><td>${r[10]?"✓":""}</td><td>${r[11]}</td><td>${r[14]}</td><td>${r[23]}</td><td>${r[22]}</td><td><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            html += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td>${r[23]}</td><td class="w-tot">${r[22]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = html + '</table>';
     }
@@ -144,14 +146,14 @@
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
+            if (resp.error !== undefined) { alert("Authorization Blocked. Update Redirect URI in Cloud Console."); return; }
             const vals = data.map(r => { let rc = [...r]; const d = new Date(rc[2]); rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; return rc.slice(0, 26); });
-            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (e) { alert("Sync Error."); }
+            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E', range: 'Sheet1!A2', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); localStorage.removeItem('ebs_trf'); renderPreview(); } catch (e) { alert("Sync Error."); }
         };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
     }
 
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
-    function copyForSheets() { alert("Use Sync for direct export."); }
     function clearData() { localStorage.removeItem('ebs_trf'); renderPreview(); }
     renderPreview();
 </script>
