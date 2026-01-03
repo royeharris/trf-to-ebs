@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-84</title>
+    <title>EBS Entry v0-85</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -48,7 +48,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-84)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-85)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -89,7 +89,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-84)";
+    const VER = "Excel Budget Sheet input (v0-85)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -101,6 +101,7 @@
     async function fetchLookups(silent = false) {
         tokenClient.callback = async (resp) => {
             try {
+                // Fetch full width range
                 const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AA1000' });
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
@@ -113,27 +114,30 @@
                 updateDropdown('colFreq', rows.map(r => p(r, 12, 13)).filter(v => v), 'A'); 
                 updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v), 'N'); 
                 
-                // INTENSIVE VERTICAL RECOVERY: Targets Column Z (Index 25) 
-                const recoveryMnth = [];
-                rows.forEach(row => {
-                    if (row.length > 25 && row[25] && row[25].toString().trim() !== "") {
-                        recoveryMnth.push(row[25].toString().trim());
+                // EXTREME HARDENING FOR COLUMN Z (Index 25)
+                const monthCollection = [];
+                rows.forEach((row, index) => {
+                    if (row.length > 25 && row[25]) {
+                        const val = row[25].toString().trim();
+                        if (val !== "") monthCollection.push(val);
                     }
                 });
-                updateDropdown('colZ', recoveryMnth, 'NEW'); 
+                console.log("DEBUG: Month Data Collected:", monthCollection);
+                updateDropdown('colZ', monthCollection, 'NEW'); 
                 
-                // INTENSIVE VERTICAL RECOVERY: Targets Column AA (Index 26)
-                const recoveryCur = [];
+                // HARDENING FOR COLUMN AA (Index 26)
+                const currencyCollection = [];
                 rows.forEach(row => {
-                    if (row.length > 26 && row[26] && row[26].toString().trim() !== "") {
-                        recoveryCur.push(row[26].toString().trim());
+                    if (row.length > 26 && row[26]) {
+                        const val = row[26].toString().trim();
+                        if (val !== "") currencyCollection.push(val);
                     }
                 });
-                updateDropdown('colX', recoveryCur, 'GBP'); 
+                updateDropdown('colX', currencyCollection, 'GBP'); 
                 
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
                 calc(); if(!silent) alert("Lookups Refreshed!");
-            } catch (e) { if(!silent) alert("Refresh Error."); }
+            } catch (e) { console.error("Refresh Error:", e); if(!silent) alert("Refresh Error."); }
         };
         tokenClient.requestAccessToken();
     }
@@ -146,6 +150,7 @@
         if(defaultCode) {
             const opt = Array.from(sel.options).find(o => o.value.startsWith(defaultCode));
             if(opt) sel.value = opt.value;
+            else if(vals.length > 0) sel.selectedIndex = prompt ? 1 : 0;
         }
     }
 
