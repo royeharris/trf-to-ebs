@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-55</title>
+    <title>EBS Entry v0-56</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; }
+        :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; --bridge: #2980b9; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h3 { margin: 0; font-weight: bold; }
+        .ver-tag { font-weight: normal; font-size: 0.9rem; }
+        .btn-lookup { background: var(--bridge); padding: 8px 12px; font-size: 0.75rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; }
+        
         .grid-top { display: grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap: 10px; }
         .grid-cat { display: grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap: 10px; margin-top: 10px; }
         .grid-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -24,21 +29,20 @@
         }
         textarea { height: auto; }
         
-        /* Mini Date Picker Styling */
         .date-wrap { display: flex; align-items: center; gap: 8px; }
         #dateBtn { width: 45px; height: 38px; cursor: pointer; background: #fff; border: 1px solid #dcdde1; border-radius: 6px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; padding: 0; }
         #colC { position: absolute; visibility: hidden; width: 0; height: 0; }
-        #colCDisp { font-size: 0.85rem; color: var(--primary); font-weight: 500; white-space: nowrap; }
+        #colCDisp { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
 
-        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); text-align: center; height: 38px; line-height: 22px; border: none; background: transparent; }
+        .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 22px; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-copy { background: #e67e22; }
-        .btn-sync { background: #2980b9; }
+        .btn-sync { background: var(--bridge); }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         .btn-clear.active { opacity: 1; border: 2px solid #000; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
@@ -47,8 +51,8 @@
         th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
         .w-fu { width: 20px; } .w-date { width: 70px; } .w-type { width: 32px; }
-        .w-cat { width: 65px; } .w-acc { width: 65px; }
-        .w-tiny { width: 14px; text-align: center; }
+        .w-cat { width: 65px; } .w-sort { width: 15px; text-align: center; } 
+        .w-acc { width: 65px; } .w-tiny { width: 14px; text-align: center; }
         .w-cur { width: 22px; text-align: center; } .w-tot { width: 45px; text-align: right; }
         .w-mnth { width: 35px; text-align: center; } .w-del { width: 22px; text-align: center; }
         .txt-center { text-align: center !important; }
@@ -56,7 +60,10 @@
 </head>
 <body>
 <div class="container">
-    <h3>EBS Entry v0-55</h3>
+    <div class="header-wrap">
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-56)</span></h3>
+        <button class="btn-lookup" id="btn_lookup" onclick="fetchLookups()">Refresh Lookups</button>
+    </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid-top">
@@ -66,27 +73,27 @@
     </div>
 
     <div class="grid-cat">
-        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Accounting fee">Accounting fee</option><option value="Ad-hoc">Ad-hoc</option><option value="Adjustment">Adjustment</option><option value="Advertising">Advertising</option><option value="Arundel Str">Arundel Str</option><option value="Bank charges">Bank charges</option><option value="Budget repay">Budget repay</option><option value="Buffer">Buffer</option><option value="Car">Car</option><option value="Card payment">Card payment</option><option value="Cigarettes">Cigarettes</option><option value="Citroen car tax">Citroen car tax</option><option value="Citroen fuel">Citroen fuel</option><option value="Citroen insurance">Citroen insurance</option><option value="Citroen MoT">Citroen MoT</option><option value="Citroen other">Citroen other</option><option value="Citroen service">Citroen service</option><option value="Clothing">Clothing</option><option value="Computer accessories">Computer accessories</option><option value="Computer consumables">Computer consumables</option><option value="Computer hardware">Computer hardware</option><option value="Consulting fee">Consulting fee</option><option value="Consumables">Consumables</option><option value="Corporation tax">Corporation tax</option><option value="Cosmetics">Cosmetics</option><option value="Dawlish Court">Dawlish Court</option><option value="Debit orders">Debit orders</option><option value="Delivery costs">Delivery costs</option><option value="Dentist">Dentist</option><option value="Deposit">Deposit</option><option value="Director loan">Director loan</option><option value="Dividend">Dividend</option><option value="Eat out">Eat out</option><option value="Education">Education</option><option value="Electricity">Electricity</option><option value="Entertainment">Entertainment</option><option value="Expenses">Expenses</option><option value="Extra">Extra</option><option value="Fees">Fees</option><option value="FlexiPay payment">FlexiPay payment</option><option value="Food">Food</option><option value="Gifts">Gifts</option><option value="Groceries">Groceries</option><option value="Haircut">Haircut</option><option value="Hardware">Hardware</option><option value="Health">Health</option><option value="Home">Home</option><option value="Income">Income</option><option value="Insurance">Insurance</option><option value="Interest">Interest</option><option value="Internet">Internet</option><option value="Investment">Investment</option><option value="Jose motorbike">Jose motorbike</option><option value="Jose salary">Jose salary</option><option value="Land purchase">Land purchase</option><option value="Loan receive">Loan receive</option><option value="Loan interest">Loan interest</option><option value="Loan repay">Loan repay</option><option value="Luggage">Luggage</option><option value="Maid">Maid</option><option value="Miscellaneous">Miscellaneous</option><option value="Mobile">Mobile</option><option value="Mobile phone">Mobile phone</option><option value="Monthly">Monthly</option><option value="Music subs">Music subs</option><option value="NI">NI</option><option value="Office accessories">Office accessories</option><option value="Office equipment">Office equipment</option><option value="Office supplies">Office supplies</option><option value="Other">Other</option><option value="P tax">P tax</option><option value="Parking">Parking</option><option value="Personal tax">Personal tax</option><option value="Peter salary">Peter salary</option><option value="Phone accessories">Phone accessories</option><option value="Phone costs">Phone costs</option><option value="Portman Place">Portman Place</option><option value="Postage">Postage</option><option value="Refund">Refund</option><option value="Rent">Rent</option><option value="Roy">Roy</option><option value="Roy dividend">Roy dividend</option><option value="Roy salary">Roy salary</option><option value="Services">Services</option><option value="Shoes">Shoes</option><option value="Smoke">Smoke</option><option value="Software">Software</option><option value="Software subs">Software subs</option><option value="Storage">Storage</option><option value="Support">Support</option><option value="Support weekly">Support weekly</option><option value="Support monthly">Support monthly</option><option value="Support home">Support home</option><option value="Support rent">Support rent</option><option value="Support Samara">Support Samara</option><option value="Support unplanned">Support unplanned</option><option value="Sweets">Sweets</option><option value="Take-out food">Take-out food</option><option value="Taxi">Taxi</option><option value="Toiletries">Toiletries</option><option value="Transfer">Transfer</option><option value="Transport">Transport</option><option value="Travel">Travel</option><option value="Tut">Tut</option><option value="Unknown">Unknown</option><option value="VAT">VAT</option><option value="Visa">Visa</option><option value="Vitamins">Vitamins</option><option value="Water & Lights">Water & Lights</option><option value="Wine">Wine</option><option value="Wood cutting">Wood cutting</option></select></div>
+        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Bank charges">Bank charges</option><option value="Support">Support</option><option value="Transfer">Transfer</option></select></div>
         <div><label class="lbl-center">Type</label><div id="workTypeDisplay" class="type-display">--</div></div>
         <div><label>sort</label><input type="number" id="colG" placeholder="0" min="0" max="99"></div>
     </div>
 
     <div class="grid-acc">
-        <div><label>From</label><select id="colH" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select From --</option><option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option></select></div>
-        <div><label>To</label><select id="colI" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select To --</option><option value="@HomeStore">@HomeStore</option><option value="1Password">1Password</option><option value="Adjustment">Adjustment</option><option value="AirBnB">AirBnB</option><option value="Alberto Gonzalez">Alberto Gonzalez</option><option value="Alex Smirnov">Alex Smirnov</option><option value="Amazon B">Amazon B</option><option value="Amazon Music">Amazon Music</option><option value="Amazon P">Amazon P</option><option value="Apple">Apple</option><option value="AppsIT">AppsIT</option><option value="Bank Austria">Bank Austria</option><option value="Booking.com">Booking.com</option><option value="Cash GBP">Cash GBP</option><option value="Cashplus B">Cashplus B</option><option value="Cashplus P">Cashplus P</option><option value="Cash ZAR">Cash ZAR</option><option value="FlexiPay">FlexiPay</option><option value="Fluid MC">Fluid MC</option><option value="FNB Budget">FNB Budget</option><option value="FNB Smart">FNB Smart</option><option value="FNB Visa">FNB Visa</option><option value="Google Workspace">Google Workspace</option><option value="HMRC">HMRC</option><option value="Income">Income</option><option value="Kraken B">Kraken B</option><option value="Kraken P">Kraken P</option><option value="Microsoft">Microsoft</option><option value="mobicred">mobicred</option><option value="PayPal B">PayPal B</option><option value="Paysend">Paysend</option><option value="RBoS MC">RBoS MC</option><option value="RBoS P">RBoS P</option><option value="Revolut B">Revolut B</option><option value="Revolut P">Revolut P</option><option value="Santander B">Santander B</option><option value="Santander MC">Santander MC</option><option value="Santander P">Santander P</option><option value="Starling B">Starling B</option><option value="Starling P">Starling P</option><option value="Std Bank">Std Bank</option><option value="Std Peter">Std Peter</option><option value="TFG Money">TFG Money</option><option value="Tyme Bank Roy">Tyme Bank Roy</option><option value="Tyme Bank Peter">Tyme Bank Peter</option><option value="Zoom">Zoom</option></select></div>
+        <div><label>From</label><select id="colH" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select From --</option><option value="Std Bank">Std Bank</option><option value="Revolut P">Revolut P</option></select></div>
+        <div><label>To</label><select id="colI" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select To --</option><option value="Std Bank">Std Bank</option><option value="Support weekly">Support weekly</option></select></div>
     </div>
 
     <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2"></textarea></div>
 
     <div class="grid-3">
-        <div><label>Frequency</label><select id="colFreq"><option value="u - Unplanned">u - Unplanned</option><option value="Q4 - Quarterly">Q4 - Quarterly</option><option value="K - Keep in credit">K - Keep in credit</option><option value="5 - 5-weekly">5 - 5-weekly</option><option value="Yr - Annual">Yr - Annual</option><option value="2Yr - 2 yearly">2Yr - 2 yearly</option><option value="M - Monthly">M - Monthly</option><option value="W - Weekly">W - Weekly</option><option value="Life - Lifetime">Life - Lifetime</option><option value="A - Ad-hoc" selected>A - Ad-hoc</option></select></div>
-        <div><label>Status</label><select id="colStatus"><option value="aa - archived">aa - archived</option><option value="aj - adjustment">aj - adjustment</option><option value="R - Review">R - Review</option><option value="V - Varies">V - Varies</option><option value="F - Fixed">F - Fixed</option><option value="N - Pending" selected>N - Pending</option><option value="P - Plan">P - Plan</option><option value="O - Open">O - Open</option><option value="n/a - n/a">n/a - n/a</option><option value="C - Cancelled">C - Cancelled</option><option value="A - Actual">A - Actual</option></select></div>
-        <div><label>Mnth</label><select id="colZ"><option value="25-11">25-11</option><option value="25-12">25-12</option><option value="26-01">26-01</option><option value="26-02">26-02</option><option value="26-03">26-03</option><option value="26-04">26-04</option><option value="26-05">26-05</option><option value="26-06">26-06</option><option value="26-07">26-07</option><option value="26-08">26-08</option><option value="26-09">26-09</option><option value="26-10">26-10</option><option value="26-11">26-11</option><option value="26-12">26-12</option><option value="27-01">27-01</option><option value="27-02">27-02</option><option value="NEW" selected>NEW</option></select></div>
+        <div><label>Frequency</label><select id="colFreq"><option value="u - Unplanned">u - Unplanned</option><option value="A - Ad-hoc" selected>A - Ad-hoc</option></select></div>
+        <div><label>Status</label><select id="colStatus"><option value="N - Pending" selected>N - Pending</option></select></div>
+        <div><label>Mnth</label><select id="colZ"><option value="NEW" selected>NEW</option></select></div>
     </div>
 
     <div class="grid-4">
         <div><label>Each</label><input type="number" id="colT" placeholder="0.00" step="0.01" oninput="calc()"></div>
-        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="ZAR">ZAR</option><option value="CHF">CHF</option><option value="THB">THB</option><option value="RUR">RUB</option><option value="COP">COP</option></select></div>
+        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="COP">COP</option></select></div>
         <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
@@ -105,9 +112,9 @@
 </div>
 
 <script>
-    const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "EBS Entry v0-55";
+    const VER = "EBS Entry v0-56";
+    let AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
@@ -115,66 +122,86 @@
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
     function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; } }
 
+    async function fetchLookups() {
+        if (!gapiInited) return alert("Bridge not ready.");
+        tokenClient.callback = async (resp) => {
+            try {
+                const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:E100' });
+                const rows = res.result.values; if(!rows) return;
+                
+                const lists = { colA: [], colF: [], colH: [], colFreq: [], colZ: [], AA: [] };
+                rows.forEach(r => {
+                    if(r[0]) lists.colA.push(r[0]); if(r[1]) lists.colF.push(r[1]); if(r[2]) lists.colH.push(r[2]);
+                    if(r[3]) lists.colFreq.push(r[3]); if(r[4]) lists.colZ.push(r[4]);
+                });
+
+                updateDropdown('colA', lists.colA); updateDropdown('colF', lists.colF);
+                updateDropdown('colH', lists.colH); updateDropdown('colI', lists.colH);
+                updateDropdown('colFreq', lists.colFreq); updateDropdown('colZ', lists.colZ);
+                AA_LIST = lists.colH; // Assuming From column identifies internal accounts
+                alert("Lookups Refreshed!");
+            } catch (e) { alert("Refresh Error: Ensure 'Lookups' tab exists."); }
+        };
+        tokenClient.requestAccessToken();
+    }
+
+    function updateDropdown(id, vals) {
+        const sel = document.getElementById(id); const cur = sel.value;
+        sel.innerHTML = vals.map(v => `<option value="${v}">${v}</option>`).join('');
+        if(vals.includes(cur)) sel.value = cur;
+    }
+
     function calcTypeAndAuto() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, f = document.getElementById('colF').value;
-        const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay');
-        const fuField = document.getElementById('colB');
-        
-        if (!h || !i) { bgE.value = "--"; workE.innerText = "--"; return; }
+        const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay'), fu = document.getElementById('colB');
+        if (!h || !i) return;
         
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         bgE.value = valE; workE.innerText = valE;
         
-        if (valE === "xfer") { 
-            fuField.value = "xf - transfer"; 
-            document.getElementById('colF').value = "Transfer"; 
-        } else if (i.toLowerCase().includes("support") || f === "Support") {
-            fuField.value = "S - Support";
-        }
+        if (valE === "xfer") { fu.value = "xf - transfer"; document.getElementById('colF').value = "Transfer"; }
+        else if (i.toLowerCase().includes("support") || f.toLowerCase().includes("support")) { fu.value = "S - Support"; }
     }
 
     function handleManualFU() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
-    
     function handleDateChange() {
         const dStr = document.getElementById('colC').value; if(!dStr) return;
-        const [year, month, day] = dStr.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
+        const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d);
         const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], mos = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('colCDisp').innerText = `${days[date.getDay()]} ${date.getDate()} ${mos[date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
+        document.getElementById('colCDisp').innerText = `${days[dt.getDay()]} ${dt.getDate()} ${mos[dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
     }
 
     window.onload = () => { 
         document.getElementById('colC').value = new Date().toISOString().split('T')[0]; 
         document.getElementById('colStatus').value = "N - Pending"; 
         document.getElementById('colZ').value = "NEW"; 
-        handleDateChange(); calcTypeAndAuto(); gapiLoaded(); gisLoaded(); 
+        handleDateChange(); gapiLoaded(); gisLoaded(); 
     };
 
     function calc() {
-        const t = parseFloat(document.getElementById('colT').value) || 0, u = parseFloat(document.getElementById('colM').value) || 1, v = parseFloat(document.getElementById('colV').value) || 0;
+        const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0;
         const tot = ((t * u) + v).toFixed(2);
-        document.getElementById('symbol').innerText = symbols[document.getElementById('colX').value] || "";
+        document.getElementById('symbol').innerText = symbols[document.getElementById('colX').value]||"";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
 
     function saveRow() {
-        if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select accounts.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value, document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value || 0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value || 0).toFixed(2), calc(), document.getElementById('colX').value, "", document.getElementById('colZ').value, VER];
+        calcTypeAndAuto(); if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value, document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value, "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let html = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
+        let h = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
         data.forEach((r, idx) => {
-            const [year, month, day] = r[2].split('-').map(Number);
-            const date = new Date(year, month - 1, day);
-            const dS = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()]} ${date.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()]} '${String(date.getFullYear()).substr(-2)}`;
-            html += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            const [y, m, d] = r[2].split('-').map(Number); const dt = new Date(y, m-1, d);
+            const dS = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
+            h += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
         });
-        document.getElementById('previewArea').innerHTML = html + '</table>';
+        document.getElementById('previewArea').innerHTML = h + '</table>';
     }
 
     async function handleSync() {
@@ -187,7 +214,7 @@
             });
             try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); renderPreview(); } catch (e) { alert("Sync Error."); }
         };
-        tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
+        tokenClient.requestAccessToken();
     }
 
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
