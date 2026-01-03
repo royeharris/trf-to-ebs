@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-75</title>
+    <title>EBS Entry v0-76</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -50,7 +50,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-75)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-76)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -91,7 +91,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-75)";
+    const VER = "Excel Budget Sheet input (v0-76)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -160,7 +160,8 @@
     function calc() {
         const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0;
         const tot = ((t * u) + v).toFixed(2);
-        const curCode = document.getElementById('colX').value.split(' - ')[0] || 'GBP';
+        const curValue = document.getElementById('colX').value;
+        const curCode = curValue ? curValue.split(' - ')[0] : 'GBP';
         document.getElementById('symbol').innerText = symbols[curCode]||"£";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
