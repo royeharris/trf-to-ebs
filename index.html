@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-85</title>
+    <title>EBS Entry v0-86</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -31,6 +31,7 @@
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
+        .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; }
@@ -48,7 +49,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-85)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-86)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -89,7 +90,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-85)";
+    const VER = "Excel Budget Sheet input (v0-86)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -101,7 +102,6 @@
     async function fetchLookups(silent = false) {
         tokenClient.callback = async (resp) => {
             try {
-                // Fetch full width range
                 const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AA1000' });
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
@@ -114,44 +114,25 @@
                 updateDropdown('colFreq', rows.map(r => p(r, 12, 13)).filter(v => v), 'A'); 
                 updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v), 'N'); 
                 
-                // EXTREME HARDENING FOR COLUMN Z (Index 25)
-                const monthCollection = [];
-                rows.forEach((row, index) => {
-                    if (row.length > 25 && row[25]) {
-                        const val = row[25].toString().trim();
-                        if (val !== "") monthCollection.push(val);
-                    }
-                });
-                console.log("DEBUG: Month Data Collected:", monthCollection);
-                updateDropdown('colZ', monthCollection, 'NEW'); 
+                const recMnth = []; rows.forEach(row => { if (row.length > 25 && row[25] && row[25].toString().trim() !== "") recMnth.push(row[25].toString().trim()); });
+                updateDropdown('colZ', recMnth, 'NEW'); 
                 
-                // HARDENING FOR COLUMN AA (Index 26)
-                const currencyCollection = [];
-                rows.forEach(row => {
-                    if (row.length > 26 && row[26]) {
-                        const val = row[26].toString().trim();
-                        if (val !== "") currencyCollection.push(val);
-                    }
-                });
-                updateDropdown('colX', currencyCollection, 'GBP'); 
+                const recCur = []; rows.forEach(row => { if (row.length > 26 && row[26] && row[26].toString().trim() !== "") recCur.push(row[26].toString().trim()); });
+                updateDropdown('colX', recCur, 'GBP'); 
                 
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
                 calc(); if(!silent) alert("Lookups Refreshed!");
-            } catch (e) { console.error("Refresh Error:", e); if(!silent) alert("Refresh Error."); }
+            } catch (e) { if(!silent) alert("Refresh Error."); }
         };
         tokenClient.requestAccessToken();
     }
 
-    function updateDropdown(id, vals, defaultCode = null, prompt = null) {
+    function updateDropdown(id, vals, defCode = null, prompt = null) {
         const sel = document.getElementById(id); if(!sel) return;
         let html = prompt ? `<option value="" disabled selected>${prompt}</option>` : '';
         html += vals.map(v => `<option value="${v}">${v}</option>`).join('');
         sel.innerHTML = html;
-        if(defaultCode) {
-            const opt = Array.from(sel.options).find(o => o.value.startsWith(defaultCode));
-            if(opt) sel.value = opt.value;
-            else if(vals.length > 0) sel.selectedIndex = prompt ? 1 : 0;
-        }
+        if(defCode) { const opt = Array.from(sel.options).find(o => o.value.startsWith(defCode)); if(opt) sel.value = opt.value; }
     }
 
     function calcTypeAndAuto() {
@@ -180,7 +161,7 @@
     function calc() {
         const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0;
         const tot = ((t * u) + v).toFixed(2);
-        const curVal = document.getElementById('colX').value; const curCode = curVal ? curVal.split(' - ')[0] : 'GBP';
+        const curCode = document.getElementById('colX').value.split(' - ')[0] || 'GBP';
         document.getElementById('symbol').innerText = symbols[curCode]||"£";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
@@ -192,26 +173,22 @@
     }
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-del"></th></tr>';
+        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-tiny">X</th></tr>';
         data.forEach((r, idx) => {
             const [y, m, d] = r[2].split('-').map(Number); const dt = new Date(y, m-1, d);
-            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-tiny"><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 3px;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
+    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
-            const vals = data.map(r => { 
-                let rc = [...r]; const [y, m, d] = rc[2].split('-').map(Number);
-                rc[2] = `${d.toString().padStart(2,'0')}/${m.toString().padStart(2,'0')}/${y}`;
-                [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc.slice(0, 27); 
-            });
+            const vals = data.map(r => { let rc = [...r]; const [y, m, d] = rc[2].split('-').map(Number); rc[2] = `${d.toString().padStart(2,'0')}/${m.toString().padStart(2,'0')}/${y}`; [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc.slice(0, 27); });
             try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); renderPreview(); } catch (e) { alert("Sync Error."); }
         };
         tokenClient.requestAccessToken();
     }
-    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
     function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
     renderPreview();
 </script>
