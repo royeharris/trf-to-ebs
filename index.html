@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-71</title>
+    <title>EBS Entry v0-72</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -26,11 +26,18 @@
         #dateBtn { width: 45px; height: 38px; cursor: pointer; background: #fff; border: 1px solid #dcdde1; border-radius: 6px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
         #colC { position: absolute; visibility: hidden; width: 0; height: 0; }
         #colCDisp { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
-        .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 22px; border: none; background: transparent; }
+        
+        /* Fixed Display-Only Type Style */
+        .type-display { 
+            font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; 
+            height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; 
+            background: #f1f2f6; box-sizing: border-box; cursor: default;
+        }
+
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
@@ -50,7 +57,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-71)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-72)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -61,7 +68,7 @@
     </div>
     <div class="grid-cat">
         <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"></select></div>
-        <div><label style="text-align:center;">Type</label><select id="colE" class="type-display"></select></div>
+        <div><label style="text-align:center;">Type</label><div id="workTypeDisplay" class="type-display">--</div></div>
         <div><label>sort</label><input type="number" id="colG" placeholder="0" min="0" max="99"></div>
     </div>
     <div class="grid-acc">
@@ -91,7 +98,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-71)";
+    const VER = "Excel Budget Sheet input (v0-72)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -109,7 +116,6 @@
 
                 updateDropdown('colA', rows.map(r => r[0]).filter(v => v), 'Roy');
                 updateDropdown('colB', rows.map(r => p(r, 1, 2)).filter(v => v), 'v');
-                updateDropdown('colE', rows.map(r => r[5]).filter(v => v), '--');
                 updateDropdown('colF', rows.map(r => r[6]).filter(v => v), null, '--Select--');
                 updateDropdown('colH', rows.map(r => r[8]).filter(v => v), null, '--Select--'); 
                 updateDropdown('colI', rows.map(r => r[9]).filter(v => v), null, '--Select--'); 
@@ -119,7 +125,7 @@
                 updateDropdown('colX', rows.map(r => r[26]).filter(v => v), 'GBP'); 
                 
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
-                calc(); // Sync currency symbol
+                calc();
                 if(!silent) alert("Lookups Refreshed!");
             } catch (e) { if(!silent) alert("Refresh Error."); }
         };
@@ -139,12 +145,13 @@
 
     function calcTypeAndAuto() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fFull = document.getElementById('colF').value;
-        const fu = document.getElementById('colB'), typeSel = document.getElementById('colE');
-        if (!h || !i) { typeSel.value = "--"; return; }
+        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), bgE = document.getElementById('bgTypeE');
+        
+        if (!h || !i) { typeDisp.innerText = "--"; bgE.value = "--"; return; }
         
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
-        typeSel.value = valE;
+        typeDisp.innerText = valE; bgE.value = valE;
 
         if (valE === "xfer") { 
             const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value;
@@ -172,7 +179,7 @@
     }
 
     function saveRow() {
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('colE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
