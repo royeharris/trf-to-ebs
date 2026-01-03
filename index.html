@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Transaction Recorder v0-52</title>
+    <title>EBS Transaction Recorder v0-51</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -15,29 +15,17 @@
         .grid-date-type { display: grid; grid-template-columns: 0.7fr 0.3fr; gap: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
-        
-        /* iPad Height Synchronization Fix */
-        input, select, textarea { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #dcdde1; 
-            border-radius: 6px; 
-            font-size: 0.85rem; 
-            box-sizing: border-box;
-            height: 38px; /* Fixed height to match Select fields on iPad */
-        }
-        textarea { height: auto; }
-        
-        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); text-align: center; height: 38px; line-height: 22px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
+        .type-display { font-size: 0.85rem; font-weight: bold; padding: 8px 0; color: var(--primary); text-align: center; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-copy { background: #e67e22; }
         .btn-sync { background: #2980b9; }
-        .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; height: auto; }
+        .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         .btn-clear.active { opacity: 1; border: 2px solid #000; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; font-weight: bold; }
         #colCDisp { font-size: 0.85rem; color: var(--primary); margin-top: 4px; }
@@ -56,7 +44,7 @@
 </head>
 <body>
 <div class="container">
-    <h3>EBS Entry v0-52</h3>
+    <h3>EBS Entry v0-51</h3>
     <div id="auth_status">Bridge Status: Initializing...</div>
     <div class="grid">
         <div><label>Grouping</label><select id="colA"><option value="Roy" selected>Roy</option><option value="Alek">Alek</option><option value="Haricom">Haricom</option><option value="Ev">Ev</option><option value="Flannagan">Flannagan</option><option value="Jose">Jose</option><option value="Peter">Peter</option><option value="Roy_Peter">Roy_Peter</option><option value="Xfer">Xfer</option><option value="Vanya">Vanya</option><option value="n/a">n/a</option></select></div>
@@ -99,7 +87,7 @@
 <script>
     const AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "EBS Entry v0-52";
+    const VER = "EBS Entry v0-51";
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
     function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) {} }); }
@@ -134,8 +122,32 @@
     }
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let html = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
+        let html = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Cat</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
         data.forEach((r, idx) => {
             const d = new Date(r[2]);
             const dS = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} '${String(d.getFullYear()).substr(-2)}`;
-            html += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-
+            html += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+        });
+        document.getElementById('previewArea').innerHTML = html + '</table>';
+    }
+    async function handleSync() {
+        const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
+        tokenClient.callback = async (resp) => {
+            const vals = data.map(r => { 
+                let rc = [...r]; const d = new Date(rc[2]); 
+                rc[2] = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+                [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i])); return rc.slice(0, 27); 
+            });
+            try { await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SHEET_ID, range: 'Sheet1', valueInputOption: 'USER_ENTERED', resource: { values: vals } }); alert("Success!"); renderPreview(); } catch (e) { alert("Sync Error."); }
+        };
+        tokenClient.requestAccessToken({prompt: gapi.client.getToken() === null ? 'consent' : ''});
+    }
+    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
+    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function copyForSheets() { alert("Use Sync for direct export."); }
+    renderPreview();
+</script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</body>
+</html>
