@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-68</title>
+    <title>EBS Entry v0-69</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -30,7 +30,9 @@
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
+        button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
+        .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         .btn-clear.active { opacity: 1; border: 2px solid #000; }
@@ -49,7 +51,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-68)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-69)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -59,7 +61,7 @@
         <div><label>Date</label><div class="date-wrap"><button id="dateBtn" onclick="document.getElementById('colC').showPicker()">📅</button><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div></div>
     </div>
     <div class="grid-cat">
-        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select --</option></select></div>
+        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"></select></div>
         <div><label style="text-align:center;">Type</label><select id="colE" class="type-display"></select></div>
         <div><label>sort</label><input type="number" id="colG" placeholder="0" min="0" max="99"></div>
     </div>
@@ -90,7 +92,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-68)";
+    const VER = "Excel Budget Sheet input (v0-69)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -104,13 +106,13 @@
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
                 updateDropdown('colA', rows.map(r => r[0]).filter(v => v));
-                updateDropdown('colB', rows.map(r => p(r, 1, 2)).filter(v => v));
+                updateDropdown('colB', rows.map(r => p(r, 1, 2)).filter(v => v), 'v');
                 updateDropdown('colE', rows.map(r => r[5]).filter(v => v));
-                updateDropdown('colF', rows.map(r => r[6]).filter(v => v));
-                updateDropdown('colH', rows.map(r => r[8]).filter(v => v)); 
-                updateDropdown('colI', rows.map(r => r[9]).filter(v => v)); 
+                updateDropdown('colF', rows.map(r => r[6]).filter(v => v), null, '-- Category --');
+                updateDropdown('colH', rows.map(r => r[8]).filter(v => v), null, '-- From --'); 
+                updateDropdown('colI', rows.map(r => r[9]).filter(v => v), null, '-- To --'); 
                 updateDropdown('colFreq', rows.map(r => p(r, 12, 13)).filter(v => v)); 
-                updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v)); 
+                updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v), 'N'); 
                 updateDropdown('colZ', rows.map(r => r[25]).filter(v => v)); 
                 updateDropdown('colX', rows.map(r => r[26]).filter(v => v)); 
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
@@ -119,10 +121,15 @@
         };
         tokenClient.requestAccessToken();
     }
-    function updateDropdown(id, vals) {
+    function updateDropdown(id, vals, defaultCode = null, prompt = null) {
         const sel = document.getElementById(id); if(!sel) return;
-        const cur = sel.value; sel.innerHTML = vals.map(v => `<option value="${v}">${v}</option>`).join('');
-        if(vals.includes(cur)) sel.value = cur;
+        let html = prompt ? `<option value="" disabled selected>${prompt}</option>` : '';
+        html += vals.map(v => `<option value="${v}">${v}</option>`).join('');
+        sel.innerHTML = html;
+        if(defaultCode) {
+            const opt = Array.from(sel.options).find(o => o.value.startsWith(defaultCode));
+            if(opt) sel.value = opt.value;
+        }
     }
     function calcTypeAndAuto() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fFull = document.getElementById('colF').value;
