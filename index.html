@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-57</title>
+    <title>EBS Entry v0-58</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -14,26 +14,18 @@
         h3 { margin: 0; font-weight: bold; }
         .ver-tag { font-weight: normal; font-size: 0.9rem; }
         .btn-lookup { background: var(--bridge); padding: 8px 12px; font-size: 0.75rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; }
-        
         .grid-top { display: grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap: 10px; }
         .grid-cat { display: grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap: 10px; margin-top: 10px; }
         .grid-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
-        .lbl-center { text-align: center; }
-        
-        input, select, textarea { 
-            width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; 
-            font-size: 0.85rem; box-sizing: border-box; height: 38px;
-        }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; height: 38px; }
         textarea { height: auto; }
-        
         .date-wrap { display: flex; align-items: center; gap: 8px; }
         #dateBtn { width: 45px; height: 38px; cursor: pointer; background: #fff; border: 1px solid #dcdde1; border-radius: 6px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; padding: 0; }
         #colC { position: absolute; visibility: hidden; width: 0; height: 0; }
         #colCDisp { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
-
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 22px; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
@@ -41,7 +33,6 @@
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
-        .btn-copy { background: #e67e22; }
         .btn-sync { background: var(--bridge); }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         .btn-clear.active { opacity: 1; border: 2px solid #000; }
@@ -50,8 +41,8 @@
         table { width: 100%; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
-        .w-fu { width: 20px; } .w-date { width: 70px; } .w-type { width: 32px; }
-        .w-cat { width: 65px; } .w-sort { width: 15px; text-align: center; } 
+        .w-grp { width: 35px; } .w-fu { width: 22px; } .w-date { width: 70px; } .w-type { width: 32px; }
+        .w-cat { width: 70px; } .w-sort { width: 15px; text-align: center; } 
         .w-acc { width: 65px; } .w-tiny { width: 14px; text-align: center; }
         .w-cur { width: 22px; text-align: center; } .w-tot { width: 45px; text-align: right; }
         .w-mnth { width: 35px; text-align: center; } .w-del { width: 22px; text-align: center; }
@@ -61,39 +52,39 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-57)</span></h3>
-        <button class="btn-lookup" id="btn_lookup" onclick="fetchLookups()">Refresh Lookups</button>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-58)</span></h3>
+        <button class="btn-lookup" onclick="fetchLookups()">Refresh Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
     
     <div class="grid-top">
-        <div><label>F/U</label><select id="colB" onchange="handleManualFU()"><option value="aj - ad-hoc">aj - ad-hoc</option><option value="aj - adjustment">aj - adjustment</option><option value="c - selected">c - selected</option><option value="F - fixed">F - fixed</option><option value="h - highlight">h - highlight</option><option value="I - income">I - income</option><option value="o - other">o - other</option><option value="p - Planned">p - Planned</option><option value="S - Support">S - Support</option><option value="u - unplanned">u - unplanned</option><option value="v" selected>v - variable</option><option value="xf - transfer">xf - transfer</option></select></div>
-        <div><label>Grouping</label><select id="colA"><option value="Roy" selected>Roy</option><option value="Alek">Alek</option><option value="Haricom">Haricom</option><option value="Ev">Ev</option><option value="Flannagan">Flannagan</option><option value="Jose">Jose</option><option value="Peter">Peter</option><option value="Roy_Peter">Roy_Peter</option><option value="Xfer">Xfer</option><option value="Vanya">Vanya</option><option value="n/a">n/a</option></select></div>
+        <div><label>F/U</label><select id="colB" onchange="handleManualFU()"><option value="v">variable</option></select></div>
+        <div><label>Grouping</label><select id="colA"><option value="Roy">Roy</option></select></div>
         <div><label>Date</label><div class="date-wrap"><button id="dateBtn" onclick="document.getElementById('colC').showPicker()">📅</button><input type="date" id="colC" onchange="handleDateChange()"><div id="colCDisp"></div></div></div>
     </div>
 
     <div class="grid-cat">
-        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select Category --</option><option value="Accessories">Accessories</option><option value="Bank charges">Bank charges</option><option value="Support">Support</option><option value="Transfer">Transfer</option></select></div>
-        <div><label class="lbl-center">Type</label><div id="workTypeDisplay" class="type-display">--</div></div>
+        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select Category --</option></select></div>
+        <div><label style="text-align:center;">Type</label><div id="workTypeDisplay" class="type-display">--</div></div>
         <div><label>sort</label><input type="number" id="colG" placeholder="0" min="0" max="99"></div>
     </div>
 
     <div class="grid-acc">
-        <div><label>From</label><select id="colH" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select From --</option><option value="Std Bank">Std Bank</option><option value="Revolut P">Revolut P</option></select></div>
-        <div><label>To</label><select id="colI" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select To --</option><option value="Std Bank">Std Bank</option><option value="Support weekly">Support weekly</option></select></div>
+        <div><label>From</label><select id="colH" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select From --</option></select></div>
+        <div><label>To</label><select id="colI" required onchange="calcTypeAndAuto()"><option value="" disabled selected>-- Select To --</option></select></div>
     </div>
 
     <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2"></textarea></div>
 
     <div class="grid-3">
-        <div><label>Frequency</label><select id="colFreq"><option value="u - Unplanned">u - Unplanned</option><option value="A - Ad-hoc" selected>A - Ad-hoc</option></select></div>
-        <div><label>Status</label><select id="colStatus"><option value="aa - archived">aa - archived</option><option value="aj - adjustment">aj - adjustment</option><option value="R - Review">R - Review</option><option value="V - Varies">V - Varies</option><option value="F - Fixed">F - Fixed</option><option value="N - Pending" selected>N - Pending</option><option value="P - Plan">P - Plan</option><option value="O - Open">O - Open</option><option value="n/a - n/a">n/a - n/a</option><option value="C - Cancelled">C - Cancelled</option><option value="A - Actual">A - Actual</option></select></div>
+        <div><label>Frequency</label><select id="colFreq"><option value="A">Ad-hoc</option></select></div>
+        <div><label>Status</label><select id="colStatus"><option value="N - Pending" selected>N - Pending</option><option value="A - Actual">A - Actual</option></select></div>
         <div><label>Mnth</label><select id="colZ"><option value="NEW" selected>NEW</option></select></div>
     </div>
 
     <div class="grid-4">
         <div><label>Each</label><input type="number" id="colT" placeholder="0.00" step="0.01" oninput="calc()"></div>
-        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="COP">COP</option></select></div>
+        <div><label>Currency</label><select id="colX" onchange="calc()"><option value="GBP" selected>GBP</option><option value="EUR">EUR</option><option value="COP">COP</option></select></div>
         <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
@@ -102,42 +93,42 @@
     
     <div class="actions">
         <button class="btn-save" onclick="saveRow()">Stage Transaction</button>
-        <button class="btn-copy" onclick="copyForSheets()">Copy for Sheets</button>
         <button class="btn-sync" id="sync_btn" onclick="handleSync()" disabled>Send to Sheets</button>
     </div>
     <div class="preview-wrap"><div id="previewArea"></div></div>
     <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
-    <div id="debug_log"></div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "EBS Entry v0-57";
-    let AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
+    const VER = "EBS Entry v0-58";
+    let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
-    function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); } catch (e) {} }); }
+    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
     function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; } }
 
     async function fetchLookups() {
-        if (!gapiInited) return alert("Bridge not ready.");
         tokenClient.callback = async (resp) => {
             try {
-                const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:E100' });
+                const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:J100' });
                 const rows = res.result.values; if(!rows) return;
-                const lists = { colA: [], colF: [], colH: [], colFreq: [], colZ: [] };
-                rows.forEach(r => {
-                    if(r[0]) lists.colA.push(r[0]); if(r[1]) lists.colF.push(r[1]); if(r[2]) lists.colH.push(r[2]);
-                    if(r[3]) lists.colFreq.push(r[3]); if(r[4]) lists.colZ.push(r[4]);
-                });
-                updateDropdown('colA', lists.colA); updateDropdown('colF', lists.colF); updateDropdown('colH', lists.colH);
-                updateDropdown('colI', lists.colH); updateDropdown('colFreq', lists.colFreq); updateDropdown('colZ', lists.colZ);
-                AA_LIST = lists.colH;
+                
+                const processPair = (rows, valIdx, descIdx) => rows.map(r => r[valIdx] ? (r[descIdx] ? `${r[valIdx]} - ${r[descIdx]}` : r[valIdx]) : null).filter(v => v);
+
+                updateDropdown('colB', processPair(rows, 0, 1));
+                updateDropdown('colA', rows.map(r => r[2]).filter(v => v));
+                updateDropdown('colF', processPair(rows, 3, 4));
+                const accs = processPair(rows, 5, 6);
+                updateDropdown('colH', accs); updateDropdown('colI', accs);
+                updateDropdown('colFreq', processPair(rows, 7, 8));
+                updateDropdown('colZ', rows.map(r => r[9]).filter(v => v));
+                AA_LIST = rows.map(r => r[5]).filter(v => v);
                 alert("Lookups Refreshed!");
-            } catch (e) { alert("Refresh Error: Ensure 'Lookups' tab exists."); }
+            } catch (e) { alert("Refresh Error: Ensure tab 'Lookups' matches the layout."); }
         };
         tokenClient.requestAccessToken();
     }
@@ -149,29 +140,32 @@
     }
 
     function calcTypeAndAuto() {
-        const h = document.getElementById('colH').value, i = document.getElementById('colI').value, f = document.getElementById('colF').value;
+        const hFull = document.getElementById('colH').value, iFull = document.getElementById('colI').value, fFull = document.getElementById('colF').value;
+        const h = hFull.split(' - ')[0], i = iFull.split(' - ')[0], f = fFull.split(' - ')[0];
         const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay'), fu = document.getElementById('colB');
         if (!h || !i) return;
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         bgE.value = valE; workE.innerText = valE;
-        if (valE === "xfer") { fu.value = "xf - transfer"; document.getElementById('colF').value = "Transfer"; }
-        else if (i.toLowerCase().includes("support") || f.toLowerCase().includes("support")) { fu.value = "S - Support"; }
+        if (valE === "xfer") { fu.value = fu.options[fu.options.length-1].value; document.getElementById('colF').value = "Transfer"; }
+        else if (iFull.toLowerCase().includes("support") || fFull.toLowerCase().includes("support")) { 
+            const sOpt = Array.from(fu.options).find(o => o.text.startsWith('S'));
+            if(sOpt) fu.value = sOpt.value;
+        }
     }
 
-    function handleManualFU() { if(document.getElementById('colB').value === 'xf - transfer') document.getElementById('colF').value = "Transfer"; }
+    function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     function handleDateChange() {
         const dStr = document.getElementById('colC').value; if(!dStr) return;
         const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d);
         const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], mos = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('colCDisp').innerText = `${days[dt.getDay()]} ${dt.getDate()} ${mos[dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
+        document.getElementById('colCDisp').innerText = `${days[dt.getDay()]} ${dateToDisplay(dt)}`;
     }
+    const dateToDisplay = (d) => `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} '${String(d.getFullYear()).substr(-2)}`;
 
     window.onload = () => { 
         document.getElementById('colC').value = new Date().toISOString().split('T')[0]; 
-        document.getElementById('colStatus').value = "N - Pending"; 
-        document.getElementById('colZ').value = "NEW"; 
-        handleDateChange(); calcTypeAndAuto(); gapiLoaded(); gisLoaded(); 
+        handleDateChange(); gapiLoaded(); gisLoaded(); 
     };
 
     function calc() {
@@ -182,19 +176,18 @@
     }
 
     function saveRow() {
-        calcTypeAndAuto(); if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select accounts.");
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value, document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value, "", document.getElementById('colZ').value, VER];
+        if (document.getElementById('bgTypeE').value === "--") return alert("Error: Select accounts.");
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value.split(' - ')[0], document.getElementById('colI').value.split(' - ')[0], "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value, "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
+        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="w-cur txt-center">Cur</th><th class="w-tot">Total</th><th class="w-mnth txt-center">Mnth</th><th class="w-del"></th></tr>';
         data.forEach((r, idx) => {
             const [y, m, d] = r[2].split('-').map(Number); const dt = new Date(y, m-1, d);
-            const dS = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
-            h += `<tr><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dateToDisplay(dt)}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
@@ -211,10 +204,8 @@
         };
         tokenClient.requestAccessToken();
     }
-
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
     function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
-    function copyForSheets() { alert("Use Sync for direct export."); }
     renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
