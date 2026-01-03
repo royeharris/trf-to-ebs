@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-69</title>
+    <title>EBS Entry v0-70</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -32,10 +32,8 @@
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
-        .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
-        .btn-clear.active { opacity: 1; border: 2px solid #000; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
@@ -51,7 +49,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-69)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-70)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -92,35 +90,40 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-69)";
+    const VER = "Excel Budget Sheet input (v0-70)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
+
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; checkReady(); }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; checkReady(); }
     function checkReady() { if (gapiInited && gsiInited) { document.getElementById('auth_status').innerText = "Bridge Status: Active and Ready"; document.getElementById('sync_btn').disabled = false; fetchLookups(true); } }
+
     async function fetchLookups(silent = false) {
         tokenClient.callback = async (resp) => {
             try {
                 const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AA1000' });
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
-                updateDropdown('colA', rows.map(r => r[0]).filter(v => v));
+
+                updateDropdown('colA', rows.map(r => r[0]).filter(v => v), 'Roy');
                 updateDropdown('colB', rows.map(r => p(r, 1, 2)).filter(v => v), 'v');
-                updateDropdown('colE', rows.map(r => r[5]).filter(v => v));
-                updateDropdown('colF', rows.map(r => r[6]).filter(v => v), null, '-- Category --');
-                updateDropdown('colH', rows.map(r => r[8]).filter(v => v), null, '-- From --'); 
-                updateDropdown('colI', rows.map(r => r[9]).filter(v => v), null, '-- To --'); 
+                updateDropdown('colE', rows.map(r => r[5]).filter(v => v), '--');
+                updateDropdown('colF', rows.map(r => r[6]).filter(v => v), null, '--Select--');
+                updateDropdown('colH', rows.map(r => r[8]).filter(v => v), null, '--Select--'); 
+                updateDropdown('colI', rows.map(r => r[9]).filter(v => v), null, '--Select--'); 
                 updateDropdown('colFreq', rows.map(r => p(r, 12, 13)).filter(v => v)); 
                 updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v), 'N'); 
                 updateDropdown('colZ', rows.map(r => r[25]).filter(v => v)); 
                 updateDropdown('colX', rows.map(r => r[26]).filter(v => v)); 
+                
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
                 if(!silent) alert("Lookups Refreshed!");
             } catch (e) { if(!silent) alert("Refresh Error."); }
         };
         tokenClient.requestAccessToken();
     }
+
     function updateDropdown(id, vals, defaultCode = null, prompt = null) {
         const sel = document.getElementById(id); if(!sel) return;
         let html = prompt ? `<option value="" disabled selected>${prompt}</option>` : '';
@@ -131,26 +134,32 @@
             if(opt) sel.value = opt.value;
         }
     }
+
     function calcTypeAndAuto() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fFull = document.getElementById('colF').value;
-        const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay'), fu = document.getElementById('colB'), typeSel = document.getElementById('colE');
-        if (!h || !i) return;
+        const fu = document.getElementById('colB'), typeSel = document.getElementById('colE');
+        
+        if (!h || !i) { typeSel.value = "--"; return; }
+        
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         typeSel.value = valE;
+
         if (valE === "xfer") { 
             const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value;
             document.getElementById('colF').value = "Transfer"; 
-        } else if (i.toLowerCase().includes("support") || fFull.toLowerCase().includes("support")) {
+        } else if (fFull.toLowerCase().includes("support")) {
             const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value;
         }
     }
+
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     function handleDateChange() {
         const dStr = document.getElementById('colC').value; if(!dStr) return;
         const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d);
         document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
     }
+
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); };
     function calc() {
         const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0;
@@ -158,20 +167,24 @@
         const curCode = document.getElementById('colX').value; document.getElementById('symbol').innerText = symbols[curCode]||"";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
+
     function saveRow() {
         const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('colE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value, "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
     }
+
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
         let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-del"></th></tr>';
         data.forEach((r, idx) => {
             const [y, m, d] = r[2].split('-').map(Number); const dt = new Date(y, m-1, d);
-            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
+            const dS = `${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]}`;
+            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dS}</td><td>${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${r[10]?"✓":""}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;padding:2px 5px;border:none;color:white;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
+
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
