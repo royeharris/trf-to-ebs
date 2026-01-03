@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-79</title>
+    <title>EBS Entry v0-83</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -48,7 +48,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-79)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-83)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -89,7 +89,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-79)";
+    const VER = "Excel Budget Sheet input (v0-83)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -101,7 +101,7 @@
     async function fetchLookups(silent = false) {
         tokenClient.callback = async (resp) => {
             try {
-                // Expanded range for robustness
+                // Precision range fetch to ensure index consistency
                 const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AA1000' });
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
@@ -114,15 +114,11 @@
                 updateDropdown('colFreq', rows.map(r => p(r, 12, 13)).filter(v => v), 'A'); 
                 updateDropdown('colStatus', rows.map(r => p(r, 16, 17)).filter(v => v), 'N'); 
                 
-                // Hardened Month retrieval: Force scan of index 25 (Col Z) 
-                const mList = [];
-                for(let i=0; i < rows.length; i++) {
-                    const val = rows[i][25];
-                    if(val && val.toString().trim() !== "") mList.push(val.toString().trim());
-                }
-                updateDropdown('colZ', mList, 'NEW'); 
+                // FIXED: Direct targeted retrieval of Column Z (Index 25)
+                const monthList = rows.filter(r => r.length > 25 && r[25]).map(r => r[25].toString().trim());
+                updateDropdown('colZ', monthList, 'NEW'); 
                 
-                updateDropdown('colX', rows.map(r => r[26]).filter(v => v), 'GBP'); 
+                updateDropdown('colX', rows.filter(r => r.length > 26 && r[26]).map(r => r[26].toString().trim()), 'GBP'); 
                 AA_LIST = rows.map(r => r[8]).filter(v => v);
                 calc(); if(!silent) alert("Lookups Refreshed!");
             } catch (e) { if(!silent) alert("Refresh Error."); }
@@ -143,8 +139,7 @@
 
     function calcTypeAndAuto() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fFull = document.getElementById('colF').value;
-        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), freq = document.getElementById('colFreq');
-        const bgE = document.getElementById('bgTypeE');
+        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), freq = document.getElementById('colFreq'), bgE = document.getElementById('bgTypeE');
         if (!h || !i || h.includes("--") || i.includes("--")) { typeDisp.innerText = "--"; bgE.value = "--"; return; }
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
@@ -168,13 +163,12 @@
     function calc() {
         const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0;
         const tot = ((t * u) + v).toFixed(2);
-        const curValue = document.getElementById('colX').value;
-        const curCode = curValue ? curValue.split(' - ')[0] : 'GBP';
+        const curVal = document.getElementById('colX').value; const curCode = curVal ? curVal.split(' - ')[0] : 'GBP';
         document.getElementById('symbol').innerText = symbols[curCode]||"£";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
     function saveRow() {
-        if (!document.getElementById('colF').value || !document.getElementById('colH').value || !document.getElementById('colI').value) return alert("Missing required fields.");
+        if (!document.getElementById('colF').value || !document.getElementById('colH').value || !document.getElementById('colI').value) return alert("Required fields missing.");
         const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
