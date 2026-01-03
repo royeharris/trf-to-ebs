@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-73</title>
+    <title>EBS Entry v0-74</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -13,22 +13,7 @@
         .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h3 { margin: 0; font-weight: bold; }
         .ver-tag { font-weight: normal; font-size: 0.9rem; }
-        
-        /* Compact Refresh Button Styling */
-        .btn-lookup { 
-            background: var(--bridge); 
-            padding: 4px 8px; 
-            font-size: 0.7rem; 
-            border-radius: 6px; 
-            border: none; 
-            color: white; 
-            cursor: pointer; 
-            font-weight: bold;
-            width: 60px;
-            line-height: 1.1;
-            text-align: center;
-        }
-        
+        .btn-lookup { background: var(--bridge); padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 60px; line-height: 1.1; text-align: center; }
         .grid-top { display: grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap: 10px; }
         .grid-cat { display: grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap: 10px; margin-top: 10px; }
         .grid-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -50,8 +35,6 @@
         .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
-        
-        /* Widened Table Columns for v0-73 */
         table { width: 100%; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
@@ -65,7 +48,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-73)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-74)</span></h3>
         <button class="btn-lookup" onclick="fetchLookups()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -106,7 +89,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-73)";
+    const VER = "Excel Budget Sheet input (v0-74)";
     let AA_LIST = [];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -118,7 +101,7 @@
     async function fetchLookups(silent = false) {
         tokenClient.callback = async (resp) => {
             try {
-                const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' });
+                const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AA1000' });
                 const rows = res.result.values; if(!rows) return;
                 const p = (r, v, d) => r[v] ? (r[d] ? `${r[v]} - ${r[d]}` : r[v]) : null;
 
@@ -181,6 +164,7 @@
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
     function saveRow() {
+        if (!document.getElementById('colF').value || !document.getElementById('colH').value || !document.getElementById('colI').value) return alert("Please fill required Category and Account fields.");
         const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colK', 'colG'].forEach(id => document.getElementById(id).value = ""); renderPreview();
