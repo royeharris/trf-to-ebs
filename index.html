@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-56</title>
+    <title>EBS Entry v0-57</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -38,7 +38,7 @@
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-copy { background: #e67e22; }
@@ -61,7 +61,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-56)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-57)</span></h3>
         <button class="btn-lookup" id="btn_lookup" onclick="fetchLookups()">Refresh Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -87,7 +87,7 @@
 
     <div class="grid-3">
         <div><label>Frequency</label><select id="colFreq"><option value="u - Unplanned">u - Unplanned</option><option value="A - Ad-hoc" selected>A - Ad-hoc</option></select></div>
-        <div><label>Status</label><select id="colStatus"><option value="N - Pending" selected>N - Pending</option></select></div>
+        <div><label>Status</label><select id="colStatus"><option value="aa - archived">aa - archived</option><option value="aj - adjustment">aj - adjustment</option><option value="R - Review">R - Review</option><option value="V - Varies">V - Varies</option><option value="F - Fixed">F - Fixed</option><option value="N - Pending" selected>N - Pending</option><option value="P - Plan">P - Plan</option><option value="O - Open">O - Open</option><option value="n/a - n/a">n/a - n/a</option><option value="C - Cancelled">C - Cancelled</option><option value="A - Actual">A - Actual</option></select></div>
         <div><label>Mnth</label><select id="colZ"><option value="NEW" selected>NEW</option></select></div>
     </div>
 
@@ -113,7 +113,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "EBS Entry v0-56";
+    const VER = "EBS Entry v0-57";
     let AA_LIST = ["Bank Austria", "Cashplus B", "Cashplus P", "Cash ZAR", "FlexiPay", "Fluid MC", "FNB Budget", "FNB Smart", "FNB Visa", "Kraken B", "Kraken P", "mobicred", "PayPal B", "Paysend", "RBoS MC", "RBoS P", "Revolut B", "Revolut P", "Santander B", "Santander MC", "Santander P", "Starling B", "Starling P", "Std Bank", "Std Peter", "TFG Money", "Tyme Bank Roy", "Tyme Bank Peter"];
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -128,17 +128,14 @@
             try {
                 const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:E100' });
                 const rows = res.result.values; if(!rows) return;
-                
-                const lists = { colA: [], colF: [], colH: [], colFreq: [], colZ: [], AA: [] };
+                const lists = { colA: [], colF: [], colH: [], colFreq: [], colZ: [] };
                 rows.forEach(r => {
                     if(r[0]) lists.colA.push(r[0]); if(r[1]) lists.colF.push(r[1]); if(r[2]) lists.colH.push(r[2]);
                     if(r[3]) lists.colFreq.push(r[3]); if(r[4]) lists.colZ.push(r[4]);
                 });
-
-                updateDropdown('colA', lists.colA); updateDropdown('colF', lists.colF);
-                updateDropdown('colH', lists.colH); updateDropdown('colI', lists.colH);
-                updateDropdown('colFreq', lists.colFreq); updateDropdown('colZ', lists.colZ);
-                AA_LIST = lists.colH; // Assuming From column identifies internal accounts
+                updateDropdown('colA', lists.colA); updateDropdown('colF', lists.colF); updateDropdown('colH', lists.colH);
+                updateDropdown('colI', lists.colH); updateDropdown('colFreq', lists.colFreq); updateDropdown('colZ', lists.colZ);
+                AA_LIST = lists.colH;
                 alert("Lookups Refreshed!");
             } catch (e) { alert("Refresh Error: Ensure 'Lookups' tab exists."); }
         };
@@ -155,11 +152,9 @@
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value, f = document.getElementById('colF').value;
         const bgE = document.getElementById('bgTypeE'), workE = document.getElementById('workTypeDisplay'), fu = document.getElementById('colB');
         if (!h || !i) return;
-        
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         bgE.value = valE; workE.innerText = valE;
-        
         if (valE === "xfer") { fu.value = "xf - transfer"; document.getElementById('colF').value = "Transfer"; }
         else if (i.toLowerCase().includes("support") || f.toLowerCase().includes("support")) { fu.value = "S - Support"; }
     }
@@ -176,7 +171,7 @@
         document.getElementById('colC').value = new Date().toISOString().split('T')[0]; 
         document.getElementById('colStatus').value = "N - Pending"; 
         document.getElementById('colZ').value = "NEW"; 
-        handleDateChange(); gapiLoaded(); gisLoaded(); 
+        handleDateChange(); calcTypeAndAuto(); gapiLoaded(); gisLoaded(); 
     };
 
     function calc() {
@@ -219,6 +214,7 @@
 
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
     function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function copyForSheets() { alert("Use Sync for direct export."); }
     renderPreview();
 </script>
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
