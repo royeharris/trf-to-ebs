@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-93</title>
+    <title>EBS Entry v0-94</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -46,7 +46,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-93)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-94)</span></h3>
         <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -56,7 +56,7 @@
         <div><label>Date</label><div class="date-wrap"><button onclick="document.getElementById('colC').showPicker()" style="height:38px; border:1px solid #ddd; border-radius:6px; background:#fff; width:40px;">📅</button><input type="date" id="colC" style="visibility:hidden; width:0; position:absolute;" onchange="handleDateChange()"><span id="colCDisp" style="font-size:0.8rem; margin-left:5px;"></span></div></div>
     </div>
     <div class="grid-cat">
-        <div><label>Category</label><select id="colF" required onchange="calcTypeAndAuto()"></select></div>
+        <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
         <div><label style="text-align:center;">Type</label><div id="workTypeDisplay" class="type-display">--</div></div>
         <div><label>sort</label><input type="number" id="colG" placeholder="0"></div>
     </div>
@@ -87,7 +87,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-93)";
+    const VER = "Excel Budget Sheet input (v0-94)";
     let AA_LIST = [], coordinateMap = {};
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -131,9 +131,11 @@
             pop('colFreq', 'Frequency', 'A'); pop('colStatus', 'Status', 'N'); pop('colZ', 'Month', 'NEW'); pop('colX', 'Currency', 'GBP');
             AA_LIST = data.filter(r => r[coordinateMap['From'].val]).map(r => r[coordinateMap['From'].val]);
             
-            // Hardened Refresh: Reset Sort and Note
-            document.getElementById('colG').value = ""; document.getElementById('colK').value = "";
-            document.getElementById('colM').value = "1"; calc();
+            // initialization fix v0-94: Fully clear numeric and note fields
+            ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('colM').value = "1";
+            document.getElementById('workTypeDisplay').innerText = "--";
+            calc();
             if(!silent) alert("Lookups Refreshed!");
         } catch (e) { console.error(e); }
     }
@@ -146,19 +148,17 @@
         
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
-        
-        // Only trigger automation if both are actually in AA list
+        typeDisp.innerText = valE; bgE.value = valE;
+
+        // Automation Rule v0-94: Only force transfer fields IF it is actually an internal transfer
         if (valE === "xfer") { 
-            typeDisp.innerText = "xfer"; bgE.value = "xfer";
             const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value;
             const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value;
             document.getElementById('colF').value = "Transfer"; 
-        } else {
-            typeDisp.innerText = valE; bgE.value = valE;
         }
     }
 
-    function calcTypeAndAuto() {
+    function handleCatTrigger() {
         const f = document.getElementById('colF').value, fu = document.getElementById('colB');
         if (f.toLowerCase().includes("support")) { 
             const s = Array.from(fu.options).find(o => o.value.startsWith('S')); 
@@ -189,14 +189,13 @@
 
     function saveRow() {
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
-        const noteText = document.getElementById('colK').value;
-        if (!fv || !hv || !iv) { alert("Category and Accounts required."); return; }
+        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Category and Accounts required."); return; }
         
-        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", noteText, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
+        const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
         
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         
-        // Initialization Rule: Clear Numeric and Note fields after staging
+        // Cleanup after staging
         ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
         document.getElementById('colM').value = "1"; calc();
         renderPreview();
@@ -207,7 +206,6 @@
         let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-tiny">X</th></tr>';
         data.forEach((r, idx) => {
             const dParts = r[2].split('-'); const day = dParts[2], mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(dParts[1])-1];
-            // Rule: Checkmark if note (r[10]) exists
             const noteMark = r[10] && r[10].trim() !== "" ? "✓" : "";
             h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${day} ${mon}</td><td>${r[4]}</td><td>${r[5]}</td><td class="w-sort">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${noteMark}</td><td class="w-tiny">${r[11]}</td><td class="w-tiny">${r[14]}</td><td class="txt-center">${r[23]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-tiny"><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 3px;">X</button></td></tr>`;
         });
