@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-08</title>
+    <title>EBS Entry v2-09</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -21,6 +21,11 @@
         .btn-cache-pull { background: var(--cache); }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; }
+        
+        /* v2-09 Date Picker Wrapper */
+        .date-input-container { display: flex; align-items: center; gap: 5px; background: white; border: 1px solid #dcdde1; border-radius: 6px; padding: 0 8px; height: 38px; }
+        .date-input-container input[type="date"] { border: none; padding: 0; height: 100%; font-size: 14px; flex-grow: 1; outline: none; background: transparent; }
+        
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
@@ -40,7 +45,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-08</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-09</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-save" onclick="cacheSave()">Save to<br>Local</button>
             <button class="btn-lookup btn-cache-pull" onclick="cachePull()">Pull Local<br>Lookups</button>
@@ -51,7 +56,13 @@
     <div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
         <div><label>F/U</label><select id="colB" onchange="handleManualFU()"></select></div>
         <div><label>Grouping</label><select id="colA"></select></div>
-        <div><label>Date</label><div style="display:flex;align-items:center;gap:5px;"><button onclick="document.getElementById('colC').showPicker()" style="height:38px; border:1px solid #ddd; border-radius:6px; background:#fff; width:40px;">📅</button><input type="date" id="colC" style="visibility:hidden; width:0; position:absolute;" onchange="handleDateChange()"><span id="colCDisp" style="font-size:0.75rem;"></span></div></div>
+        <div><label>Date</label>
+            <div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
+                <span style="font-size:1.1rem;">📅</span>
+                <input type="date" id="colC" onchange="handleDateChange()">
+            </div>
+            <div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
+        </div>
     </div>
     <div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
         <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
@@ -83,27 +94,20 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-08 initialized. Click for detail.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-09 Date picker revised.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-08)";
+    const VER = "Excel Budget Sheet Input (v2-09)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
 
-    // HARDCODED TEST SET v2-08: Allows remote testing without login
     const STATIC_TEST_DATA = {
-        "Grouping": ["Roy", "Peter"],
-        "F/U": ["v - Verified", "xf - Transfer", "S - Support"],
-        "Category": ["Food", "Transport", "Transfer", "Support Misc"],
-        "From": ["Cashplus P", "Revolut P", "Amazon B", "Starling B"],
-        "To": ["Cash GBP", "Revolut B", "Amazon P", "Cashplus B"],
-        "Frequency": ["A - Annual", "M - Monthly", "K - Transfer"],
-        "Status": ["N - New", "P - Paid"],
-        "Month": ["NEW", "JAN", "FEB"],
-        "Currency": ["GBP", "EUR", "ZAR"],
-        "AA": ["Cashplus P", "Revolut P", "Revolut B", "Starling B", "Cashplus B", "Cash GBP"]
+        "Grouping": ["Roy", "Peter"], "F/U": ["v - Verified", "xf - Transfer", "S - Support"], "Category": ["Food", "Transport", "Transfer", "Support Misc"],
+        "From": ["Cashplus P", "Revolut P", "Amazon B", "Starling B"], "To": ["Cash GBP", "Revolut B", "Amazon P", "Cashplus B"],
+        "Frequency": ["A - Annual", "M - Monthly", "K - Transfer"], "Status": ["N - New", "P - Paid"], "Month": ["NEW", "JAN", "FEB"],
+        "Currency": ["GBP", "EUR", "ZAR"], "AA": ["Cashplus P", "Revolut P", "Revolut B", "Starling B", "Cashplus B", "Cash GBP"]
     };
 
     function logTrace(msg) { const log = document.getElementById('trace_log'); const now = new Date().toLocaleTimeString(); log.innerText += `\n[${now}] ${msg}`; log.scrollTop = log.scrollHeight; }
@@ -124,64 +128,28 @@
         if (!confirm("Overwrite with local test values?")) return;
         const cached = localStorage.getItem('ebs_cache_data');
         if (cached) {
-            rawLookupData = JSON.parse(cached);
-            coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords'));
-            AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa'));
-            populateUI(rawLookupData);
-            logTrace("Loaded from Local Cache.");
+            rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa'));
+            populateUI(rawLookupData); logTrace("Loaded from Local Cache.");
         } else {
-            // Fallback to hardcoded test data for remote testers v2-08
-            AA_LIST = STATIC_TEST_DATA["AA"];
-            coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
-            updateDropdown('colA', STATIC_TEST_DATA["Grouping"], 'Roy');
-            updateDropdown('colB', STATIC_TEST_DATA["F/U"], 'v');
-            updateDropdown('colF', STATIC_TEST_DATA["Category"], null, '--Select--');
-            updateDropdown('colH', STATIC_TEST_DATA["From"], null, '--Select--');
-            updateDropdown('colI', STATIC_TEST_DATA["To"], null, '--Select--');
-            updateDropdown('colFreq', STATIC_TEST_DATA["Frequency"], 'A');
-            updateDropdown('colStatus', STATIC_TEST_DATA["Status"], 'N');
-            updateDropdown('colZ', STATIC_TEST_DATA["Month"], 'NEW');
-            updateDropdown('colX', STATIC_TEST_DATA["Currency"], 'GBP');
-            logTrace("Remote Mode: Static Test Data Loaded.");
+            AA_LIST = STATIC_TEST_DATA["AA"]; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
+            updateDropdown('colA', STATIC_TEST_DATA["Grouping"], 'Roy'); updateDropdown('colB', STATIC_TEST_DATA["F/U"], 'v'); updateDropdown('colF', STATIC_TEST_DATA["Category"], null, '--Select--'); updateDropdown('colH', STATIC_TEST_DATA["From"], null, '--Select--'); updateDropdown('colI', STATIC_TEST_DATA["To"], null, '--Select--'); updateDropdown('colFreq', STATIC_TEST_DATA["Frequency"], 'A'); updateDropdown('colStatus', STATIC_TEST_DATA["Status"], 'N'); updateDropdown('colZ', STATIC_TEST_DATA["Month"], 'NEW'); updateDropdown('colX', STATIC_TEST_DATA["Currency"], 'GBP');
+            logTrace("Remote Mode: Static Data Loaded.");
         }
     }
 
-    function initRefresh() {
-        tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } };
-        tokenClient.requestAccessToken();
-    }
-
-    async function fetchLookupRefs() {
-        const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' });
-        res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; });
-        fetchActiveAccounts();
-    }
-
+    function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
+    async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
     function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
-    async function fetchActiveAccounts() {
-        const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' });
-        AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : []; fetchActualData();
-    }
-
-    async function fetchActualData() {
-        const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' });
-        rawLookupData = res.result.values; populateUI(rawLookupData);
-    }
+    async function fetchActiveAccounts() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' }); AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : []; fetchActualData(); }
+    async function fetchActualData() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' }); rawLookupData = res.result.values; populateUI(rawLookupData); }
 
     function populateUI(data) {
-        const pop = (id, key, def, p = null) => {
-            const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; });
-            updateDropdown(id, list, def, p);
-        };
+        const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; }); updateDropdown(id, list, def, p); };
         pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP');
-        localReset(); logTrace("Cloud Lookups OK.");
+        localReset(); logTrace("Sync OK.");
     }
 
-    function updateDropdown(id, vals, def, prompt) {
-        const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : '';
-        h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h;
-        if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; }
-    }
+    function updateDropdown(id, vals, def, prompt) { const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : ''; h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } }
 
     function localReset() {
         const resetSel = (id, def) => { const s = document.getElementById(id); if(!s) return; if(def) { const opt = Array.from(s.options).find(o => o.value.startsWith(def)); if(opt) s.value = opt.value; } else s.selectedIndex = 0; };
@@ -190,8 +158,7 @@
     }
 
     function handleAccTrigger() {
-        const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
-        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return;
+        const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return;
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         typeDisp.innerText = valE;
         if (valE === "xfer") { const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value; const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value; cat.value = "Transfer"; }
@@ -202,29 +169,20 @@
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' - ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
 
-    function handleEdit(idx) {
-        if (!confirm("Confirm edit?")) return;
-        editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-        const setVal = (id, val, isSel = false) => { const el = document.getElementById(id); if(!el) return; if(!isSel) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } };
-        setVal('colA',d[0],true); setVal('colB',d[1],true); setVal('colC',d[2]); setVal('colF',d[5],true); setVal('colG',d[6]); setVal('colH',d[7],true); setVal('colI',d[8],true); setVal('colK',d[10]); setVal('colFreq',d[11],true); setVal('colStatus',d[14],true); setVal('colT',d[19]); setVal('colM',d[20]); setVal('colV',d[21]); setVal('colX',d[23],true); setVal('colZ',d[25],true);
-        handleDateChange(); handleAccTrigger(); renderPreview();
-    }
+    function handleEdit(idx) { if (!confirm("Confirm edit?")) return; editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx]; const setVal = (id, val, isSel = false) => { const el = document.getElementById(id); if(!el) return; if(!isSel) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } };
+        setVal('colA',d[0],true); setVal('colB',d[1],true); setVal('colC',d[2]); setVal('colF',d[5],true); setVal('colG',d[6]); setVal('colH',d[7],true); setVal('colI',d[8],true); setVal('colK',d[10]); setVal('colFreq',d[11],true); setVal('colStatus',d[14],true); setVal('colT',d[19]); setVal('colM',d[20]); setVal('colV',d[21]); setVal('colX',d[23],true); setVal('colZ',d[25],true); handleDateChange(); handleAccTrigger(); renderPreview(); }
 
     function saveRow() {
-        const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
-        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Incomplete data."); return; }
+        const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value; if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; }
         let whoVal = ""; if (fv.startsWith('S')) whoVal = document.getElementById('colA').value;
         const row = Array(35).fill(""); row[0]=document.getElementById('colA').value; row[1]=document.getElementById('colB').value.split(' - ')[0]; row[2]=document.getElementById('colC').value; row[4]=document.getElementById('workTypeDisplay').innerText; row[5]=document.getElementById('colF').value.split(' - ')[0]; row[6]=document.getElementById('colG').value; row[7]=document.getElementById('colH').value; row[8]=document.getElementById('colI').value; row[10]=document.getElementById('colK').value; row[11]=document.getElementById('colFreq').value.split(' - ')[0]; row[14]=document.getElementById('colStatus').value.split(' - ')[0]; row[19]=parseFloat(document.getElementById('colT').value||0).toFixed(2); row[20]=document.getElementById('colM').value; row[21]=parseFloat(document.getElementById('colV').value||0).toFixed(2); row[22]=calc(); row[23]=document.getElementById('colX').value.split(' - ')[0]; row[25]=document.getElementById('colZ').value; row[33]=whoVal; row[34]=VER;
-        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        if (editIndex > -1) d[editIndex] = row; else d.push(row);
-        localStorage.setItem('ebs_trf', JSON.stringify(d));
-        ['colT','colV','colG','colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; editIndex = -1; renderPreview();
+        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (editIndex > -1) d[editIndex] = row; else d.push(row);
+        localStorage.setItem('ebs_trf', JSON.stringify(d)); ['colT','colV','colG','colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; editIndex = -1; calc(); renderPreview();
     }
 
     function renderPreview() {
-        const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
-        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[10]?'✓':''}</td><td>${r[22]}</td><td>${r[25]}</td><td>${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
+        const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
+        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="txt-center">${r[10]?'✓':''}</td><td>${r[22]}</td><td>${r[25]}</td><td>${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; renderPreview(); }
