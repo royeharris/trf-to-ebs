@@ -1,55 +1,43 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-04</title>
+    <title>EBS Entry v2-05</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
         :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; --bridge: #2980b9; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
-        /* Cosmetic: Balanced Header v2-04 */
         .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
         .title-block { display: flex; flex-direction: column; justify-content: center; }
         h3 { margin: 0; font-weight: bold; font-size: 1.15rem; line-height: 1.1; }
         .ver-tag { font-weight: 400; font-size: 0.75rem; color: #7f8c8d; margin-top: 2px; }
-        
         .header-btns { display: flex; gap: 8px; }
         .btn-lookup { background: var(--bridge); padding: 4px; font-size: 0.7rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 65px; height: 40px; line-height: 1.1; text-align: center; }
         .btn-reset-ui { background: #7f8c8d; }
-        
         .grid-top, .grid-cat, .grid-acc { display: grid; gap: 10px; margin-top: 10px; }
         .grid-top { grid-template-columns: 0.8fr 1fr 1.2fr; margin-top: 0; }
         .grid-cat { grid-template-columns: 1fr 0.4fr 0.3fr; }
         .grid-acc { grid-template-columns: 1fr 1fr; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
-        
-        /* Cosmetic: Standard 16px to prevent iOS zoom */
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; }
-        
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-        
         .actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
         button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; }
         .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
         .btn-wipe { background: var(--danger); opacity: 0.85; }
-
-        /* Staging List v2-04: Fixed widths and scroll restoration */
         .preview-wrap { width: 100%; overflow-x: auto; margin-top: 15px; -webkit-overflow-scrolling: touch; border: 1px solid #ddd; border-radius: 6px; }
         table { width: 720px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f9f9f9; font-weight: bold; }
-        
-        .w-grp { width: 40px; } .w-fu { width: 25px; } .w-date { width: 70px; } .w-sort { width: 20px; } 
-        .w-who { width: 45px; } .w-tot { width: 80px; } .w-cat, .w-acc { width: 110px; }
-        .w-del { width: 30px; text-align: center; }
-        
+        th { background: #f2f2f2; font-weight: bold; }
+        .w-edit { width: 30px; text-align: center; } .w-grp { width: 35px; } .w-fu { width: 25px; } .w-date { width: 70px; }
+        .w-cat, .w-acc { width: 110px; } .w-tot { width: 80px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
         #auth_status { font-size: 0.65rem; margin-top: 10px; text-align: center; color: #7f8c8d; }
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: monospace; font-size: 0.6rem; border-radius: 6px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; }
     </style>
@@ -59,7 +47,7 @@
     <div class="header-wrap">
         <div class="title-block">
             <h3>EBS Input</h3>
-            <div class="ver-tag">v2-04</div>
+            <div class="ver-tag">v2-05</div>
         </div>
         <div class="header-btns">
             <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
@@ -82,7 +70,6 @@
         <div><label>To</label><select id="colI" required onchange="handleAccTrigger()"></select></div>
     </div>
     <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2" style="width:100%; border-radius:6px; border:1px solid #dcdde1; padding:8px; box-sizing:border-box; font-size:16px;"></textarea></div>
-    
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
         <div><label>Frequency</label><select id="colFreq"></select></div>
         <div><label>Status</label><select id="colStatus"></select></div>
@@ -101,18 +88,17 @@
         <button class="btn-sync" id="sync_btn" onclick="handleSync()">Send to Sheets</button>
         <button id="wipeBtn" class="btn-wipe" onclick="clearData()">Wipe Local (2 clicks)</button>
     </div>
-
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
-    <div id="trace_log">Trace: Spec v2-04 applied. Header balanced. Delete restored.</div>
+    <div id="trace_log">Trace: v2-05 Logic Initialized. Edit mode enabled.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-04)";
+    const VER = "Excel Budget Sheet Input (v2-05)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
-    let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
+    let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false, editIndex = -1;
 
     function logTrace(msg) {
         const log = document.getElementById('trace_log');
@@ -121,53 +107,24 @@
         log.scrollTop = log.scrollHeight;
     }
 
-    function gapiLoaded() {
-        gapi.load('client', async () => {
-            await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' });
-            await gapi.client.load('sheets', 'v4');
-            gapiInited = true; logTrace("GAPI Ready.");
-        });
-    }
-
-    function gisLoaded() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/spreadsheets',
-            callback: '' 
-        });
-        gsiInited = true; logTrace("GIS Ready.");
-    }
+    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; logTrace("GAPI Ready."); }); }
+    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; logTrace("GIS Ready."); }
 
     function initRefresh() {
-        logTrace("Manual Auth Initiated...");
-        document.getElementById('auth_status').innerText = "Requesting Login...";
-        tokenClient.callback = async (resp) => {
-            if (resp.access_token) {
-                localStorage.setItem('g_token', resp.access_token);
-                logTrace("Token Saved.");
-                fetchLookupRefs();
-            }
-        };
+        tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } };
         tokenClient.requestAccessToken();
     }
 
     async function fetchLookupRefs() {
         const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' });
-        res.result.values.forEach(r => { 
-            coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; 
-        });
+        res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; });
         fetchActiveAccounts();
     }
 
-    function colToIndex(col) {
-        let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); }
-        return idx - 1;
-    }
-
+    function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
     async function fetchActiveAccounts() {
         const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' });
-        AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : [];
-        fetchActualData();
+        AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : []; fetchActualData();
     }
 
     async function fetchActualData() {
@@ -183,9 +140,7 @@
         pop('colA', 'Grouping', 'Roy'); pop('colB', 'F/U', 'v'); pop('colF', 'Category', null, '--Select--');
         pop('colH', 'From', null, '--Select--'); pop('colI', 'To', null, '--Select--');
         pop('colFreq', 'Frequency', 'A'); pop('colStatus', 'Status', 'N'); pop('colZ', 'Month', 'NEW'); pop('colX', 'Currency', 'GBP');
-        localReset();
-        document.getElementById('auth_status').innerText = "Ready - Bridge Active";
-        logTrace("Sync OK.");
+        localReset(); document.getElementById('auth_status').innerText = "Ready - Bridge Active"; logTrace("Lookups OK.");
     }
 
     function updateDropdown(id, vals, def, prompt) {
@@ -205,10 +160,9 @@
         resetSel('colStatus', 'N'); resetSel('colZ', 'NEW'); resetSel('colX', 'GBP');
         ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
         document.getElementById('colM').value = "1"; document.getElementById('workTypeDisplay').innerText = "--";
-        calc();
+        editIndex = -1; renderPreview(); calc();
     }
 
-    function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     function handleAccTrigger() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
         const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq');
@@ -240,10 +194,25 @@
         document.getElementById('symbol').innerText = symbols[curCode]||"£";
         document.getElementById('totalDisp').innerText = tot; return tot;
     }
+
+    function handleEdit(idx) {
+        if (!confirm("Confirm edit will overwrite current entries?")) return;
+        editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
+        const setVal = (id, val, isSel = false) => {
+            const el = document.getElementById(id); if(!el) return;
+            if(!isSel) el.value = val;
+            else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; }
+        };
+        setVal('colA', d[0], true); setVal('colB', d[1], true); setVal('colC', d[2]);
+        setVal('colF', d[5], true); setVal('colG', d[6]); setVal('colH', d[7], true); setVal('colI', d[8], true);
+        setVal('colK', d[10]); setVal('colFreq', d[11], true); setVal('colStatus', d[14], true);
+        setVal('colT', d[19]); setVal('colM', d[20]); setVal('colV', d[21]); setVal('colX', d[23], true); setVal('colZ', d[25], true);
+        handleDateChange(); handleAccTrigger(); renderPreview(); logTrace(`Edit mode: Row ${idx+1}`);
+    }
+
     function saveRow() {
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
-        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing Category/Accounts."); return; }
-        
+        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Incomplete data."); return; }
         let whoVal = ""; if (fv.startsWith('S')) whoVal = document.getElementById('colA').value;
         const row = Array(35).fill("");
         row[0] = document.getElementById('colA').value; row[1] = document.getElementById('colB').value.split(' - ')[0]; row[2] = document.getElementById('colC').value;
@@ -254,26 +223,31 @@
         row[21] = parseFloat(document.getElementById('colV').value||0).toFixed(2); row[22] = calc(); row[23] = document.getElementById('colX').value.split(' - ')[0];
         row[25] = document.getElementById('colZ').value; row[33] = whoVal; row[34] = VER;
         
-        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.push(row); localStorage.setItem('ebs_trf', JSON.stringify(d));
+        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
+        if (editIndex > -1) { d[editIndex] = row; logTrace("Record Overwritten."); } 
+        else { d.push(row); logTrace("New Record Staged."); }
+        
+        localStorage.setItem('ebs_trf', JSON.stringify(d));
         ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('colM').value = "1"; calc(); renderPreview();
+        document.getElementById('colM').value = "1"; editIndex = -1; calc(); renderPreview();
     }
+
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="txt-center" style="width:15px;">S</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
+        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
         data.forEach((r, idx) => {
             const dP = r[2].split('-'); const noteMark = r[10] && r[10].trim() !== "" ? "✓" : "";
-            h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${dP[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(dP[1])-1]}</td><td>${r[5]}</td><td class="w-sort">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-tiny">${noteMark}</td><td class="txt-center">${r[14]}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-who">${r[33]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`;
+            const isEditing = editIndex === idx;
+            h += `<tr><td class="w-edit"><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${dP[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(dP[1])-1]}</td><td>${r[5]}</td><td class="w-sort">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="txt-center">${noteMark}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[25]}</td><td class="w-who">${r[33]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
-    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); renderPreview(); }
+    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; renderPreview(); }
     
     async function handleSync() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => {
             if (!resp.access_token) return;
-            logTrace("Sync started...");
             try {
                 const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" });
                 const nextRow = (meta.result.values ? meta.result.values.length : 0) + 1;
