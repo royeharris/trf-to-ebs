@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-95</title>
+    <title>EBS Entry v0-96</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -21,6 +21,7 @@
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; height: 38px; }
+        textarea { height: auto; }
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; cursor: default; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
@@ -45,7 +46,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-95)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-96)</span></h3>
         <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -86,7 +87,7 @@
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-95)";
+    const VER = "Excel Budget Sheet input (v0-96)";
     let AA_LIST = [], coordinateMap = {};
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -130,7 +131,6 @@
             pop('colFreq', 'Frequency', 'A'); pop('colStatus', 'Status', 'N'); pop('colZ', 'Month', 'NEW'); pop('colX', 'Currency', 'GBP');
             AA_LIST = data.filter(r => r[coordinateMap['From'].val]).map(r => r[coordinateMap['From'].val]);
             
-            // Full Reset Logic v0-95
             ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
             document.getElementById('colM').value = "1";
             document.getElementById('workTypeDisplay').innerText = "--";
@@ -141,20 +141,25 @@
 
     function handleAccTrigger() {
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
-        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), freq = document.getElementById('colFreq'), bgE = document.getElementById('bgTypeE');
+        const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), freq = document.getElementById('colFreq'), bgE = document.getElementById('bgTypeE'), cat = document.getElementById('colF');
         if (!h || !i || h.includes("--") || i.includes("--")) return;
         
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
         
-        // Update display type regardless
         typeDisp.innerText = valE; bgE.value = valE;
 
-        // PROTECTION LOGIC v0-95: Only auto-set fields IF we have entered a valid internal transfer state
+        // V0-96 STRICT ACCOUNT PROTECTION: Only set if transfer is positive
         if (valE === "xfer") { 
             const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value;
             const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value;
-            document.getElementById('colF').value = "Transfer"; 
+            cat.value = "Transfer"; 
+        } else {
+            // Re-validate Support priority if transfer logic is false
+            if (cat.value.toLowerCase().includes("support")) {
+                const s = Array.from(fu.options).find(o => o.value.startsWith('S')); 
+                if(s) fu.value = s.value;
+            }
         }
     }
 
@@ -199,7 +204,7 @@
 
     function renderPreview() {
         const data = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tiny">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-tiny">X</th></tr>';
+        let h = '<table><tr><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-type">Type</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="txt-center" style="width:15px;">S</th><th class="txt-center" style="width:25px;">Cur</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="w-tiny">X</th></tr>';
         data.forEach((r, idx) => {
             const dParts = r[2].split('-'); const day = dParts[2], mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(dParts[1])-1];
             const noteMark = r[10] && r[10].trim() !== "" ? "✓" : "";
