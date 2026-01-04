@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-105</title>
+    <title>EBS Entry v0-106</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -12,7 +12,6 @@
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
         h3 { margin: 0; font-weight: bold; flex-grow: 1; font-size: 1.1rem; }
-        .ver-tag { font-weight: normal; font-size: 0.8rem; }
         .header-btns { display: flex; gap: 8px; }
         .btn-lookup { background: var(--bridge); padding: 4px; font-size: 0.7rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 65px; height: 35px; line-height: 1.1; text-align: center; }
         .btn-reset-ui { background: #7f8c8d; }
@@ -23,7 +22,6 @@
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; height: 38px; }
-        textarea { height: auto; }
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; cursor: default; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
@@ -32,12 +30,12 @@
         .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
         .btn-wipe { background: var(--danger); opacity: 0.85; }
-        #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; }
+        #auth_status { font-size: 0.65rem; margin-top: 10px; text-align: center; color: #7f8c8d; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
-        .w-grp { width: 35px; } .w-fu { width: 22px; } .w-date { width: 68px; } .w-type { width: 32px; }
+        .w-grp { width: 35px; } .w-fu { width: 22px; } .w-date { width: 68px; }
         .w-cat, .w-acc { width: 110px; } .w-tiny { width: 15px; text-align: center; }
         .w-sort { width: 15px; text-align: center; } 
         .w-tot { width: 75px; text-align: right; }
@@ -46,17 +44,17 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>EBS input <span class="ver-tag">(v0-105)</span></h3>
+        <h3>EBS input <span style="font-weight:normal; font-size:0.8rem;">(v0-106)</span></h3>
         <div class="header-btns">
             <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" onclick="localReset()">Reset<br>fields</button>
         </div>
     </div>
-    <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
+    
     <div class="grid-top">
         <div><label>F/U</label><select id="colB" onchange="handleManualFU()"></select></div>
         <div><label>Grouping</label><select id="colA"></select></div>
-        <div><label>Date</label><div class="date-wrap"><button onclick="document.getElementById('colC').showPicker()" style="height:38px; border:1px solid #ddd; border-radius:6px; background:#fff; width:40px;">📅</button><input type="date" id="colC" style="visibility:hidden; width:0; position:absolute;" onchange="handleDateChange()"><span id="colCDisp" style="font-size:0.8rem; margin-left:5px;"></span></div></div>
+        <div><label>Date</label><div style="display:flex;align-items:center;gap:5px;"><button onclick="document.getElementById('colC').showPicker()" style="height:38px; border:1px solid #ddd; border-radius:6px; background:#fff; width:40px;">📅</button><input type="date" id="colC" style="visibility:hidden; width:0; position:absolute;" onchange="handleDateChange()"><span id="colCDisp" style="font-size:0.75rem;"></span></div></div>
     </div>
     <div class="grid-cat">
         <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
@@ -67,7 +65,7 @@
         <div><label>From</label><select id="colH" required onchange="handleAccTrigger()"></select></div>
         <div><label>To</label><select id="colI" required onchange="handleAccTrigger()"></select></div>
     </div>
-    <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2"></textarea></div>
+    <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2" style="width:100%; border-radius:6px; border:1px solid #dcdde1; padding:8px; box-sizing:border-box;"></textarea></div>
     <div class="grid-3">
         <div><label>Frequency</label><select id="colFreq"></select></div>
         <div><label>Status</label><select id="colStatus"></select></div>
@@ -79,18 +77,24 @@
         <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()"></div>
         <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
-    <div class="total-box"><label>Total</label><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
+    <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
+    
     <div class="actions">
         <button class="btn-save" onclick="saveRow()">Stage Entry</button>
         <button class="btn-sync" id="sync_btn" onclick="handleSync()">Send to Sheets</button>
         <button id="wipeBtn" class="btn-wipe" onclick="clearData()">Wipe Local (2 clicks)</button>
     </div>
+    
     <div class="preview-wrap" id="previewArea"></div>
+    
+    <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
+    
     <input type="hidden" id="bgTypeE" value="--">
 </div>
+
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-105)";
+    const VER = "Excel Budget Sheet input (v0-106)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
