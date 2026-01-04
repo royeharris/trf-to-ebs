@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-00</title>
+    <title>EBS Entry v2-01</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
         :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; --bridge: #2980b9; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 950px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* v2-01 Balanced Header Block */
         .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
-        h3 { margin: 0; font-weight: bold; flex-grow: 1; font-size: 1.1rem; }
-        .ver-tag { font-weight: 400; font-size: 0.8rem; color: #7f8c8d; }
+        .title-block { display: flex; flex-direction: column; justify-content: center; }
+        h3 { margin: 0; font-weight: bold; font-size: 1.15rem; line-height: 1.1; }
+        .ver-tag { font-weight: 400; font-size: 0.75rem; color: #7f8c8d; margin-top: 2px; }
+        
         .header-btns { display: flex; gap: 8px; }
-        .btn-lookup { background: var(--bridge); padding: 4px; font-size: 0.7rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 65px; height: 35px; line-height: 1.1; text-align: center; }
+        .btn-lookup { background: var(--bridge); padding: 4px; font-size: 0.7rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 65px; height: 40px; line-height: 1.1; text-align: center; }
         .btn-reset-ui { background: #7f8c8d; }
+        
         .grid-top, .grid-cat, .grid-acc { display: grid; gap: 10px; margin-top: 10px; }
         .grid-top { grid-template-columns: 0.8fr 1fr 1.2fr; margin-top: 0; }
         .grid-cat { grid-template-columns: 1fr 0.4fr 0.3fr; }
@@ -36,19 +41,22 @@
         th { background: #f2f2f2; font-weight: bold; }
         .w-grp { width: 35px; } .w-fu { width: 22px; } .w-date { width: 68px; } .w-sort { width: 15px; } .w-who { width: 40px; } .w-tot { width: 75px; }
         #auth_status { font-size: 0.65rem; margin-top: 10px; text-align: center; color: #7f8c8d; }
-        /* Trace Log Style v2-00 */
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: monospace; font-size: 0.6rem; border-radius: 6px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>EBS input <span class="ver-tag">(v2-00)</span></h3>
+        <div class="title-block">
+            <h3>EBS Input</h3>
+            <div class="ver-tag">(v2-01)</div>
+        </div>
         <div class="header-btns">
             <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" onclick="localReset()">Reset<br>fields</button>
         </div>
     </div>
+    
     <div class="grid-top">
         <div><label>F/U</label><select id="colB" onchange="handleManualFU()"></select></div>
         <div><label>Grouping</label><select id="colA"></select></div>
@@ -76,6 +84,7 @@
         <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
     <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
+    
     <div class="actions">
         <button class="btn-save" onclick="saveRow()">Stage Entry</button>
         <button class="btn-sync" id="sync_btn" onclick="handleSync()">Send to Sheets</button>
@@ -83,13 +92,13 @@
     </div>
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
-    <div id="trace_log">Trace: Application initialized v2-00. Ready for manual login.</div>
+    <div id="trace_log">Trace: Application initialized v2-01. Balanced header block applied.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v2-00)";
+    const VER = "Excel Budget Sheet input (v2-01)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
 
@@ -119,7 +128,6 @@
         logTrace("GIS Client Initialized.");
     }
 
-    // Step 1 v2-00: Manual Refresh with Token Capture
     function initRefresh() {
         logTrace("Manual Refresh Triggered. Requesting Access Token...");
         document.getElementById('auth_status').innerText = "Requesting Login...";
@@ -128,9 +136,7 @@
                 logTrace("Token acquired. Saving to local storage.");
                 localStorage.setItem('g_token', resp.access_token);
                 fetchLookupRefs();
-            } else {
-                logTrace("Token request failed or cancelled.");
-            }
+            } else { logTrace("Token request failed or cancelled."); }
         };
         tokenClient.requestAccessToken();
     }
@@ -182,7 +188,6 @@
         logTrace("Form populated successfully.");
     }
 
-    // Preservation of standard EBS logic from v0-115
     function updateDropdown(id, vals, def, prompt) {
         const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : '';
         h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h;
