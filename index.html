@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>EBS Entry v0-98</title>
+    <title>EBS Entry v0-99</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -26,11 +26,11 @@
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; height: auto; }
+        button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.75rem; }
         button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
         .btn-save { background: var(--accent); }
         .btn-sync { background: var(--bridge); }
-        .btn-clear { background: var(--danger); width: 100%; margin-top: 15px; opacity: 0.6; }
+        .btn-wipe { background: var(--danger); opacity: 0.8; }
         #auth_status { font-size: 0.65rem; margin-top: 5px; text-align: center; color: #7f8c8d; }
         .preview-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
@@ -46,7 +46,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-98)</span></h3>
+        <h3>Excel Budget Sheet input <span class="ver-tag">(v0-99)</span></h3>
         <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
     </div>
     <div id="auth_status">Bridge Status: Initializing...</div>
@@ -78,16 +78,16 @@
     </div>
     <div class="total-box"><label>Total</label><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
     <div class="actions">
-        <button class="btn-save" id="btn_stage" onclick="saveRow()" style="background:var(--accent);">Stage Transaction</button>
+        <button class="btn-save" onclick="saveRow()">Stage Entry</button>
         <button class="btn-sync" id="sync_btn" onclick="handleSync()" disabled>Send to Sheets</button>
+        <button id="wipeBtn" class="btn-wipe" onclick="clearData()">Wipe Local</button>
     </div>
     <div class="preview-wrap" id="previewArea"></div>
-    <button id="wipeBtn" class="btn-clear" onclick="clearData()">Wipe Local Data (Requires 2 clicks)</button>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet input (v0-98)";
+    const VER = "Excel Budget Sheet input (v0-99)";
     let AA_LIST = [], coordinateMap = {};
     const symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false;
@@ -130,7 +130,6 @@
             pop('colH', 'From', null, '--Select--'); pop('colI', 'To', null, '--Select--');
             pop('colFreq', 'Frequency', 'A'); pop('colStatus', 'Status', 'N'); pop('colZ', 'Month', 'NEW'); pop('colX', 'Currency', 'GBP');
             AA_LIST = data.filter(r => r[coordinateMap['From'].val]).map(r => r[coordinateMap['From'].val]);
-            
             ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
             document.getElementById('colM').value = "1";
             document.getElementById('workTypeDisplay').innerText = "--";
@@ -143,30 +142,22 @@
         const h = document.getElementById('colH').value, i = document.getElementById('colI').value;
         const fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), freq = document.getElementById('colFreq'), bgE = document.getElementById('bgTypeE'), cat = document.getElementById('colF');
         if (!h || !i || h.includes("--") || i.includes("--")) return;
-        
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
         let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
-        
         typeDisp.innerText = valE; bgE.value = valE;
-
-        // V0-98 EXPLICIT POSITIVE TRIGGER ONLY
         if (valE === "xfer") { 
             const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value;
             const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value;
             cat.value = "Transfer"; 
-        } else {
-            // Re-apply current Category rules to ensure "xf" logic doesn't leak
-            if (cat.value.toLowerCase().includes("support")) {
-                const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value;
-            }
+        } else if (cat.value.toLowerCase().includes("support")) {
+            const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value;
         }
     }
 
     function handleCatTrigger() {
         const f = document.getElementById('colF').value, fu = document.getElementById('colB');
         if (f.toLowerCase().includes("support")) { 
-            const s = Array.from(fu.options).find(o => o.value.startsWith('S')); 
-            if(s) fu.value = s.value; 
+            const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value; 
         }
     }
 
@@ -193,12 +184,11 @@
 
     function saveRow() {
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
-        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Category and Accounts required."); return; }
+        if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Required fields missing."); return; }
         const row = [document.getElementById('colA').value, document.getElementById('colB').value.split(' - ')[0], document.getElementById('colC').value, "", document.getElementById('bgTypeE').value, document.getElementById('colF').value.split(' - ')[0], document.getElementById('colG').value, document.getElementById('colH').value, document.getElementById('colI').value, "", document.getElementById('colK').value, document.getElementById('colFreq').value.split(' - ')[0], "", "", document.getElementById('colStatus').value.split(' - ')[0], "", "", "", "", parseFloat(document.getElementById('colT').value||0).toFixed(2), document.getElementById('colM').value, parseFloat(document.getElementById('colV').value||0).toFixed(2), calc(), document.getElementById('colX').value.split(' - ')[0], "", document.getElementById('colZ').value, VER];
         let data = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); data.push(row); localStorage.setItem('ebs_trf', JSON.stringify(data));
         ['colT', 'colV', 'colG', 'colK'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('colM').value = "1"; calc();
-        renderPreview();
+        document.getElementById('colM').value = "1"; calc(); renderPreview();
     }
 
     function renderPreview() {
@@ -221,7 +211,7 @@
         };
         tokenClient.requestAccessToken();
     }
-    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').classList.remove('active');},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').classList.add('active'); setTimeout(()=>{wipeConfirmed=false;},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); renderPreview(); };
 </script>
 </body>
