@@ -3,53 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-24</title>
+    <title>EBS Entry v2-25</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
+        /* Reverted color palette and font weights v2-25 */
         :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; --bridge: #2980b9; --cache: #8e44ad; --test: #e67e22; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 960px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 5px; }
         .title-block { display: flex; flex-direction: column; justify-content: center; min-width: 85px; }
-        h3 { margin: 0; font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
+        h3 { margin: 0; font-weight: bold; font-size: 1.1rem; line-height: 1.1; color: var(--primary); }
         .ver-tag { font-weight: 400; font-size: 0.7rem; color: #7f8c8d; margin-top: 2px; }
         .header-btns { display: flex; gap: 3px; }
-        /* Button font size slightly reduced to fit new longer labels */
-        .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.5rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: bold; width: 55px; height: 44px; line-height: 1.1; text-align: center; overflow: hidden; }
+        
+        /* Reverted Button Styling v2-25 */
+        .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.5rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; width: 55px; height: 44px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; }
         .btn-reset-ui { background: #7f8c8d; }
         .btn-cache-save { background: var(--accent); }
         .btn-cache-pull { background: var(--cache); }
         .btn-test-mode { background: var(--test); }
-        label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; }
-        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; }
+        
+        label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; font-family: inherit; }
         .date-input-container { display: flex; align-items: center; gap: 5px; background: white; border: 1px solid #dcdde1; border-radius: 6px; padding: 0 8px; height: 38px; }
         .date-input-container input[type="date"] { border: none; padding: 0; height: 100%; font-size: 14px; flex-grow: 1; outline: none; background: transparent; }
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        
         .actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
-        button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; }
+        button.action-main { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; -webkit-font-smoothing: antialiased; }
+        
         .preview-wrap { width: 100%; overflow-x: auto; margin-top: 15px; -webkit-overflow-scrolling: touch; border: 1px solid #ddd; border-radius: 6px; }
-        /* Table width increased to 940px to accommodate wider labels */
         table { width: 940px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f2f2f2; font-weight: bold; }
-        /* Adjusted column widths for new labels */
+        th { background: #f2f2f2; font-weight: bold; color: var(--primary); }
+        
         .w-edit { width: 30px; text-align: center; } .w-grp { width: 35px; } .w-fu { width: 25px; } .w-date { width: 70px; }
-        .w-cat, .w-acc { width: 110px; } 
-        .w-sort { width: 30px; } /* Increased for "sort" */
-        .w-small { width: 30px; text-align: center; } /* New class for "Note" and "Freq" */
+        .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; } .w-small { width: 30px; text-align: center; }
         .w-tot { width: 80px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
-        #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; }
-        #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
+        
+        #auth_status { font-size: 0.65rem; margin-top: 10px; text-align: center; color: #7f8c8d; }
+        #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; font-weight: 600; }
+        #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
         .txt-center { text-align: center; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-24</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-25</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-test-mode" onclick="useTestData()">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-cache-save" onclick="cacheSave()">Save to<br>local Lookups</button>
@@ -86,58 +90,42 @@
     </div>
     <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
     <div class="actions">
-        <button onclick="saveRow()" style="background:var(--accent);">Stage Entry</button>
-        <button id="sync_btn" onclick="handleSync()" style="background:var(--bridge);">Send to Sheets</button>
-        <button id="wipeBtn" onclick="clearData()" style="background:var(--danger); opacity: 0.85;">Wipe Local (2 clicks)</button>
+        <button class="action-main" onclick="saveRow()" style="background:var(--accent);">Stage entry</button>
+        <button class="action-main" id="sync_btn" onclick="handleSync()" style="background:var(--bridge);">Send to Sheets</button>
+        <button class="action-main" id="wipeBtn" onclick="clearData()" style="background:var(--danger); opacity: 0.85;">Clear Staging records</button>
     </div>
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-24 Labels updated.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-25 Font and labels restored.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-24)";
+    const VER = "Excel Budget Sheet Input (v2-25)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
-    let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
+    let tokenClient, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
 
-    // CURATED REPRESENTATIONAL SET v2-24
     const TEST_SET = {
-        "Grouping": ["Roy", "Peter"],
-        "FU": ["v - Verified", "xf - Transfer", "S - Support"],
-        "Categories": ["Food", "Transfer", "Support Misc", "Salary", "Rent"],
-        "Accounts": ["Revolut P (AA)", "Starling B (AA)", "Employer (EXT)", "Landlord (EXT)", "Tesco (EXT)"],
-        "AA": ["Revolut P (AA)", "Starling B (AA)"],
-        "Freq": ["A - Ad-hoc", "M - Monthly", "K - Transfer"],
-        "Status": ["N - New", "P - Paid"],
-        "Month": ["NEW", "JAN", "FEB"],
-        "Cur": ["GBP", "EUR", "ZAR"]
+        "Grouping": ["Roy", "Peter"], "FU": ["v - Verified", "xf - Transfer", "S - Support"], "Categories": ["Food", "Transfer", "Support Misc", "Salary", "Rent"],
+        "Accounts": ["Revolut P (AA)", "Starling B (AA)", "Employer (EXT)", "Landlord (EXT)", "Tesco (EXT)"], "AA": ["Revolut P (AA)", "Starling B (AA)"],
+        "Freq": ["A - Ad-hoc", "M - Monthly", "K - Transfer"], "Status": ["N - New", "P - Paid"], "Month": ["NEW", "JAN", "FEB"], "Cur": ["GBP", "EUR", "ZAR"]
     };
 
     function logTrace(msg) { const log = document.getElementById('trace_log'); const now = new Date().toLocaleTimeString(); log.innerText += `\n[${now}] ${msg}`; log.scrollTop = log.scrollHeight; }
     function toggleLog(show) { document.getElementById('log_btn').style.display = show ? 'none' : 'block'; document.getElementById('trace_log').style.display = show ? 'block' : 'none'; }
-    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; logTrace("GAPI Ready."); }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; logTrace("GIS Ready."); }
+    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); logTrace("GAPI Ready."); }); }
+    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); logTrace("GIS Ready."); }
 
     function useTestData() {
         if (!confirm("Overwrite current values with representational test set?")) return;
-        AA_LIST = TEST_SET.AA;
-        coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
-        updateDropdown('colA', TEST_SET.Grouping, 'Roy');
-        updateDropdown('colB', TEST_SET.FU, 'v');
-        updateDropdown('colF', TEST_SET.Categories, null, '--Select--');
-        updateDropdown('colH', TEST_SET.Accounts, null, '--Select--');
-        updateDropdown('colI', TEST_SET.Accounts, null, '--Select--');
-        updateDropdown('colFreq', TEST_SET.Freq, 'A');
-        updateDropdown('colStatus', TEST_SET.Status, 'N');
-        updateDropdown('colZ', TEST_SET.Month, 'NEW');
-        updateDropdown('colX', TEST_SET.Cur, 'GBP');
-        localReset(); logTrace("Test Data Injected.");
+        AA_LIST = TEST_SET.AA; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
+        updateDropdown('colA', TEST_SET.Grouping, 'Roy'); updateDropdown('colB', TEST_SET.FU, 'v'); updateDropdown('colF', TEST_SET.Categories, null, '--Select--'); updateDropdown('colH', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colI', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colFreq', TEST_SET.Freq, 'A'); updateDropdown('colStatus', TEST_SET.Status, 'N'); updateDropdown('colZ', TEST_SET.Month, 'NEW'); updateDropdown('colX', TEST_SET.Cur, 'GBP');
+        localReset(); logTrace("Representational Data Loaded.");
     }
 
-    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("Snapshot saved to local storage."); }
-    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Snapshot Loaded from local."); } else { alert("No snapshot found."); } }
+    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local UI Snapshotted."); }
+    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local Snapshot Loaded."); } else { alert("No snapshot found."); } }
     
     function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
@@ -149,19 +137,16 @@
 
     function localReset() {
         ['colT','colV','colG','colK'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-        document.getElementById('colM').value = "1";
-        document.getElementById('workTypeDisplay').innerText = "--";
-        editIndex = -1;
-        const resetSel = (id, def) => { const s = document.getElementById(id); if(!s) return; if(def) { const opt = Array.from(s.options).find(o => o.value.startsWith(def)); if(opt) s.value = opt.value; } else s.selectedIndex = 0; };
-        resetSel('colA','Roy'); resetSel('colB','v'); resetSel('colF',null); resetSel('colH',null); resetSel('colI',null); resetSel('colFreq','A'); resetSel('colStatus','N'); resetSel('colZ','NEW'); resetSel('colX','GBP');
-        renderPreview(); calc();
-        logTrace("local UI Reset Complete.");
+        document.getElementById('colM').value = "1"; document.getElementById('workTypeDisplay').innerText = "--"; editIndex = -1;
+        const rS = (id, def) => { const s = document.getElementById(id); if(!s) return; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } else s.selectedIndex = 0; };
+        rS('colA','Roy'); rS('colB','v'); rS('colF',null); rS('colH',null); rS('colI',null); rS('colFreq','A'); rS('colStatus','N'); rS('colZ','NEW'); rS('colX','GBP');
+        renderPreview(); calc(); logTrace("local UI Reset Complete.");
     }
 
     function handleAccTrigger() {
-        const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return;
+        const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fu = document.getElementById('colB'), tD = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return;
         const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In";
-        typeDisp.innerText = valE;
+        tD.innerText = valE;
         if (valE === "xfer") { const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value; const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value; cat.value = "Transfer"; }
         else if (cat.value.toLowerCase().includes("support")) { const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value; }
     }
@@ -169,33 +154,30 @@
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) return; const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' - ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
-    function handleEdit(idx) { if (!confirm("Confirm edit overwrite?")) return; editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx]; const setVal = (id, val, isSel = false) => { const el = document.getElementById(id); if(!el) return; if(!isSel) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } }; setVal('colA',d[0],true); setVal('colB',d[1],true); setVal('colC',d[2]); setVal('colF',d[5],true); setVal('colG',d[6]); setVal('colH',d[7],true); setVal('colI',d[8],true); setVal('colK',d[10]); setVal('colFreq',d[11],true); setVal('colStatus',d[14],true); setVal('colT',d[19]); setVal('colM',d[20]); setVal('colV',d[21]); setVal('colX',d[23],true); setVal('colZ',d[25],true); handleDateChange(); handleAccTrigger(); renderPreview(); }
+    function handleEdit(idx) { if (!confirm("Confirm edit overwrite?")) return; editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx]; const sV = (id, val, iS = false) => { const el = document.getElementById(id); if(!el) return; if(!iS) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } }; sV('colA',d[0],true); sV('colB',d[1],true); sV('colC',d[2]); sV('colF',d[5],true); sV('colG',d[6]); sV('colH',d[7],true); sV('colI',d[8],true); sV('colK',d[10]); sV('colFreq',d[11],true); sV('colStatus',d[14],true); sV('colT',d[19]); sV('colM',d[20]); sV('colV',d[21]); sV('colX',d[23],true); sV('colZ',d[25],true); handleDateChange(); handleAccTrigger(); renderPreview(); }
     function saveRow() {
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value; if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; }
-        let whoVal = ""; if (fv.startsWith('S')) whoVal = document.getElementById('colA').value;
-        const row = Array(35).fill(""); row[0]=document.getElementById('colA').value; row[1]=document.getElementById('colB').value.split(' - ')[0]; row[2]=document.getElementById('colC').value; row[4]=document.getElementById('workTypeDisplay').innerText; row[5]=document.getElementById('colF').value.split(' - ')[0]; row[6]=document.getElementById('colG').value; row[7]=document.getElementById('colH').value; row[8]=document.getElementById('colI').value; row[10]=document.getElementById('colK').value; row[11]=document.getElementById('colFreq').value.split(' - ')[0]; row[14]=document.getElementById('colStatus').value.split(' - ')[0]; row[19]=parseFloat(document.getElementById('colT').value||0).toFixed(2); row[20]=document.getElementById('colM').value; row[21]=parseFloat(document.getElementById('colV').value||0).toFixed(2); row[22]=calc(); row[23]=document.getElementById('colX').value.split(' - ')[0]; row[25]=document.getElementById('colZ').value; row[33]=whoVal; row[34]=VER;
-        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (editIndex > -1) d[editIndex] = row; else d.push(row);
-        localStorage.setItem('ebs_trf', JSON.stringify(d)); localReset();
+        let wV = ""; if (fv.startsWith('S')) wV = document.getElementById('colA').value;
+        const r = Array(35).fill(""); r[0]=document.getElementById('colA').value; r[1]=document.getElementById('colB').value.split(' - ')[0]; r[2]=document.getElementById('colC').value; r[4]=document.getElementById('workTypeDisplay').innerText; r[5]=document.getElementById('colF').value.split(' - ')[0]; r[6]=document.getElementById('colG').value; r[7]=document.getElementById('colH').value; r[8]=document.getElementById('colI').value; r[10]=document.getElementById('colK').value; r[11]=document.getElementById('colFreq').value.split(' - ')[0]; r[14]=document.getElementById('colStatus').value.split(' - ')[0]; r[19]=parseFloat(document.getElementById('colT').value||0).toFixed(2); r[20]=document.getElementById('colM').value; r[21]=parseFloat(document.getElementById('colV').value||0).toFixed(2); r[22]=calc(); r[23]=document.getElementById('colX').value.split(' - ')[0]; r[25]=document.getElementById('colZ').value; r[33]=wV; r[34]=VER;
+        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (editIndex > -1) d[editIndex] = r; else d.push(r); localStorage.setItem('ebs_trf', JSON.stringify(d)); localReset();
     }
-
-    // v2-24 Updated renderPreview with full labels and centered data cells
     function renderPreview() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">sort</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-small">Note</th><th class="w-small">Freq</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="txt-center" style="width:35px;">Status</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
-        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="txt-center">${r[10]?'✓':''}</td><td class="txt-center">${r[11]}</td><td>${r[22]}</td><td>${r[25]}</td><td class="txt-center">${r[14]}</td><td>${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
+        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">sort</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-small">Note</th><th class="w-small">Freq</th><th class="w-tot">Total</th><th class="w-small">Mnth</th><th class="w-small">Status</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
+        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td class="w-edit"><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="txt-center">${r[10]?'✓':''}</td><td class="txt-center">${r[11]}</td><td>${r[22]}</td><td class="txt-center">${r[25]}</td><td class="txt-center">${r[14]}</td><td>${r[33]}</td><td class="w-del"><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; renderPreview(); }
     async function handleSync() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!d.length) return;
         tokenClient.callback = async (resp) => { if (!resp.access_token) return; try {
-            const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" }); const nextRow = (meta.result.values ? meta.result.values.length : 0) + 1;
-            const vals = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc; });
-            await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: `'EBSinput'!A${nextRow}:AI${nextRow + vals.length - 1}`, valueInputOption: 'USER_ENTERED', resource: { values: vals } });
+            const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" }); const nR = (meta.result.values ? meta.result.values.length : 0) + 1;
+            const vls = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc; });
+            await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: `'EBSinput'!A${nR}:AI${nR + vls.length - 1}`, valueInputOption: 'USER_ENTERED', resource: { values: vls } });
             logTrace("Sync OK."); localStorage.removeItem('ebs_trf'); renderPreview();
         } catch (e) { logTrace("Sync Fail."); } }; tokenClient.requestAccessToken();
     }
-    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').innerText = "CONFIRM?"; setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').innerText="Wipe Local (2 clicks)";},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').innerText = "CONFIRM?"; setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').innerText="Clear Staging records";},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); renderPreview(); };
 </script>
 </body>
