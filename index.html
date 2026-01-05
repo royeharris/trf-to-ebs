@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-34</title>
+    <title>EBS Entry v2-35</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -15,8 +15,10 @@
         h3 { margin: 0; font-weight: bold; font-size: 1.1rem; line-height: 1.1; color: var(--primary); }
         .ver-tag { font-weight: 400; font-size: 0.7rem; color: #7f8c8d; margin-top: 2px; }
         .header-btns { display: flex; gap: 3px; }
+        
         .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.5rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; width: 55px; height: 44px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; }
         .btn-reset-ui { background: #7f8c8d; } .btn-cache-save { background: var(--accent); } .btn-cache-pull { background: var(--cache); } .btn-test-mode { background: var(--test); }
+        
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; font-family: inherit; }
         .date-input-container { display: flex; align-items: center; gap: 5px; background: white; border: 1px solid #dcdde1; border-radius: 6px; padding: 0 8px; height: 38px; }
@@ -24,25 +26,31 @@
         .type-display { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; height: 38px; line-height: 36px; border: 1px solid #dcdde1; border-radius: 6px; background: #f1f2f6; box-sizing: border-box; }
         .total-box { background: #e8f5e9; border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin: 15px 0; }
         .total-val { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        
         .actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
         button.action-main { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; -webkit-font-smoothing: antialiased; }
+        
         .preview-wrap { width: 100%; overflow-x: auto; margin-top: 15px; -webkit-overflow-scrolling: touch; border: 1px solid #ddd; border-radius: 6px; }
         table { width: 1080px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; font-family: inherit; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f2f2f2; font-weight: bold; color: var(--primary); }
+        th { background: #f2f2f2; font-weight: bold; color: var(--primary); font-family: inherit !important; }
+        
         .w-edit { width: 30px; text-align: center; } .w-grp { width: 40px; } .w-day { width: 30px; text-align: center; } .w-fu { width: 60px; } .w-date { width: 70px; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; } .w-note { width: 35px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 60px; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; } .w-mnth { width: 40px; text-align: center; } .w-stat { width: 60px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
-        #note_modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; }
-        .modal-btns { display: flex; gap: 10px; margin-top: 15px; }
+        
+        #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; -webkit-font-smoothing: antialiased; }
         #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; font-weight: 600; }
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
         .txt-center { text-align: center; }
+        
+        #note_modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-34</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-35</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="cachePull()">Pull local<br>Lookups</button>
             <button class="btn-lookup" onclick="initRefresh()">Refresh<br>Lookups</button>
@@ -86,7 +94,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-34 Iconic refinement and string formatting.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-35 Header and Status fonts standardized.</div>
 </div>
 
 <div id="note_modal">
@@ -102,7 +110,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-34)";
+    const VER = "Excel Budget Sheet Input (v2-35)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [];
 
@@ -111,11 +119,11 @@
     function logTrace(msg) { const log = document.getElementById('trace_log'); const now = new Date().toLocaleTimeString(); log.innerText += `\n[${now}] ${msg}`; log.scrollTop = log.scrollHeight; }
     function toggleLog(show) { document.getElementById('log_btn').style.display = show ? 'none' : 'block'; document.getElementById('trace_log').style.display = show ? 'block' : 'none'; }
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); logTrace("GAPI Ready."); }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; logTrace("GIS Ready."); }
+    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); logTrace("GIS Ready."); }
 
-    function useTestData() { if (!confirm("Overwrite current values with representational test set?")) return; AA_LIST = TEST_SET.AA; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}}; updateDropdown('colA', TEST_SET.Grouping, 'Roy'); updateDropdown('colB', TEST_SET.FU, 'v'); updateDropdown('colF', TEST_SET.Categories, null, '--Select--'); updateDropdown('colH', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colI', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colFreq', TEST_SET.Freq, 'A'); updateDropdown('colStatus', TEST_SET.Status, 'N'); updateDropdown('colZ', TEST_SET.Month, 'NEW'); updateDropdown('colX', TEST_SET.Cur, 'GBP'); localReset(); logTrace("Test Data Mode Active."); }
-    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local UI Snapshotted."); }
-    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local Snapshot Loaded."); } else { alert("No snapshot found."); } }
+    function useTestData() { if (!confirm("Overwrite current values with representational test set?")) return; AA_LIST = TEST_SET.AA; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}}; updateDropdown('colA', TEST_SET.Grouping, 'Roy'); updateDropdown('colB', TEST_SET.FU, 'v'); updateDropdown('colF', TEST_SET.Categories, null, '--Select--'); updateDropdown('colH', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colI', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colFreq', TEST_SET.Freq, 'A'); updateDropdown('colStatus', TEST_SET.Status, 'N'); updateDropdown('colZ', TEST_SET.Month, 'NEW'); updateDropdown('colX', TEST_SET.Cur, 'GBP'); localReset(); logTrace("Test Data Injected."); }
+    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local snapshot saved."); }
+    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local snapshot Loaded."); } else { alert("No snapshot found."); } }
     function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
     function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
@@ -133,10 +141,10 @@
     function initiateEdit(idx) {
         if (pendingEdit === idx) {
             editIndex = idx; pendingEdit = -1; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-            const sV = (id, val, isDropdown = false) => { const el = document.getElementById(id); if(!el) return; if(!isDropdown) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val.split(' ')[0])); if(o) el.value = o.value; } };
+            const sV = (id, val, isDrop = false) => { const el = document.getElementById(id); if(!el) return; if(!isDrop) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val.split(' ')[0])); if(o) el.value = o.value; } };
             sV('colA',d[0],true); sV('colB',d[1],true); sV('colC',d[2]); sV('colF',d[5],true); sV('colG',d[6]); sV('colH',d[7],true); sV('colI',d[8],true); sV('colK',d[10]); sV('colFreq',d[11],true); sV('colStatus',d[14],true); sV('colT',d[19]); sV('colM',d[20]); sV('colV',d[21]); sV('colX',d[23],true); sV('colZ',d[25],true);
             handleDateChange(); handleAccTrigger(); logTrace("Edit active.");
-        } else { pendingEdit = idx; editIndex = -1; logTrace("Confirming edit..."); }
+        } else { pendingEdit = idx; editIndex = -1; logTrace("Confim overwrite values..."); }
         renderPreview();
     }
     
