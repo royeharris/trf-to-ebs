@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-10</title>
+    <title>EBS Entry v2-11</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -29,9 +29,9 @@
         .actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
         button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; }
         
-        /* v2-10 Restored Staging Area */
+        /* v2-11 Restored Staging with Frequency */
         .preview-wrap { width: 100%; overflow-x: auto; margin-top: 15px; -webkit-overflow-scrolling: touch; border: 1px solid #ddd; border-radius: 6px; }
-        table { width: 850px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
+        table { width: 880px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold; }
         
@@ -47,7 +47,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-10</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-11</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-save" onclick="cacheSave()">Save to<br>Local</button>
             <button class="btn-lookup btn-cache-pull" onclick="cachePull()">Pull Local<br>Lookups</button>
@@ -58,12 +58,7 @@
     <div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
         <div><label>F/U</label><select id="colB" onchange="handleManualFU()"></select></div>
         <div><label>Grouping</label><select id="colA"></select></div>
-        <div><label>Date</label>
-            <div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
-                <span>📅</span><input type="date" id="colC" onchange="handleDateChange()">
-            </div>
-            <div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
-        </div>
+        <div><label>Date</label><div class="date-input-container" onclick="document.getElementById('colC').showPicker()"><span>📅</span><input type="date" id="colC" onchange="handleDateChange()"></div><div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div></div>
     </div>
     <div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
         <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
@@ -95,12 +90,12 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle (Tap Refresh to Login)</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-10 Restore successful.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-11 Frequency restored.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-10)";
+    const VER = "Excel Budget Sheet Input (v2-11)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
 
@@ -110,13 +105,13 @@
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); gapiInited = true; logTrace("GAPI OK."); }); }
     function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; logTrace("GIS OK."); }
     function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("Cache Saved."); }
-    function cachePull() { if (!confirm("Load local values?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Local Cache Loaded."); } else { AA_LIST = STATIC_TEST_DATA["AA"]; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}}; updateDropdown('colA', STATIC_TEST_DATA["Grouping"], 'Roy'); updateDropdown('colB', STATIC_TEST_DATA["F/U"], 'v'); updateDropdown('colF', STATIC_TEST_DATA["Category"], null, '--Select--'); updateDropdown('colH', STATIC_TEST_DATA["From"], null, '--Select--'); updateDropdown('colI', STATIC_TEST_DATA["To"], null, '--Select--'); updateDropdown('colFreq', STATIC_TEST_DATA["Frequency"], 'A'); updateDropdown('colStatus', STATIC_TEST_DATA["Status"], 'N'); updateDropdown('colZ', STATIC_TEST_DATA["Month"], 'NEW'); updateDropdown('colX', STATIC_TEST_DATA["Currency"], 'GBP'); logTrace("Static Test Data Loaded."); } }
+    function cachePull() { if (!confirm("Load local values?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Local Cache Loaded."); } else { AA_LIST = STATIC_TEST_DATA["AA"]; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}}; updateDropdown('colA', STATIC_TEST_DATA["Grouping"], 'Roy'); updateDropdown('colB', STATIC_TEST_DATA["F/U"], 'v'); updateDropdown('colF', STATIC_TEST_DATA["Category"], null, '--Select--'); updateDropdown('colH', STATIC_TEST_DATA["From"], null, '--Select--'); updateDropdown('colI', STATIC_TEST_DATA["To"], null, '--Select--'); updateDropdown('colFreq', STATIC_TEST_DATA["Frequency"], 'A'); updateDropdown('colStatus', STATIC_TEST_DATA["Status"], 'N'); updateDropdown('colZ', STATIC_TEST_DATA["Month"], 'NEW'); updateDropdown('colX', STATIC_TEST_DATA["Currency"], 'GBP'); logTrace("Static Data Loaded."); } }
     function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
     function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
     async function fetchActiveAccounts() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' }); AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : []; fetchActualData(); }
     async function fetchActualData() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' }); rawLookupData = res.result.values; populateUI(rawLookupData); }
-    function populateUI(data) { const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; }); updateDropdown(id, list, def, p); }; pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP'); localReset(); logTrace("Cloud OK."); }
+    function populateUI(data) { const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; }); updateDropdown(id, list, def, p); }; pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP'); localReset(); }
     function updateDropdown(id, vals, def, prompt) { const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : ''; h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } }
     function localReset() { ['colT','colV','colG','colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; document.getElementById('workTypeDisplay').innerText = "--"; editIndex = -1; renderPreview(); calc(); }
     function handleAccTrigger() { const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fu = document.getElementById('colB'), typeDisp = document.getElementById('workTypeDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return; const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In"; typeDisp.innerText = valE; if (valE === "xfer") { const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value; const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value; cat.value = "Transfer"; } else if (cat.value.toLowerCase().includes("support")) { const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value; } }
@@ -133,13 +128,13 @@
     }
     function renderPreview() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="txt-center" style="width:15px;">S</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
-        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="txt-center">${r[10]?'✓':''}</td><td>${r[22]}</td><td>${r[25]}</td><td class="txt-center">${r[14]}</td><td>${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
+        let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-fu">F/U</th><th class="w-date">Date</th><th class="w-cat">Category</th><th class="w-sort">s</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-tiny">N</th><th class="w-tiny">F</th><th class="w-tot">Total</th><th class="txt-center" style="width:35px;">Mnth</th><th class="txt-center" style="width:15px;">S</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
+        d.forEach((r, idx) => { const isEditing = editIndex === idx; h += `<tr><td><button onclick="${isEditing?'saveRow()':'handleEdit('+idx+')'}" style="background:${isEditing?'#f39c12':'#3498db'};color:white;border:none;border-radius:4px;padding:2px 6px;">${isEditing?'C':'E'}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].split('-')[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(r[2].split('-')[1])-1]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[10]?'✓':''}</td><td>${r[11]}</td><td>${r[22]}</td><td>${r[25]}</td><td>${r[14]}</td><td>${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;border:none;color:white;cursor:pointer;padding:0 5px;border-radius:4px;">X</button></td></tr>`; });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; renderPreview(); }
     async function handleSync() {
-        const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!d.length) return;
+        const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!data.length) return;
         tokenClient.callback = async (resp) => { if (!resp.access_token) return; try {
             const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" }); const nextRow = (meta.result.values ? meta.result.values.length : 0) + 1;
             const vals = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc; });
