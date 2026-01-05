@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-25</title>
+    <title>EBS Entry v2-26</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
-        /* Reverted color palette and font weights v2-25 */
         :root { --primary: #2c3e50; --accent: #27ae60; --danger: #c0392b; --bg: #f8f9fa; --bridge: #2980b9; --cache: #8e44ad; --test: #e67e22; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 960px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -17,7 +16,6 @@
         .ver-tag { font-weight: 400; font-size: 0.7rem; color: #7f8c8d; margin-top: 2px; }
         .header-btns { display: flex; gap: 3px; }
         
-        /* Reverted Button Styling v2-25 */
         .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.5rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; width: 55px; height: 44px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; }
         .btn-reset-ui { background: #7f8c8d; }
         .btn-cache-save { background: var(--accent); }
@@ -53,7 +51,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-25</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-26</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-test-mode" onclick="useTestData()">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-cache-save" onclick="cacheSave()">Save to<br>local Lookups</button>
@@ -90,19 +88,19 @@
     </div>
     <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
     <div class="actions">
-        <button class="action-main" onclick="saveRow()" style="background:var(--accent);">Stage entry</button>
-        <button class="action-main" id="sync_btn" onclick="handleSync()" style="background:var(--bridge);">Send to Sheets</button>
+        <button class="action-main" onclick="saveRow()" style="background:var(--accent);">Create Staging record</button>
+        <button class="action-main" id="sync_btn" onclick="handleSync()" style="background:var(--bridge);">Send Staging records to Sheets</button>
         <button class="action-main" id="wipeBtn" onclick="clearData()" style="background:var(--danger); opacity: 0.85;">Clear Staging records</button>
     </div>
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-25 Font and labels restored.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-26 Action labels updated.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-25)";
+    const VER = "Excel Budget Sheet Input (v2-26)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
 
@@ -115,17 +113,17 @@
     function logTrace(msg) { const log = document.getElementById('trace_log'); const now = new Date().toLocaleTimeString(); log.innerText += `\n[${now}] ${msg}`; log.scrollTop = log.scrollHeight; }
     function toggleLog(show) { document.getElementById('log_btn').style.display = show ? 'none' : 'block'; document.getElementById('trace_log').style.display = show ? 'block' : 'none'; }
     function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); logTrace("GAPI Ready."); }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); logTrace("GIS Ready."); }
+    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: '' }); gsiInited = true; logTrace("GIS Ready."); }
 
     function useTestData() {
         if (!confirm("Overwrite current values with representational test set?")) return;
         AA_LIST = TEST_SET.AA; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
         updateDropdown('colA', TEST_SET.Grouping, 'Roy'); updateDropdown('colB', TEST_SET.FU, 'v'); updateDropdown('colF', TEST_SET.Categories, null, '--Select--'); updateDropdown('colH', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colI', TEST_SET.Accounts, null, '--Select--'); updateDropdown('colFreq', TEST_SET.Freq, 'A'); updateDropdown('colStatus', TEST_SET.Status, 'N'); updateDropdown('colZ', TEST_SET.Month, 'NEW'); updateDropdown('colX', TEST_SET.Cur, 'GBP');
-        localReset(); logTrace("Representational Data Loaded.");
+        localReset(); logTrace("Test Data Mode Active.");
     }
 
-    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local UI Snapshotted."); }
-    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local Snapshot Loaded."); } else { alert("No snapshot found."); } }
+    function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local snapshot saved."); }
+    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local snapshot Loaded."); } else { alert("No snapshot found."); } }
     
     function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
@@ -177,7 +175,7 @@
             logTrace("Sync OK."); localStorage.removeItem('ebs_trf'); renderPreview();
         } catch (e) { logTrace("Sync Fail."); } }; tokenClient.requestAccessToken();
     }
-    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').innerText = "CONFIRM?"; setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').innerText="Clear Staging records";},3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed=false; renderPreview(); } }
+    function clearData() { if(!wipeConfirmed) { wipeConfirmed=true; document.getElementById('wipeBtn').innerText = "CONFIRM?"; setTimeout(()=>{wipeConfirmed=false; document.getElementById('wipeBtn').innerText="Clear Staging records";},3000); } else { localStorage.removeItem('ebs_cache_data'); wipeConfirmed=false; renderPreview(); } }
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); renderPreview(); };
 </script>
 </body>
