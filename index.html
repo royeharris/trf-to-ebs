@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-20</title>
+    <title>EBS Entry v2-21</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -36,6 +36,7 @@
         .w-edit { width: 30px; text-align: center; } .w-grp { width: 35px; } .w-fu { width: 25px; } .w-date { width: 70px; }
         .w-cat, .w-acc { width: 110px; } .w-sort { width: 20px; } .w-tiny { width: 15px; text-align: center; }
         .w-tot { width: 80px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
+        #auth_status { font-size: 0.65rem; margin-top: 10px; text-align: center; color: #7f8c8d; }
         #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; }
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
     </style>
@@ -43,7 +44,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-20</div></div>
+        <div class="title-block"><h3>EBS Input</h3><div class="ver-tag">v2-21</div></div>
         <div class="header-btns">
             <button class="btn-lookup btn-test-mode" onclick="useTestData()">Use Test<br>Data</button>
             <button class="btn-lookup btn-cache-save" onclick="cacheSave()">Save to<br>Local</button>
@@ -87,16 +88,15 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-20 Logic OK. Test data curated.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-21 UI Guardrails active.</div>
     <input type="hidden" id="bgTypeE" value="--">
 </div>
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-20)";
+    const VER = "Excel Budget Sheet Input (v2-21)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, gapiInited = false, gsiInited = false, wipeConfirmed = false, editIndex = -1, rawLookupData = [];
 
-    // CURATED REPRESENTATIONAL SET v2-20
     const TEST_SET = {
         "Grouping": ["Roy", "Peter"],
         "FU": ["v - Verified", "xf - Transfer", "S - Support"],
@@ -131,19 +131,22 @@
     }
 
     function cacheSave() { if (rawLookupData.length === 0) { alert("First Refresh Lookups"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("Cache Saved."); }
-    function cachePull() { const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Snapshot Loaded."); } else { alert("No snapshot found."); } }
+    
+    // Updated Logic v2-21
+    function cachePull() { 
+        if (!confirm("Do you want to load local Lookups?")) return; 
+        const cached = localStorage.getItem('ebs_cache_data'); 
+        if (cached) { 
+            rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Snapshot Loaded."); 
+        } else { alert("No snapshot found."); } 
+    }
+
     function initRefresh() { tokenClient.callback = async (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookupRefs(); } }; tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
     function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
     async function fetchActiveAccounts() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' }); AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : []; fetchActualData(); }
     async function fetchActualData() { const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' }); rawLookupData = res.result.values; populateUI(rawLookupData); }
-
-    function populateUI(data) {
-        const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; }); updateDropdown(id, list, def, p); };
-        pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP');
-        localReset(); logTrace("Cloud OK.");
-    }
-
+    function populateUI(data) { const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} - ${d}` : v; }); updateDropdown(id, list, def, p); }; pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP'); localReset(); }
     function updateDropdown(id, vals, def, prompt) { const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : ''; h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } }
     function localReset() { ['colT','colV','colG','colK'].forEach(id => document.getElementById(id).value = ""); document.getElementById('colM').value = "1"; document.getElementById('workTypeDisplay').innerText = "--"; editIndex = -1; renderPreview(); calc(); }
     function handleAccTrigger() {
@@ -157,7 +160,7 @@
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) return; const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' - ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
-    function handleEdit(idx) { if (!confirm("Confirm edit will overwrite current entries?")) return; editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx]; const setVal = (id, val, isSel = false) => { const el = document.getElementById(id); if(!el) return; if(!isSel) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } }; setVal('colA',d[0],true); setVal('colB',d[1],true); setVal('colC',d[2]); setVal('colF',d[5],true); setVal('colG',d[6]); setVal('colH',d[7],true); setVal('colI',d[8],true); setVal('colK',d[10]); setVal('colFreq',d[11],true); setVal('colStatus',d[14],true); setVal('colT',d[19]); setVal('colM',d[20]); setVal('colV',d[21]); setVal('colX',d[23],true); setVal('colZ',d[25],true); handleDateChange(); handleAccTrigger(); renderPreview(); }
+    function handleEdit(idx) { if (!confirm("Confirm edit overwrite?")) return; editIndex = idx; const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx]; const setVal = (id, val, isSel = false) => { const el = document.getElementById(id); if(!el) return; if(!isSel) el.value = val; else { const o = Array.from(el.options).find(opt => opt.value.startsWith(val)); if(o) el.value = o.value; } }; setVal('colA',d[0],true); setVal('colB',d[1],true); setVal('colC',d[2]); setVal('colF',d[5],true); setVal('colG',d[6]); setVal('colH',d[7],true); setVal('colI',d[8],true); setVal('colK',d[10]); setVal('colFreq',d[11],true); setVal('colStatus',d[14],true); setVal('colT',d[19]); setVal('colM',d[20]); setVal('colV',d[21]); setVal('colX',d[23],true); setVal('colZ',d[25],true); handleDateChange(); handleAccTrigger(); renderPreview(); }
     function saveRow() {
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value; if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; }
         let whoVal = ""; if (fv.startsWith('S')) whoVal = document.getElementById('colA').value;
