@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-57</title>
+    <title>EBS Entry v2-58</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -16,9 +16,8 @@
         .header-wrap { display: flex; flex-direction: column; margin-bottom: 15px; gap: 8px; }
         .header-btns { display: flex; justify-content: space-between; gap: 4px; width: 100%; }
         
-        /* v2-57: Adjusted button sizing for long Refresh label */
-        .btn-lookup { background: var(--bridge); padding: 4px 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; display: flex; align-items: center; justify-content: center; min-width: 0; }
-        .btn-refresh { flex: 1.3; } /* Give more space to button 2 */
+        /* v2-58: optimized sizing for multi-line labels */
+        .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; display: flex; align-items: center; justify-content: center; min-width: 0; }
         .btn-reset-ui { background: var(--danger); } .btn-cache-save { background: var(--accent); } .btn-cache-pull { background: var(--cache); } .btn-test-mode { background: var(--test); }
         
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
@@ -47,12 +46,12 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-57</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-58</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
-            <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh Lookups from Sheets</button>
+            <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
             <button class="btn-lookup btn-cache-save" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
-            <button class="btn-lookup btn-test-mode" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
+            <button class="btn-lookup btn-test-mode" onclick="useTestData()">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
         </div>
     </div>
@@ -92,7 +91,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-57 Long Refresh label optimized for mobile fit.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-58 Triple-line Refresh label for optimized mobile fit.</div>
 </div>
 
 <div id="note_modal">
@@ -108,7 +107,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-57)";
+    const VER = "Excel Budget Sheet Input (v2-58)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false;
 
