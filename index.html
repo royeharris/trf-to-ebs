@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-64</title>
+    <title>EBS Entry v2-65</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -30,7 +30,7 @@
         table { width: 1100px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; font-family: inherit; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); font-size: 0.58rem !important; font-family: inherit !important; }
-        .w-edit { width: 30px; text-align: center; } .w-grp { width: 40px; } .w-day { width: 30px; text-align: center; } .w-type { width: 60px; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; } 
+        .w-edit { width: 30px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; } 
         .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 100px; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-mnth { width: 40px; text-align: center; } .w-stat { width: 60px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
         #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; -webkit-font-smoothing: antialiased; }
         #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; font-weight: 600; }
@@ -43,7 +43,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-64</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-65</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -88,7 +88,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-64 Swapped logical mapping fixed. Type=Dropdown, Flow=Display.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-65 logic rebuilt from v2-62. Type/Flow renaming corrected.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -109,7 +109,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-64)";
+    const VER = "Excel Budget Sheet Input (v2-65)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -158,7 +158,6 @@
             };
             setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colM', d[20]); setUI('colV', d[21]); setUI('colX', d[23], true); setUI('colZ', d[25], true);
             setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
-            // v2-64 REFIX: Flow maps to Flow box
             document.getElementById('flowDisplay').innerText = d[4] || "--";
             handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled for edit.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirm data retrieval..."); } renderPreview();
