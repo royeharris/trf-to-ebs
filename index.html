@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-72</title>
+    <title>EBS Entry v2-73</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -43,12 +43,12 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-72</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-73</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
             <button class="btn-lookup btn-cache-save" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
-            <button class="btn-lookup btn-test-mode" onclick="useTestData()">Pull test<br>Lookups</button>
+            <button class="btn-lookup btn-test-mode" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
         </div>
     </div>
@@ -88,7 +88,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-72 Auto-clear after sync disabled. Manual clear enforced.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-73 Strict loop matching for accounts and standardised labels implemented.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -109,7 +109,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-72)";
+    const VER = "Excel Budget Sheet Input (v2-73)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -142,16 +142,26 @@
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     
+    // v2-73 Logic: Loop matching for accounts and standard labels
     function initiateEdit(idx) {
         if (rawLookupData.length === 0) { alert("First Refresh Lookups or Pull local Lookups."); return; }
         if (pendingEdit === idx) {
             isRestoring = true; editIndex = idx; pendingEdit = -1;
             const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-            const setUI = (id, val, isDrop = false) => { const el = document.getElementById(id); if(!el) return; if(!isDrop) el.value = val; else { const opts = Array.from(el.options); const found = opts.find(o => o.value === val || o.value === `${val} (AA)` || o.value.split(' ')[0] === val.split(' ')[0]); if(found) el.value = found.value; } };
+            const setUI = (id, val, isDrop = false) => { 
+                const el = document.getElementById(id); if(!el) return; 
+                if(!isDrop) el.value = val; 
+                else { 
+                    // v2-73: STRICT LOOP MATCHING RESTORED
+                    const opts = Array.from(el.options);
+                    const found = opts.find(o => o.value === val || o.value === `${val} (AA)` || o.value.split(' ')[0] === val.split(' ')[0]);
+                    if(found) el.value = found.value;
+                } 
+            };
             setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colM', d[20]); setUI('colV', d[21]); setUI('colX', d[23], true); setUI('colZ', d[25], true);
             setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
             document.getElementById('flowDisplay').innerText = d[4] || "--";
-            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled for edit.");
+            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled. Strict accounts matched.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirm data retrieval..."); } renderPreview();
     }
     
@@ -159,6 +169,7 @@
     function closeFlowModal() { document.getElementById('flow_modal').style.display = 'none'; }
     function commitFlowSelection() { const selected = document.getElementById('modal_flow_select').value; document.getElementById('flowDisplay').innerText = selected; closeFlowModal(); saveRow(pendingOverwrite); }
     function saveRow(isOverwrite) { const flowV = document.getElementById('flowDisplay').innerText; if (flowV === "--") { pendingOverwrite = isOverwrite; openFlowModal(); return; } const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value; if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; } let wV = ""; if (fv.startsWith('S')) wV = document.getElementById('colA').value; const r = Array(35).fill(""); r[0]=document.getElementById('colA').value; r[1]=document.getElementById('colB').value; r[2]=document.getElementById('colC').value; r[4]=flowV; r[5]=document.getElementById('colF').value; r[6]=document.getElementById('colG').value; r[7]=document.getElementById('colH').value; r[8]=document.getElementById('colI').value; r[10]=document.getElementById('colK').value; r[11]=document.getElementById('colFreq').value; r[14]=document.getElementById('colStatus').value; r[19]=parseFloat(document.getElementById('colT').value||0).toFixed(2); r[20]=document.getElementById('colM').value; r[21]=parseFloat(document.getElementById('colV').value||0).toFixed(2); r[22]=calc(); r[23]=document.getElementById('colX').value; r[25]=document.getElementById('colZ').value; r[33]=wV; r[34]=VER; let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (isOverwrite && editIndex > -1) { d[editIndex] = r; logTrace("Record Overwritten."); } else { d.push(r); logTrace("New Record Staged."); } localStorage.setItem('ebs_trf', JSON.stringify(d)); localReset(); }
+    
     function renderPreview() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
         let h = '<table><tr><th class="w-edit">E</th><th class="w-grp">Grp</th><th class="w-type">Type</th><th class="w-day">Day</th><th class="w-date">Date</th><th class="w-flow">Flow</th><th class="w-cat">Category</th><th class="w-sort">Sort</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-note">Note</th><th class="w-freq">Frequency</th><th class="w-cur">Cur</th><th class="w-tot">Total</th><th class="w-mnth">Mnth</th><th class="w-stat">Status</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
@@ -170,9 +181,12 @@
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
+
+    function openNote(idx) { activeNoteIdx = idx; const d = JSON.parse(localStorage.getItem('ebs_trf')); document.getElementById('modal_note_text').value = d[idx][10] || ""; document.getElementById('note_modal').style.display = 'block'; }
+    function closeNote() { document.getElementById('note_modal').style.display = 'none'; activeNoteIdx = -1; }
+    function commitNote() { let d = JSON.parse(localStorage.getItem('ebs_trf')); d[activeNoteIdx][10] = document.getElementById('modal_note_text').value; localStorage.setItem('ebs_trf', JSON.stringify(d)); closeNote(); renderPreview(); logTrace("Note Updated."); }
     function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; pendingEdit = -1; renderPreview(); }
     
-    // v2-72 FIX: Removed automatic localStorage removal and grid wipe after sync
     async function handleSync() {
         if (pendingEdit !== -1 || editIndex !== -1) { alert("This function is not available while Edit is in progress for a Staging entry."); return; }
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!d.length) return;
@@ -182,7 +196,6 @@
             const vls = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [1, 5, 11, 14, 23, 25].forEach(i => rc[i] = rc[i].split(' ')[0]); [7, 8].forEach(i => rc[i] = rc[i].replace(/ \(AA\)/g, '')); [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc; });
             await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: `'EBSinput'!A${nR}:AI${nR + vls.length - 1}`, valueInputOption: 'USER_ENTERED', resource: { values: vls } });
             alert("Sync completed."); updateStatus("Token Active", "active"); 
-            // v2-72: LOCAL DATA IS PRESERVED. renderPreview() and removeItem() calls removed.
             logTrace("Sync complete. local data preserved.");
         } catch (e) { logTrace("Sync Fail."); updateStatus("Error", "error"); } }; tokenClient.requestAccessToken();
     }
