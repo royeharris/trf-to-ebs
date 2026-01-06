@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-58</title>
+    <title>EBS Entry v2-59</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -15,11 +15,8 @@
         .branding-row span { font-weight: 400; font-size: 0.75rem; color: #7f8c8d; margin-left: 5px; }
         .header-wrap { display: flex; flex-direction: column; margin-bottom: 15px; gap: 8px; }
         .header-btns { display: flex; justify-content: space-between; gap: 4px; width: 100%; }
-        
-        /* v2-58: optimized sizing for multi-line labels */
         .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; display: flex; align-items: center; justify-content: center; min-width: 0; }
         .btn-reset-ui { background: var(--danger); } .btn-cache-save { background: var(--accent); } .btn-cache-pull { background: var(--cache); } .btn-test-mode { background: var(--test); }
-        
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; font-family: inherit; }
         .date-input-container { display: flex; align-items: center; gap: 5px; background: white; border: 1px solid #dcdde1; border-radius: 6px; padding: 0 8px; height: 38px; }
@@ -46,12 +43,12 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-58</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-59</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
             <button class="btn-lookup btn-cache-save" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
-            <button class="btn-lookup btn-test-mode" onclick="useTestData()">Pull test<br>Lookups</button>
+            <button class="btn-lookup btn-test-mode" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
         </div>
     </div>
@@ -91,7 +88,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-58 Triple-line Refresh label for optimized mobile fit.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-59 Strict value matching implemented to fix "Santander B" error.</div>
 </div>
 
 <div id="note_modal">
@@ -107,11 +104,11 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-58)";
+    const VER = "Excel Budget Sheet Input (v2-59)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false;
 
-    const TEST_SET = { "Grouping": ["Roy", "Peter"], "FU": ["v Verified", "xf Transfer", "S Support"], "Categories": ["Food", "Transfer", "Support Misc", "Salary", "Rent"], "Accounts": ["Santander P (AA)", "Revolut P (AA)", "Starling B (AA)"], "AA": ["Santander P (AA)", "Revolut P (AA)", "Starling B (AA)"], "Freq": ["A Ad-hoc", "M Monthly", "K Keep in credit"], "Status": ["N New", "P Paid"], "Month": ["NEW", "JAN", "FEB"], "Cur": ["GBP", "EUR", "ZAR"] };
+    const TEST_SET = { "Grouping": ["Roy", "Peter"], "FU": ["v Verified", "xf Transfer", "S Support"], "Categories": ["Food", "Transfer", "Support Misc", "Salary", "Rent"], "Accounts": ["Santander P (AA)", "Santander B (AA)", "Revolut P (AA)", "Revolut (AA)"], "AA": ["Santander P (AA)", "Santander B (AA)", "Revolut P (AA)", "Revolut (AA)"], "Freq": ["A Ad-hoc", "M Monthly", "K Keep in credit"], "Status": ["N New", "P Paid"], "Month": ["NEW", "JAN", "FEB"], "Cur": ["GBP", "EUR", "ZAR"] };
 
     function logTrace(msg) { const log = document.getElementById('trace_log'); const now = new Date().toLocaleTimeString(); log.innerText += `\n[${now}] ${msg}`; log.scrollTop = log.scrollHeight; }
     function toggleLog(show) { document.getElementById('log_btn').style.display = show ? 'none' : 'block'; document.getElementById('trace_log').style.display = show ? 'block' : 'none'; }
@@ -154,15 +151,25 @@
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     
+    // v2-59 Logic: Strict equality check during restoration to prevent mis-mapping
     function initiateEdit(idx) {
         if (rawLookupData.length === 0) { alert("First Refresh Lookups or Pull local Lookups."); return; }
         if (pendingEdit === idx) {
             isRestoring = true; editIndex = idx; pendingEdit = -1;
             const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-            const setUI = (id, val, isDrop = false) => { const el = document.getElementById(id); if(!el) return; if(!isDrop) el.value = val; else { const code = val.split(' ')[0]; const o = Array.from(el.options).find(opt => opt.value.startsWith(code)); if(o) el.value = o.value; } };
+            const setUI = (id, val, isDrop = false) => { 
+                const el = document.getElementById(id); if(!el) return; 
+                if(!isDrop) el.value = val; 
+                else { 
+                    // v2-59 FIX: EXACT MATCH iterate
+                    const target = val.split(' ')[0];
+                    const opt = Array.from(el.options).find(o => o.value === val || o.value.split(' ')[0] === target);
+                    if(opt) el.value = opt.value;
+                } 
+            };
             setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colM', d[20]); setUI('colV', d[21]); setUI('colX', d[23], true); setUI('colZ', d[25], true);
             setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
-            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled for edit.");
+            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled. Strict accounts matched.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirm data retrieval..."); } renderPreview();
     }
     
