@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-59</title>
+    <title>EBS Entry v2-60</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -43,7 +43,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-59</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-60</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -88,7 +88,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-59 Strict value matching implemented to fix "Santander B" error.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-60 Robust dropdown loop matching for accounts.</div>
 </div>
 
 <div id="note_modal">
@@ -104,7 +104,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-59)";
+    const VER = "Excel Budget Sheet Input (v2-60)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false;
 
@@ -151,7 +151,7 @@
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
     
-    // v2-59 Logic: Strict equality check during restoration to prevent mis-mapping
+    // v2-60 Logic: Robust Loop matching for exact dropdown restoration
     function initiateEdit(idx) {
         if (rawLookupData.length === 0) { alert("First Refresh Lookups or Pull local Lookups."); return; }
         if (pendingEdit === idx) {
@@ -161,15 +161,15 @@
                 const el = document.getElementById(id); if(!el) return; 
                 if(!isDrop) el.value = val; 
                 else { 
-                    // v2-59 FIX: EXACT MATCH iterate
-                    const target = val.split(' ')[0];
-                    const opt = Array.from(el.options).find(o => o.value === val || o.value.split(' ')[0] === target);
-                    if(opt) el.value = opt.value;
+                    // v2-60: FULL LOOP MATCHING
+                    const opts = Array.from(el.options);
+                    const found = opts.find(o => o.value === val || o.value === `${val} (AA)` || o.value.startsWith(`${val} `));
+                    if(found) el.value = found.value;
                 } 
             };
             setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colM', d[20]); setUI('colV', d[21]); setUI('colX', d[23], true); setUI('colZ', d[25], true);
             setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
-            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled. Strict accounts matched.");
+            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled. Robust account matching active.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirm data retrieval..."); } renderPreview();
     }
     
