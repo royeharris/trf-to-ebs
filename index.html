@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-63</title>
+    <title>EBS Entry v2-64</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -43,7 +43,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-63</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-64</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -88,7 +88,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-63 Renamed Type and Flow fields. Logical positions maintained.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-64 Swapped logical mapping fixed. Type=Dropdown, Flow=Display.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -109,7 +109,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-63)";
+    const VER = "Excel Budget Sheet Input (v2-64)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -136,8 +136,8 @@
     function handleResetConfirm() { const btn = document.getElementById('resetBtn'); if(!resetConfirmed) { resetConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ resetConfirmed = false; btn.innerText="Reset"; }, 3000); } else { localReset(); resetConfirmed = false; btn.innerText="Reset"; } }
     function handleWipeConfirm() { const btn = document.getElementById('wipeBtn'); if(!wipeConfirmed) { wipeConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ wipeConfirmed = false; btn.innerText="Clear Staging records"; }, 3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; btn.innerText="Clear Staging records"; renderPreview(); logTrace("Staging wiped."); } }
     
-    function handleAccTrigger() { if (isRestoring) return; const h = document.getElementById('colH').value, i = document.getElementById('colI').value, fu = document.getElementById('colB'), fD = document.getElementById('flowDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return; const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In"; fD.innerText = valE; if (valE === "xfer") { const xf = Array.from(fu.options).find(o => o.value.startsWith('xf')); if(xf) fu.value = xf.value; const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value; cat.value = "Transfer"; } else if (cat.value.toLowerCase().includes("support")) { const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value; } }
-    function handleCatTrigger() { if (isRestoring) return; const f = document.getElementById('colF').value, fu = document.getElementById('colB'); if (f.startsWith('S')) { const s = Array.from(fu.options).find(o => o.value.startsWith('S')); if(s) fu.value = s.value; } }
+    function handleAccTrigger() { if (isRestoring) return; const h = document.getElementById('colH').value, i = document.getElementById('colI').value, ty = document.getElementById('colB'), fD = document.getElementById('flowDisplay'), cat = document.getElementById('colF'), freq = document.getElementById('colFreq'); if (!h || !i || h.includes("--") || i.includes("--")) return; const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In"; fD.innerText = valE; if (valE === "xfer") { const xf = Array.from(ty.options).find(o => o.value.startsWith('xf')); if(xf) ty.value = xf.value; const k = Array.from(freq.options).find(o => o.value.startsWith('K')); if(k) freq.value = k.value; cat.value = "Transfer"; } else if (cat.value.toLowerCase().includes("support")) { const s = Array.from(ty.options).find(o => o.value.startsWith('S')); if(s) ty.value = s.value; } }
+    function handleCatTrigger() { if (isRestoring) return; const f = document.getElementById('colF').value, ty = document.getElementById('colB'); if (f.startsWith('S')) { const s = Array.from(ty.options).find(o => o.value.startsWith('S')); if(s) ty.value = s.value; } }
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) return; const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualType() { if(document.getElementById('colB').value.startsWith('xf')) document.getElementById('colF').value = "Transfer"; }
@@ -147,9 +147,18 @@
         if (pendingEdit === idx) {
             isRestoring = true; editIndex = idx; pendingEdit = -1;
             const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-            const setUI = (id, val, isDrop = false) => { const el = document.getElementById(id); if(!el) return; if(!isDrop) el.value = val; else { const opts = Array.from(el.options); const found = opts.find(o => o.value === val || o.value === `${val} (AA)` || o.value.startsWith(`${val} `)); if(found) el.value = found.value; } };
+            const setUI = (id, val, isDrop = false) => { 
+                const el = document.getElementById(id); if(!el) return; 
+                if(!isDrop) el.value = val; 
+                else { 
+                    const opts = Array.from(el.options);
+                    const found = opts.find(o => o.value === val || o.value === `${val} (AA)` || o.value.split(' ')[0] === val.split(' ')[0]);
+                    if(found) el.value = found.value;
+                } 
+            };
             setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colM', d[20]); setUI('colV', d[21]); setUI('colX', d[23], true); setUI('colZ', d[25], true);
             setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
+            // v2-64 REFIX: Flow maps to Flow box
             document.getElementById('flowDisplay').innerText = d[4] || "--";
             handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50); logTrace("Record pulled for edit.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirm data retrieval..."); } renderPreview();
