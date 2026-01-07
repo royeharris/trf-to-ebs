@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-104</title>
+    <title>EBS Entry v2-105</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -31,7 +31,7 @@
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); font-size: 0.58rem !important; }
         .w-edit { width: 35px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; text-align: center; } 
-        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 100px; } .w-tot { width: 80px; text-align: right; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
+        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 100px; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; }
@@ -45,7 +45,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-104</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-105</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local Lookups</button>
             <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh Lookups from Sheets</button>
@@ -100,7 +100,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-104 Edit Commit lock fix and mandatory Lookup Guard restored.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-105 Commit sequence (C to E) repaired; mandatory lookup check active.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -121,7 +121,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-104)";
+    const VER = "Excel Budget Sheet Input (v2-105)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -154,7 +154,7 @@
             else s.selectedIndex = 0; 
         }; 
         rS('colA','Roy'); rS('colB','v'); rS('colF',null); rS('colH',null); rS('colI',null); rS('colFreq','A'); rS('colStatus','N'); rS('colZ','NEW'); rS('colX','GBP'); 
-        renderPreview(); calc(); logTrace("Grid Reset Complete."); 
+        renderPreview(); calc(); logTrace("Full UI Reset Complete."); 
     }
 
     function handleResetConfirm() { const btn = document.getElementById('resetBtn'); if(!resetConfirmed) { resetConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ resetConfirmed = false; btn.innerText="Reset"; }, 3000); } else { localReset(); resetConfirmed = false; btn.innerText="Reset"; } }
@@ -164,14 +164,14 @@
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) { document.getElementById('colCDisp').innerText = ""; return; } const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     
-    // v2-104 Repaired Synchronous Commit Sequence
+    // v2-105 Repaired Staging Logic with Synchronous State Guard
     function handleStagingAction() {
         if (rawLookupData.length === 0) { alert("Edit is only possible after Lookups are pulled or refreshed"); return; }
         if (editIndex > -1) { 
-            saveRow(true); // Commit overwrite first
-            localReset();  // Reset UI immediately after successful save
+            saveRow(true); // Commitment must happen BEFORE UI clear
+            localReset();  
         } else { 
-            saveRow(false); // Create new record
+            saveRow(false); 
         }
     }
 
