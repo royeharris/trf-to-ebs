@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-81</title>
+    <title>EBS Entry v2-82</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -11,11 +11,10 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 960px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .branding-row { margin-bottom: 10px; font-size: 1.1rem; line-height: 1.1; color: var(--primary); }
-        .branding-row b { font-weight: bold; }
         .branding-row span { font-weight: 400; font-size: 0.75rem; color: #7f8c8d; margin-left: 5px; }
         .header-wrap { display: flex; flex-direction: column; margin-bottom: 15px; gap: 8px; }
         .header-btns { display: flex; justify-content: space-between; gap: 4px; width: 100%; }
-        .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; display: flex; align-items: center; justify-content: center; min-width: 0; -webkit-font-smoothing: antialiased; }
+        .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; display: flex; align-items: center; justify-content: center; min-width: 0; }
         .btn-reset-ui { background: var(--danger); }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; font-family: inherit; }
@@ -29,21 +28,19 @@
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); }
         .w-edit { width: 45px; text-align: center; } .w-flow { width: 40px; text-align: center; } .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-tot { width: 80px; text-align: right; }
-        #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; -webkit-font-smoothing: antialiased; }
-        #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; border: none; font-weight: 600; }
-        #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
+        #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; }
         
-        /* Calculator Overlay */
+        /* Calculator Styles */
         .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
         .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
         #calc_modal { display: none; position: fixed; z-index: 2000; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 260px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .calc-header { background: var(--primary); color: white; padding: 10px; border-radius: 12px 12px 0 0; cursor: move; text-align: center; font-size: 0.8rem; font-weight: bold; }
-        .calc-screen { background: #ecf0f1; padding: 10px; text-align: right; font-size: 1.2rem; font-family: monospace; font-weight: bold; height: 40px; overflow: hidden; border-bottom: 1px solid #ccc; }
+        .calc-screen { background: #ecf0f1; padding: 10px; text-align: right; font-size: 1.2rem; font-family: monospace; font-weight: bold; border-bottom: 1px solid #ccc; height: 40px; overflow: hidden; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; }
         .calc-btn { padding: 15px 5px; background: #eee; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
         .calc-op { background: var(--test); color: white; }
-        .calc-res { background: #bdc3c7; font-size: 1.2rem; }
         .calc-eq { background: var(--accent); color: white; }
+        .calc-res { background: #bdc3c7; }
         .calc-clr { background: var(--danger); color: white; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; }
@@ -52,54 +49,63 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-81</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-82</span></div>
         <div class="header-btns">
-            <button class="btn-lookup" id="pullLookups">Pull local<br>Lookups</button>
-            <button class="btn-lookup" id="refreshLookups">Refresh<br>Lookups<br>from Sheets</button>
-            <button class="btn-lookup" id="saveLookups">Save to<br>local Lookups</button>
-            <button class="btn-lookup" id="testLookups">Pull test<br>Lookups</button>
-            <button class="btn-lookup btn-reset-ui" id="resetUI">Reset</button>
+            <button class="btn-lookup" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
+            <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
+            <button class="btn-lookup" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
+            <button class="btn-lookup" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
+            <button class="btn-lookup btn-reset-ui" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
         </div>
     </div>
     
     <div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
-        <div><label>Type</label><select id="colB" onchange="handleManualType()"></select></div>
+        <div><label>Type</label><select id="colB" onchange="handleManualFU()"></select></div>
         <div><label>Grouping</label><select id="colA"></select></div>
-        <div><label>Date</label><input type="date" id="colC" onchange="handleDateChange()"></div>
+        <div><label>Date</label><input type="date" id="colC"></div>
     </div>
+
     <div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
         <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
         <div><label style="text-align:center;">Flow</label><div id="flowDisplay" class="flow-display">--</div></div>
         <div><label>Sort</label><input type="number" id="colG" placeholder="0"></div>
     </div>
+
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
         <div><label>From</label><select id="colH" required onchange="handleAccTrigger()"></select></div>
         <div><label>To</label><select id="colI" required onchange="handleAccTrigger()"></select></div>
     </div>
+
     <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2" style="font-size:16px;"></textarea></div>
+
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
         <div><label>Frequency</label><select id="colFreq"></select></div>
         <div><label>Status</label><select id="colStatus"></select></div>
         <div><label>Month</label><select id="colZ"></select></div>
     </div>
+
     <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:8px; margin-top:10px;">
         <div><label>Each</label>
-            <div class="calc-input-wrap"><input type="number" id="colT" placeholder="0.00" step="0.01"><button class="btn-calc-trigger" id="openCalcBtn">±</button></div>
+            <div class="calc-input-wrap">
+                <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="this.value=''" oninput="calc()">
+                <button class="btn-calc-trigger" onclick="openCalculator()">±</button>
+            </div>
         </div>
         <div><label>Currency</label><select id="colX" onchange="calc()"></select></div>
-        <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01"></div>
+        <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" onfocus="this.value=''" oninput="calc()"></div>
         <div><label>Multiplier</label><input type="number" id="colM" value="1" oninput="calc()"></div>
     </div>
+
     <div class="total-box"><div class="total-val">£ <span id="totalDisp">0.00</span></div></div>
+    
     <div class="actions">
-        <button class="action-main" id="saveRecordBtn" style="background:var(--accent);">Create Staging record</button>
-        <button class="action-main" id="syncRecordsBtn" style="background:var(--bridge);">Send Staging records to Sheets</button>
-        <button class="action-main" id="clearRecordsBtn" style="background:var(--danger);">Clear Staging records</button>
+        <button class="action-main" onclick="saveRow(editIndex !== -1)" style="background:var(--accent);">Create Staging record</button>
+        <button class="action-main" onclick="checkEditState(() => handleSync())" style="background:var(--bridge);">Send Staging records to Sheets</button>
+        <button class="action-main" id="wipeBtn" onclick="handleWipeConfirm()" style="background:var(--danger);">Clear Staging records</button>
     </div>
+
     <div class="preview-wrap" id="previewArea"></div>
-    <div id="auth_status">iOS Sync Status: Idle</div>
-    <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-81 full functional repair and audited calculator logic.</div>
+    <div id="auth_status" style="font-size: 0.75rem; margin-top:10px; text-align:center; color:#7f8c8d;">iOS Sync Status: Idle</div>
 </div>
 
 <div id="calc_modal">
@@ -131,37 +137,24 @@
 </div>
 
 <div id="note_modal" class="modal">
-    <div class="modal-content"><label>Edit Transaction Note</label><textarea id="modal_note_text" rows="4" style="margin-top:10px;"></textarea><div style="display:flex; gap:10px; margin-top:15px;"><button onclick="commitNote()" style="flex:1; background:var(--accent); color:white; padding:10px; border-radius:6px; border:none; font-weight:bold;">Save Note</button><button onclick="closeNote()" style="flex:1; background:#7f8c8d; color:white; padding:10px; border-radius:6px; border:none; font-weight:bold;">Cancel</button></div></div>
+    <div class="modal-content"><label>Edit Note</label><textarea id="modal_note_text" rows="4"></textarea><div style="display:flex; gap:10px; margin-top:15px;"><button onclick="commitNote()" style="flex:1; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold;">Save</button><button onclick="closeNote()" style="flex:1; background:#7f8c8d; color:white; padding:10px; border:none; border-radius:6px; font-weight:bold;">Cancel</button></div></div>
 </div>
 
 <script>
-    const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    let AA_LIST = [], rawLookupData = [], coordinateMap = {}, tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, isRestoring = false, wipeConfirmed = false, resetConfirmed = false;
+    let AA_LIST = [], editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, isRestoring = false, wipeConfirmed = false, resetConfirmed = false;
 
-    function logTrace(m) { const l = document.getElementById('trace_log'); l.innerText += `\n[${new Date().toLocaleTimeString()}] ${m}`; }
-    function toggleLog(s) { document.getElementById('log_btn').style.display = s ? 'none' : 'block'; document.getElementById('trace_log').style.display = s ? 'block' : 'none'; }
-    function updateStatus(l, s) { const el = document.getElementById('auth_status'); el.innerText = `iOS Sync Status: ${l}`; el.style.color = s === "active" ? "#27ae60" : s === "sync" ? "#e67e22" : "#7f8c8d"; }
+    function logTrace(msg) { console.log(`[${new Date().toLocaleTimeString()}] ${msg}`); }
     function checkEditState(fn) { if (editIndex !== -1 || pendingEdit !== -1) alert("Function locked during active Edit."); else fn(); }
 
-    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' }); await gapi.client.load('sheets', 'v4'); logTrace("GAPI Ready."); }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com', scope: 'https://www.googleapis.com/auth/spreadsheets', callback: (resp) => { if (resp.access_token) { localStorage.setItem('g_token', resp.access_token); fetchLookups(); } } }); logTrace("GIS Ready."); }
-
-    async function initRefresh() { tokenClient.requestAccessToken(); }
-    async function fetchLookups() { 
-        updateStatus("Fetching...", "sync"); 
-        try {
-            const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' });
-            res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIdx(r[1].replace(/[0-9]/g, '')), desc: (r[2] && r[2]!=='n/a') ? colToIdx(r[2]) : null }; });
-            const acc = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' });
-            AA_LIST = acc.result.values ? acc.result.values.flat().filter(v => v) : [];
-            const data = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'Lookups!A2:AC1000' });
-            rawLookupData = data.result.values; populateUI(); updateStatus("Token Active", "active"); alert("Sync complete.");
-        } catch(e) { logTrace("Fetch Fail."); updateStatus("Error", "error"); }
+    function handleWipeConfirm() {
+        const b = document.getElementById('wipeBtn');
+        if(!wipeConfirmed) { wipeConfirmed = true; b.innerText = "CONFIRM?"; setTimeout(() => { wipeConfirmed = false; b.innerText = "Clear Staging records"; }, 3000); }
+        else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; b.innerText = "Clear Staging records"; renderPreview(); logTrace("Staging wiped."); }
     }
-    function colToIdx(c) { let idx = 0; for(let i=0; i<c.length; i++) { idx = idx * 26 + (c.charCodeAt(i) - 64); } return idx - 1; }
-    function populateUI() {
-        const pop = (id, key, def) => { const list = rawLookupData.filter(r => r[coordinateMap[key].val]).map(r => r[coordinateMap[key].val]); let h = '<option value="" disabled selected>--Select--</option>'; h += list.map(v => `<option value="${v}">${v}</option>`).join(''); document.getElementById(id).innerHTML = h; };
-        pop('colA','Grouping'); pop('colB','F/U'); pop('colF','Category'); pop('colH','From'); pop('colI','To'); pop('colFreq','Frequency'); pop('colStatus','Status'); pop('colZ','Month'); pop('colX','Currency'); localReset();
+    function handleResetConfirm() {
+        const b = document.getElementById('resetBtn');
+        if(!resetConfirmed) { resetConfirmed = true; b.innerText = "CONFIRM?"; setTimeout(() => { resetConfirmed = false; b.innerText = "Reset"; }, 3000); }
+        else { editIndex = -1; pendingEdit = -1; resetConfirmed = false; b.innerText = "Reset"; renderPreview(); logTrace("UI Reset."); }
     }
 
     // Calculator Core
@@ -184,7 +177,7 @@
         d.forEach((r, idx) => {
             const bL = (pendingEdit===idx)?"...":(editIndex===idx?"C":"Edit");
             const bC = (pendingEdit===idx)?"background:red":(editIndex===idx?"background:#f39c12":"background:#3498db");
-            h += `<tr><td><button onclick="initiateEdit(${idx})" style="${bC};color:white;border:none;border-radius:4px;padding:2px;width:100%;font-size:0.55rem;">${bL}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>Day</td><td>${r[2]}</td><td class="txt-center">${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-note" onclick="openNote(${idx})">${r[10]?'📄':'▫️'}</td><td class="w-tot">${r[22]}</td></tr>`;
+            h += `<tr><td><button onclick="initiateEdit(${idx})" style="${bC};color:white;border:none;border-radius:4px;padding:2px;width:100%;font-size:0.55rem;">${bL}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>Day</td><td>${r[2]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-note" onclick="openNote(${idx})">${r[10]?'📄':'▫️'}</td><td class="w-tot">${r[22]}</td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
@@ -200,7 +193,7 @@
             };
             setUI('colA', d[0], true); setUI('colB', d[1], true); setUI('colC', d[2]); setUI('colF', d[5], true); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colT', d[19]); setUI('colV', d[21]); setUI('colM', d[20]); setUI('colZ', d[25], true);
             document.getElementById('flowDisplay').innerText = d[4] || "--";
-            isRestoring = false; logTrace("Editing staged record.");
+            isRestoring = false;
         } else { pendingEdit = idx; editIndex = -1; }
         renderPreview();
     }
@@ -208,34 +201,27 @@
     function handleAccTrigger() { if(isRestoring) return; const h = document.getElementById('colH').value, i = document.getElementById('colI').value; const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let f = "zOut"; if(fAA && tAA) f = "xfer"; else if(!fAA && tAA) f = "In"; document.getElementById('flowDisplay').innerText = f; }
     function handleCatTrigger() { if(isRestoring) return; if(document.getElementById('colF').value.startsWith('S')) { const s = Array.from(document.getElementById('colB').options).find(o => o.value.startsWith('S')); if(s) document.getElementById('colB').value = s.value; } }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); document.getElementById('totalDisp').innerText = tot; return tot; }
-    
+
     function saveRow(ovr) {
         const flow = document.getElementById('flowDisplay').innerText;
         if(flow === "--") { alert("Select Flow"); return; }
         const r = Array(35).fill("");
-        r[0]=document.getElementById('colA').value; r[1]=document.getElementById('colB').value; r[2]=document.getElementById('colC').value; r[4]=flow; r[5]=document.getElementById('colF').value; r[6]=document.getElementById('colG').value; r[7]=document.getElementById('colH').value; r[8]=document.getElementById('colI').value; r[10]=document.getElementById('colK').value; r[19]=document.getElementById('colT').value; r[20]=document.getElementById('colM').value || 1; r[21]=document.getElementById('colV').value || 0; r[22]=calc(); r[25]=document.getElementById('colZ').value;
+        r[0]=document.getElementById('colA').value; r[1]=document.getElementById('colB').value; r[2]=document.getElementById('colC').value; r[4]=flow; r[5]=document.getElementById('colF').value; r[6]=document.getElementById('colG').value; r[7]=document.getElementById('colH').value; r[8]=document.getElementById('colI').value; r[10]=document.getElementById('modal_note_text').value || ""; r[19]=document.getElementById('colT').value; r[20]=document.getElementById('colM').value || 1; r[21]=document.getElementById('colV').value || 0; r[22]=calc(); r[25]=document.getElementById('colZ').value;
         let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
         if(ovr && editIndex > -1) d[editIndex] = r; else d.push(r);
-        localStorage.setItem('ebs_trf', JSON.stringify(d)); localReset(); renderPreview(); logTrace("Record saved.");
+        localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; pendingEdit = -1; renderPreview();
     }
 
-    function handleWipeConfirm() {
-        const b = document.getElementById('clearRecordsBtn');
-        if(!wipeConfirmed) { wipeConfirmed = true; b.innerText = "CONFIRM?"; setTimeout(() => { wipeConfirmed = false; b.innerText = "Clear Staging records"; }, 3000); }
-        else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; b.innerText = "Clear Staging records"; renderPreview(); logTrace("Staging wiped."); }
-    }
-    function handleResetConfirm() {
-        const b = document.getElementById('resetUI');
-        if(!resetConfirmed) { resetConfirmed = true; b.innerText = "CONFIRM?"; setTimeout(() => { resetConfirmed = false; b.innerText = "Reset"; }, 3000); }
-        else { editIndex = -1; pendingEdit = -1; resetConfirmed = false; b.innerText = "Reset"; renderPreview(); logTrace("UI Reset."); }
-    }
-    function localReset() { editIndex = -1; pendingEdit = -1; document.getElementById('colT').value = ""; document.getElementById('colV').value = ""; document.getElementById('colM').value = "1"; document.getElementById('flowDisplay').innerText = "--"; renderPreview(); }
-    async function handleSync() { updateStatus("Syncing...", "sync"); setTimeout(()=>updateStatus("Token Active", "active"), 1000); logTrace("Sync Complete."); }
-    function cachePull() { renderPreview(); logTrace("Snapshot pulled."); } function cacheSave() { logTrace("Snapshot saved."); } function useTestData() { AA_LIST = ["Santander P (AA)", "Revolut P (AA)"]; logTrace("Test Data loaded."); }
     function openNote(idx) { activeNoteIdx = idx; const d = JSON.parse(localStorage.getItem('ebs_trf')); document.getElementById('modal_note_text').value = d[idx][10] || ""; document.getElementById('note_modal').style.display = 'block'; }
     function closeNote() { document.getElementById('note_modal').style.display = 'none'; }
     function commitNote() { let d = JSON.parse(localStorage.getItem('ebs_trf')); d[activeNoteIdx][10] = document.getElementById('modal_note_text').value; localStorage.setItem('ebs_trf', JSON.stringify(d)); closeNote(); renderPreview(); }
-    function handleManualType() {} function handleDateChange() {}
+
+    function initRefresh() { alert("Simulating Refresh..."); }
+    function cachePull() { renderPreview(); }
+    function cacheSave() { alert("Snapshot saved."); }
+    function useTestData() { AA_LIST = ["Santander P (AA)", "Revolut P (AA)"]; alert("Test data loaded."); }
+    function handleSync() { alert("Simulating Sync..."); }
+    function handleManualFU() {}
 
     // Draggable Logic
     const dm = document.querySelector("#calc_modal"); const dh = document.querySelector("#calc_handle");
@@ -244,20 +230,7 @@
     document.addEventListener("mouseup", () => active = false);
     document.addEventListener("mousemove", (e) => { if(active) { e.preventDefault(); xO = e.clientX - iX; yO = e.clientY - iY; dm.style.transform = `translate(calc(-50% + ${xO}px), calc(-50% + ${yO}px))`; } });
 
-    window.onload = () => {
-        document.getElementById('pullLookups').onclick = () => checkEditState(cachePull);
-        document.getElementById('refreshLookups').onclick = () => checkEditState(initRefresh);
-        document.getElementById('saveLookups').onclick = () => checkEditState(cacheSave);
-        document.getElementById('testLookups').onclick = () => checkEditState(useTestData);
-        document.getElementById('resetUI').onclick = handleResetConfirm;
-        document.getElementById('saveRecordBtn').onclick = () => saveRow(editIndex !== -1);
-        document.getElementById('syncRecordsBtn').onclick = () => checkEditState(handleSync);
-        document.getElementById('clearRecordsBtn').onclick = handleWipeConfirm;
-        document.getElementById('openCalcBtn').onclick = openCalculator;
-        ['colT','colV'].forEach(id => document.getElementById(id).onfocus = function(){ this.value=''; });
-        ['colT','colV','colM'].forEach(id => document.getElementById(id).oninput = calc);
-        gapiLoaded(); gisLoaded(); renderPreview();
-    };
+    window.onload = () => { renderPreview(); };
 </script>
 </body>
 </html>
