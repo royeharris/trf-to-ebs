@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-94</title>
+    <title>EBS Entry v2-95</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -16,7 +16,7 @@
         .header-wrap { display: flex; flex-direction: column; margin-bottom: 15px; gap: 8px; }
         .header-btns { display: flex; justify-content: space-between; gap: 4px; width: 100%; }
         .btn-lookup { background: var(--bridge); padding: 2px; font-size: 0.72rem; border-radius: 6px; border: none; color: white; cursor: pointer; font-weight: 600; flex: 1; height: 50px; line-height: 1.1; text-align: center; overflow: hidden; -webkit-font-smoothing: antialiased; display: flex; align-items: center; justify-content: center; min-width: 0; }
-        .btn-reset-ui { background: var(--danger); }
+        .btn-reset-ui { background: var(--danger); } .btn-cache-save { background: var(--accent); } .btn-cache-pull { background: var(--cache); } .btn-test-mode { background: var(--test); }
         label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 2px; color: var(--primary); }
         input, select, textarea { width: 100%; padding: 8px; border: 1px solid #dcdde1; border-radius: 6px; font-size: 16px; box-sizing: border-box; height: 38px; -webkit-text-size-adjust: 100%; font-family: inherit; }
         .date-input-container { display: flex; align-items: center; gap: 5px; background: white; border: 1px solid #dcdde1; border-radius: 6px; padding: 0 8px; height: 38px; }
@@ -27,32 +27,31 @@
         .actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
         button.action-main { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.72rem; -webkit-font-smoothing: antialiased; }
         .preview-wrap { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 6px; }
-        table { width: 1150px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; font-family: inherit; }
+        table { width: 1100px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; font-family: inherit; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); font-size: 0.58rem !important; }
-        .w-edit { width: 35px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 35px; text-align: center; } 
-        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
-        #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; }
-        #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; border: none; font-weight: 600; }
+        th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); font-size: 0.58rem !important; font-family: inherit !important; }
+        /* v2-95: Column widths reverted to v2-72/v2-74 standards */
+        .w-edit { width: 35px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; text-align: center; } 
+        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 100px; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-mnth { width: 40px; text-align: center; } .w-stat { width: 60px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
+        #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; -webkit-font-smoothing: antialiased; }
+        #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; font-weight: 600; }
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
-        
-        .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
-        .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
-        
         .txt-center { text-align: center; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
+        .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-94</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-95</span></div>
         <div class="header-btns">
-            <button class="btn-lookup" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
+            <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
-            <button class="btn-lookup" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
-            <button class="btn-lookup" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
+            <button class="btn-lookup btn-cache-save" onclick="checkEditState(() => cacheSave())">Save to<br>local Lookups</button>
+            <button class="btn-lookup btn-test-mode" onclick="checkEditState(() => useTestData())">Pull test<br>Lookups</button>
             <button class="btn-lookup btn-reset-ui" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
         </div>
     </div>
@@ -97,7 +96,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-94 Staging Who column restored and Row 6 trigger placement verified.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-95 Staging widths reverted to 1100px standard and Date/Day formatting restored.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -118,7 +117,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-94)";
+    const VER = "Excel Budget Sheet Input (v2-95)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -183,7 +182,7 @@
                 const opts = el.options;
                 for(let i=0; i < opts.length; i++) { if (opts[i].value === val || opts[i].text === val || opts[i].value === val + " (AA)") { el.selectedIndex = i; break; } }
             };
-            setUI('colA', d[0], true); setUI('colC', d[2]); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colV', d[21]); setUI('colM', d[20]); setUI('colZ', d[25], true); setUI('colB', d[1], true); setUI('colF', d[5], true); setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
+            setUI('colA', d[0], true); setUI('colB', d[1], true); setUI('colC', d[2]); setUI('colF', d[5], true); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colV', d[21]); setUI('colM', d[20]); setUI('colZ', d[25], true);
             document.getElementById('flowDisplay').innerText = d[4] || "--";
             isRestoring = false; logTrace("Record pulled for Edit.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirming retrieval..."); } renderPreview();
@@ -194,23 +193,30 @@
     function commitFlowSelection() { const selected = document.getElementById('modal_flow_select').value; document.getElementById('flowDisplay').innerText = selected; closeFlowModal(); saveRow(editIndex !== -1); }
     function saveRow(isOverwrite) { const flowV = document.getElementById('flowDisplay').innerText; if (flowV === "--") { openFlowModal(); return; } const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value; if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; } let wV = ""; if (fv.startsWith('S')) wV = document.getElementById('colA').value; const r = Array(35).fill(""); r[0]=document.getElementById('colA').value; r[1]=document.getElementById('colB').value; r[2]=document.getElementById('colC').value; r[4]=flowV; r[5]=document.getElementById('colF').value; r[6]=document.getElementById('colG').value; r[7]=document.getElementById('colH').value; r[8]=document.getElementById('colI').value; r[10]=document.getElementById('colK').value; r[11]=document.getElementById('colFreq').value; r[14]=document.getElementById('colStatus').value; r[19]=parseFloat(document.getElementById('colT').value||0).toFixed(2); r[20]=document.getElementById('colM').value; r[21]=parseFloat(document.getElementById('colV').value||0).toFixed(2); r[22]=calc(); r[23]=document.getElementById('colX').value; r[25]=document.getElementById('colZ').value; r[33]=wV; r[34]=VER; let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (isOverwrite && editIndex > -1) { d[editIndex] = r; logTrace("Saved."); } else { d.push(r); logTrace("Staged."); } localStorage.setItem('ebs_trf', JSON.stringify(d)); if(!isOverwrite) localReset(); }
     
-    // v2-94 RESTORED: Who column re-inserted into table
+    // v2-95 RESTORED: Precise Day and Date formatting logic
     function renderPreview() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        let h = '<table><tr><th class="w-edit">Edit</th><th>Grp</th><th>Type</th><th>Day</th><th>Date</th><th class="w-flow">Flow</th><th>Category</th><th>Sort</th><th>From</th><th>To</th><th class="w-note">Note</th><th>Total</th><th class="w-who">Who</th><th>Del</th></tr>';
+        let h = '<table><tr><th class="w-edit">Edit</th><th class="w-grp">Grp</th><th class="w-type">Type</th><th class="w-day">Day</th><th class="w-date">Date</th><th class="w-flow">Flow</th><th class="w-cat">Category</th><th class="w-sort">Sort</th><th class="w-acc">From</th><th class="w-acc">To</th><th class="w-note">Note</th><th class="w-tot">Total</th><th class="w-who">Who</th><th class="w-del">Del</th></tr>';
         d.forEach((r, idx) => {
             let bS = (pendingEdit === idx) ? "background:red" : (editIndex === idx ? "background:#f39c12" : "background:#3498db");
             let bL = (pendingEdit === idx) ? "..." : (editIndex === idx ? "C" : "E");
-            h += `<tr><td class="w-edit"><button onclick="initiateEdit(${idx})" style="${bS};color:white;border:none;border-radius:4px;padding:2px;width:100%;font-size:0.55rem;">${bL}</button></td><td>${r[0]}</td><td>${r[1]}</td><td>Day</td><td>${r[2]}</td><td class="txt-center">${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-note" onclick="openNote(${idx})">${r[10]?'📄':'▫️'}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;color:white;border:none;border-radius:4px;padding:0 5px;">X</button></td></tr>`;
+            
+            // v2-95 FIX: Parse date and calculate Day name and formatted string
+            const [y, m, dn] = r[2].split('-').map(Number);
+            const dt = new Date(y, m-1, dn);
+            const dNam = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
+            const dStr = `${String(dn).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
+            
+            h += `<tr><td class="w-edit"><button onclick="initiateEdit(${idx})" style="${bS};color:white;border:none;border-radius:4px;padding:2px;width:100%;font-size:0.55rem;">${bL}</button></td><td>${r[0]}</td><td>${r[1]}</td><td class="txt-center">${dNam}</td><td>${dStr}</td><td class="txt-center">${r[4]}</td><td>${r[5]}</td><td class="txt-center">${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td class="w-note" onclick="openNote(${idx})">${r[10]?'📄':'▫️'}</td><td class="w-tot">${r[22]}</td><td class="txt-center">${r[33]}</td><td><button onclick="deleteRow(${idx})" style="background:red;color:white;border:none;border-radius:4px;padding:0 5px;">X</button></td></tr>`;
         });
         document.getElementById('previewArea').innerHTML = h + '</table>';
     }
     
+    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; pendingEdit = -1; renderPreview(); }
     function openNote(idx) { activeNoteIdx = idx; const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (d[idx]) { document.getElementById('modal_note_text').value = d[idx][10] || ""; document.getElementById('note_modal').style.display = 'block'; } }
     function closeNote() { document.getElementById('note_modal').style.display = 'none'; }
     function commitNote() { let d = JSON.parse(localStorage.getItem('ebs_trf')); d[activeNoteIdx][10] = document.getElementById('modal_note_text').value; localStorage.setItem('ebs_trf', JSON.stringify(d)); closeNote(); renderPreview(); }
-    function deleteRow(i) { let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); d.splice(i, 1); localStorage.setItem('ebs_trf', JSON.stringify(d)); editIndex = -1; pendingEdit = -1; renderPreview(); }
-    async function handleSync() { if (pendingEdit !== -1 || editIndex !== -1) { alert("Function locked during Edit."); return; } const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!d.length) return; updateStatus("Syncing...", "sync"); tokenClient.callback = async (resp) => { if (!resp.access_token) return; try { const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" }); const nR = (meta.result.values ? meta.result.values.length : 0) + 1; const vls = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [1, 5, 11, 14, 23, 25].forEach(i => rc[i] = rc[i].split(' ')[0]); [7, 8].forEach(i => rc[i] = rc[i].replace(/ \(AA\)/g, '')); return rc; }); await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: `'EBSinput'!A${nR}:AI${nR + vls.length - 1}`, valueInputOption: 'USER_ENTERED', resource: { values: vls } }); alert("Sync completed."); updateStatus("Token Active", "active"); renderPreview(); logTrace("Sync complete."); } catch (e) { logTrace("Sync Fail."); updateStatus("Error", "error"); } }; tokenClient.requestAccessToken(); }
+    async function handleSync() { if (pendingEdit !== -1 || editIndex !== -1) { alert("Function locked during Edit."); return; } const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]'); if (!d.length) return; updateStatus("Syncing...", "sync"); tokenClient.callback = async (resp) => { if (!resp.access_token) return; try { const meta = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'EBSinput'!A:A" }); const nR = (meta.result.values ? meta.result.values.length : 0) + 1; const vls = d.map(r => { let rc = [...r]; const dP = rc[2].split('-'); rc[2] = `${dP[2]}/${dP[1]}/${dP[0]}`; [1, 5, 11, 14, 23, 25].forEach(i => rc[i] = rc[i].split(' ')[0]); [7, 8].forEach(i => rc[i] = rc[i].replace(/ \(AA\)/g, '')); [19, 21, 22].forEach(i => rc[i] = parseFloat(rc[i] || 0)); return rc; }); await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: `'EBSinput'!A${nR}:AI${nR + vls.length - 1}`, valueInputOption: 'USER_ENTERED', resource: { values: vls } }); alert("Sync completed."); updateStatus("Token Active", "active"); renderPreview(); logTrace("Sync complete."); } catch (e) { logTrace("Sync Fail."); updateStatus("Error", "error"); } }; tokenClient.requestAccessToken(); }
     function handleManualFU() { }
     window.onload = () => { gapiLoaded(); gisLoaded(); renderPreview(); };
 </script>
