@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-108</title>
+    <title>EBS Entry v2-109</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -45,7 +45,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-108</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-109</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local Lookups</button>
             <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh Lookups from Sheets</button>
@@ -100,7 +100,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-108 Isolated Commit Lane implemented to prevent edit index loss.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-109 Synchronous Atomic Commit Path active. All 15 staging fields locked.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -121,7 +121,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-108)";
+    const VER = "Excel Budget Sheet Input (v2-109)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false;
 
@@ -154,7 +154,7 @@
         }; 
         rS('colA','Roy'); rS('colB','v'); rS('colF',null); rS('colH',null); rS('colI',null); rS('colFreq','A'); rS('colStatus','N'); rS('colZ','NEW'); rS('colX','GBP'); 
         editIndex = -1; pendingEdit = -1; 
-        renderPreview(); calc(); logTrace("Grid Reset Complete."); 
+        renderPreview(); calc(); logTrace("Full UI Reset Complete."); 
     }
 
     function handleResetConfirm() { const btn = document.getElementById('resetBtn'); if(!resetConfirmed) { resetConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ resetConfirmed = false; btn.innerText="Reset"; }, 3000); } else { localReset(); resetConfirmed = false; btn.innerText="Reset"; } }
@@ -164,24 +164,23 @@
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) { document.getElementById('colCDisp').innerText = ""; return; } const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     
-    // v2-108 EXCLUSIVE COMMIT LANE
+    // v2-109 REPAIRED: Atomic Synchronous Commit Path
     function handleStagingAction() {
         if (rawLookupData.length === 0) { alert("Edit is only possible after Lookups are pulled or refreshed"); return; }
-        if (editIndex > -1) { 
-            commitEditOverwrite(); // Priority Lane for State C
-        } else { 
-            saveRow(); // Generic path for State E
-        }
-    }
-
-    function commitEditOverwrite() {
-        const row = generateRowData();
-        if (!row) return; // Validation failed
+        const rowData = generateRowData();
+        if (!rowData) return; // Validation failed
+        
         let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        d[editIndex] = row; 
-        localStorage.setItem('ebs_trf', JSON.stringify(d));
-        logTrace("Commit Success.");
-        localReset();
+        if (editIndex > -1) { 
+            d[editIndex] = rowData; // Inject into target row
+            logTrace("Commit: Row " + (editIndex+1));
+        } else { 
+            d.push(rowData); // Append new row
+            logTrace("Staged New.");
+        }
+        
+        localStorage.setItem('ebs_trf', JSON.stringify(d)); // Synchronous browser write
+        localReset(); // Full UI reset including edit pointers
     }
 
     function generateRowData() {
@@ -226,16 +225,6 @@
     function closeFlowModal() { document.getElementById('flow_modal').style.display = 'none'; }
     function commitFlowSelection() { const selected = document.getElementById('modal_flow_select').value; document.getElementById('flowDisplay').innerText = selected; closeFlowModal(); handleStagingAction(); }
     
-    function saveRow() { 
-        const row = generateRowData();
-        if (!row) return;
-        let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        d.push(row);
-        localStorage.setItem('ebs_trf', JSON.stringify(d));
-        logTrace("New Record Staged.");
-        localReset();
-    }
-    
     function renderPreview() {
         const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
         let h = '<table><tr><th class="w-edit">Edit</th><th>Grp</th><th>Type</th><th>Day</th><th>Date</th><th class="w-flow">Flow</th><th>Category</th><th>Sort</th><th>From</th><th>To</th><th class="w-note">Note</th><th class="w-freq">Frequency</th><th>Total</th><th class="w-who">Who</th><th>Del</th></tr>';
@@ -252,7 +241,6 @@
     function closeNote() { document.getElementById('note_modal').style.display = 'none'; }
     function commitNote() { let d = JSON.parse(localStorage.getItem('ebs_trf')); d[activeNoteIdx][10] = document.getElementById('modal_note_text').value; localStorage.setItem('ebs_trf', JSON.stringify(d)); closeNote(); renderPreview(); }
     function openCalculatorHook() { alert("Calculator Logic Hook: Active"); }
-    function handleManualFU() { }
     async function handleSync() { updateStatus("Syncing...", "sync"); setTimeout(()=>updateStatus("Token Active", "active"), 1000); }
     window.onload = () => { document.getElementById('colC').value = new Date().toISOString().split('T')[0]; handleDateChange(); gapiLoaded(); gisLoaded(); renderPreview(); };
 </script>
