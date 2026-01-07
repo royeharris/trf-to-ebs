@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-92</title>
+    <title>EBS Entry v2-93</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -30,11 +30,16 @@
         table { width: 1100px; border-collapse: collapse; font-size: 0.58rem; table-layout: fixed; font-family: inherit; }
         th, td { border: 1px solid #eee; padding: 6px 3px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #f2f2f2; font-weight: bold !important; color: var(--primary); font-size: 0.58rem !important; font-family: inherit !important; }
-        .w-edit { width: 35px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 30px; } 
-        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-freq { width: 100px; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-mnth { width: 40px; text-align: center; } .w-stat { width: 60px; } .w-who { width: 45px; } .w-del { width: 30px; text-align: center; }
+        .w-edit { width: 35px; text-align: center; } .w-grp { width: 40px; } .w-type { width: 60px; } .w-day { width: 30px; text-align: center; } .w-date { width: 70px; } .w-flow { width: 40px; text-align: center; } .w-cat, .w-acc { width: 110px; } .w-sort { width: 35px; text-align: center; } 
+        .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; } .w-cur { width: 35px; text-align: center; } .w-tot { width: 80px; text-align: right; } .w-del { width: 30px; text-align: center; }
         #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; -webkit-font-smoothing: antialiased; }
         #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; display: block; border: none; font-weight: 600; }
         #trace_log { margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; display: none; cursor: pointer; }
+        
+        /* v2-93: Structural trigger button styles */
+        .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
+        .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
+        
         .txt-center { text-align: center; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -43,7 +48,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-92</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-93</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-cache-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -73,12 +78,20 @@
         <div><label>Status</label><select id="colStatus"></select></div>
         <div><label>Month</label><select id="colZ"></select></div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-top:10px;">
-        <div><label>Each</label><input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="this.value=''" oninput="calc()"></div>
+    
+    <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:8px; margin-top:10px;">
+        <div>
+            <label>Each</label>
+            <div class="calc-input-wrap">
+                <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="this.value=''" oninput="calc()">
+                <button class="btn-calc-trigger">±</button>
+            </div>
+        </div>
         <div><label>Currency</label><select id="colX" onchange="calc()"></select></div>
         <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" onfocus="this.value=''" oninput="calc()"></div>
         <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()"></div>
     </div>
+
     <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
     <div class="actions">
         <button class="action-main" onclick="saveRow(false)" style="background:var(--accent);">Create Staging record</button>
@@ -88,7 +101,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-92 Surgical fix for total UI reset after Edit Commit (C).</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-93 Step 1: Structural Placement of calculator trigger completed.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -109,7 +122,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-92)";
+    const VER = "Excel Budget Sheet Input (v2-93)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false, pendingOverwrite = false;
 
@@ -122,8 +135,8 @@
     function checkEditState(onSuccess) { if (pendingEdit !== -1 || editIndex !== -1) { alert("This function is not available while Edit is in progress for a Staging entry."); return; } onSuccess(); }
 
     function useTestData() { if (!confirm("Overwrite values with test set?")) return; AA_LIST = ["Santander P (AA)", "Santander B (AA)", "Revolut P (AA)", "Revolut (AA)"]; coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}}; rawLookupData = [["INIT"]]; updateDropdown('colA', ["Roy", "Peter"], 'Roy'); updateDropdown('colB', ["v Verified", "xf Transfer", "S Support"], 'v'); updateDropdown('colF', ["Food", "Transfer", "Rent"], null, '--Select--'); updateDropdown('colH', AA_LIST, null, '--Select--'); updateDropdown('colI', AA_LIST, null, '--Select--'); updateDropdown('colFreq', ["A Ad-hoc", "M Monthly"], 'A'); updateDropdown('colStatus', ["N Pending", "P Paid"], 'N'); updateDropdown('colZ', ["NEW", "JAN"], 'NEW'); updateDropdown('colX', ["GBP", "EUR"], 'GBP'); localReset(); logTrace("Test Data Injected."); }
-    function cacheSave() { if (rawLookupData.length === 0) { alert("Refresh Lookups First"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("Snapshot Saved."); }
-    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("Snapshot Loaded."); } }
+    function cacheSave() { if (rawLookupData.length === 0) { alert("Refresh Lookups First"); return; } if (!confirm("Snapshot active values?")) return; localStorage.setItem('ebs_cache_data', JSON.stringify(rawLookupData)); localStorage.setItem('ebs_cache_coords', JSON.stringify(coordinateMap)); localStorage.setItem('ebs_cache_aa', JSON.stringify(AA_LIST)); logTrace("local UI Snapshotted."); }
+    function cachePull() { if (!confirm("Do you want to load local Lookups?")) return; const cached = localStorage.getItem('ebs_cache_data'); if (cached) { rawLookupData = JSON.parse(cached); coordinateMap = JSON.parse(localStorage.getItem('ebs_cache_coords')); AA_LIST = JSON.parse(localStorage.getItem('ebs_cache_aa')); populateUI(rawLookupData); logTrace("local Snapshot Loaded."); } }
     function initRefresh() { tokenClient.requestAccessToken(); }
     async function fetchLookupRefs() { updateStatus("Fetching Refs...", "sync"); const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'LookupRefs!A2:C15' }); res.result.values.forEach(r => { coordinateMap[r[0]] = { val: colToIndex(r[1].toUpperCase().replace(/[0-9]/g, '')), desc: (r[2] && r[2].toLowerCase() !== 'n/a') ? colToIndex(r[2]) : null }; }); fetchActiveAccounts(); }
     function colToIndex(col) { let idx = 0; for(let i=0; i<col.length; i++) { idx = idx * 26 + (col.charCodeAt(i) - 64); } return idx - 1; }
@@ -132,14 +145,11 @@
     function populateUI(data) { const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} ${d}` : v; }); updateDropdown(id, list, def, p); }; pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP'); localReset(); }
     function updateDropdown(id, vals, def, prompt) { const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : ''; h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } }
     
-    // v2-92 FIX: Comprehensive localReset to clear dropdowns and numerics
     function localReset() { 
         ['colT','colV','colG','colK'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; }); 
         document.getElementById('colM').value = "1"; 
         document.getElementById('flowDisplay').innerText = "--"; 
         editIndex = -1; pendingEdit = -1; 
-        
-        // Surgical Reset of all Dropdowns to their baseline states
         const rS = (id, def) => { 
             const s = document.getElementById(id); if(!s) return; 
             if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } 
@@ -158,7 +168,6 @@
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     function handleManualFU() { }
     
-    // v2-92 FIX: Surgical addition of localReset to the Edit Commit branch
     function initiateEdit(idx) {
         if (rawLookupData.length === 0) { alert("First Refresh Lookups or Pull local Lookups."); return; }
         const trs = document.getElementById('previewArea').getElementsByTagName('tr');
@@ -166,7 +175,7 @@
         
         if (btn.innerText === 'C') {
             saveRow(true);
-            localReset(); // v2-92 SURGICAL FIX: Reset all dropdowns and numerics after commit
+            localReset(); 
             return;
         }
 
@@ -181,8 +190,7 @@
             };
             setUI('colA', d[0], true); setUI('colB', d[1], true); setUI('colC', d[2]); setUI('colF', d[5], true); setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]); setUI('colT', d[19]); setUI('colV', d[21]); setUI('colM', d[20]); setUI('colZ', d[25], true);
             document.getElementById('flowDisplay').innerText = d[4] || "--";
-            handleDateChange(); calc(); setTimeout(() => { isRestoring = false; }, 50);
-            logTrace("Record pulled for Edit.");
+            isRestoring = false; logTrace("Record pulled for Edit.");
         } else { pendingEdit = idx; editIndex = -1; logTrace("Confirming retrieval..."); } renderPreview();
     }
     
