@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>EBS Entry v3-05</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>EBS Entry v3-06</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
   <style>
@@ -48,7 +48,7 @@
 <body>
 <div class="container">
   <div class="header-wrap">
-    <div class="branding-row"><b>EBS Input</b> <span>v3-05</span></div>
+    <div class="branding-row"><b>EBS Input</b> <span>v3-06</span></div>
     <div class="header-btns">
       <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
       <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -111,7 +111,7 @@
   <div class="preview-wrap" id="previewArea"></div>
   <div id="auth_status">iOS Sync Status: Idle</div>
   <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-  <div id="trace_log" onclick="toggleLog(false)">Trace: v3-05 Logic Circuit Breaker active.</div>
+  <div id="trace_log" onclick="toggleLog(false)">Trace: v3-06 Logic Circuit Breaker active.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -143,14 +143,15 @@
 <script>
   const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
 
-  // v3-05: Version incremented and embedded in each staged record
-  const VER = "Excel Budget Sheet Input (v3-05)";
+  // v3-06: Version incremented
+  const VER = "Excel Budget Sheet Input (v3-06)";
 
-  // v3-05: Sync destination restored to the previously working tab name from v2-52.
-  // Change to 'TRF' if required by the spreadsheet layout.
+  // v3-06: Token storage (access tokens expire; store expiry to avoid reusing expired token)
+  const TOKEN_KEY = 'g_token';
+  const TOKEN_EXP_KEY = 'g_token_exp_ms';
+
+  // v3-06: Sync destination
   const STAGING_SHEET_NAME = 'EBSinput';
-
-  // v3-05: Target is A:AI for 35 columns
   const STAGING_END_COL = 'AI';
   const STAGING_COLS = 35;
   const STAGING_START_ROW = 2;
@@ -168,18 +169,13 @@
       resetConfirmed = false,
       isRestoring = false;
 
-  // v3-05: Flow modal continuation
   let flowModalContext = 'create';
-
-  // v3-05: Track gapi readiness
   let gapiReady = false;
 
-  // v3-05: Token routing
   let tokenPurpose = null;
   let tokenPromiseResolve = null;
   let tokenPromiseReject = null;
 
-  // v3-05: Cache destination sheetId (used only if row insertion is needed)
   let stagingSheetIdCache = null;
 
   function logTrace(msg) {
@@ -199,19 +195,19 @@
     gapi.load('client', async () => {
       await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' });
       await gapi.client.load('sheets', 'v4');
-      gapiReady = true; // v3-05
-      logTrace("GAPI Ready. (v3-05)");
+      gapiReady = true;
+      logTrace("GAPI Ready. (v3-06)");
     });
   }
 
+  // v3-06: Store token expiry (expires_in) and always set gapi token for API calls
   function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com',
       scope: 'https://www.googleapis.com/auth/spreadsheets',
       callback: async (resp) => {
-        // v3-05: Unified token handler
         if (resp && resp.error) {
-          logTrace(`Token Error: ${resp.error} (v3-05)`);
+          logTrace(`Token Error: ${resp.error} (v3-06)`);
           updateStatus("Token Error", "error");
           if (tokenPromiseReject) tokenPromiseReject(new Error(resp.error));
           tokenPromiseResolve = null; tokenPromiseReject = null; tokenPurpose = null;
@@ -219,14 +215,18 @@
         }
 
         if (resp && resp.access_token) {
-          localStorage.setItem('g_token', resp.access_token);
+          localStorage.setItem(TOKEN_KEY, resp.access_token);
 
-          // v3-05: Ensure gapi uses the token
+          // v3-06: expires_in is seconds; store expiry with 60s safety margin
+          const expiresInSec = Number(resp.expires_in || 0);
+          const expMs = Date.now() + Math.max(0, (expiresInSec * 1000) - 60000);
+          localStorage.setItem(TOKEN_EXP_KEY, String(expMs));
+
           if (gapi && gapi.client && typeof gapi.client.setToken === 'function') {
             gapi.client.setToken({ access_token: resp.access_token });
           }
 
-          logTrace(`Token Received. Purpose=${tokenPurpose || 'none'} (v3-05)`);
+          logTrace(`Token Received. expires_in=${expiresInSec}s Purpose=${tokenPurpose || 'none'} (v3-06)`);
 
           const p = tokenPurpose;
           tokenPurpose = null;
@@ -234,12 +234,11 @@
           if (tokenPromiseResolve) tokenPromiseResolve(resp.access_token);
           tokenPromiseResolve = null; tokenPromiseReject = null;
 
-          // v3-05: Only refresh lookups when requested
           if (p === 'refresh') fetchLookupRefs();
         }
       }
     });
-    logTrace("GIS Ready.");
+    logTrace("GIS Ready. (v3-06)");
   }
 
   function updateStatus(label, state) {
@@ -250,33 +249,39 @@
   }
 
   function checkEditState(onSuccess) {
-    if (pendingEdit !== -1 || editIndex !== -1) {
-      alert("Function locked during Edit.");
-      return;
-    }
+    if (pendingEdit !== -1 || editIndex !== -1) { alert("Function locked during Edit."); return; }
     onSuccess();
   }
 
-  function initRefresh() {
-    tokenPurpose = 'refresh'; // v3-05
-    tokenClient.requestAccessToken();
-  }
+  function initRefresh() { tokenPurpose = 'refresh'; tokenClient.requestAccessToken(); }
 
-  // v3-05: Promise-based token getter
-  function ensureToken(purpose) {
-    const existing = localStorage.getItem('g_token');
-    if (existing && existing.length > 20) {
+  // v3-06: Validate token expiry; force refresh when required
+  function ensureToken(purpose, force = false) {
+    const existing = localStorage.getItem(TOKEN_KEY);
+    const expMs = Number(localStorage.getItem(TOKEN_EXP_KEY) || 0);
+    const valid = !!existing && Date.now() < expMs;
+
+    if (!force && valid) {
       if (gapi && gapi.client && typeof gapi.client.setToken === 'function') {
         gapi.client.setToken({ access_token: existing });
       }
       return Promise.resolve(existing);
     }
+
     return new Promise((resolve, reject) => {
       tokenPurpose = purpose;
       tokenPromiseResolve = resolve;
       tokenPromiseReject = reject;
       tokenClient.requestAccessToken();
     });
+  }
+
+  function clearStoredToken() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_EXP_KEY);
+    if (gapi && gapi.client && typeof gapi.client.setToken === 'function') {
+      gapi.client.setToken(null);
+    }
   }
 
   async function fetchLookupRefs() {
@@ -291,11 +296,7 @@
     fetchActiveAccounts();
   }
 
-  function colToIndex(col) {
-    let idx = 0;
-    for (let i = 0; i < col.length; i++) idx = idx * 26 + (col.charCodeAt(i) - 64);
-    return idx - 1;
-  }
+  function colToIndex(col) { let idx = 0; for (let i = 0; i < col.length; i++) idx = idx * 26 + (col.charCodeAt(i) - 64); return idx - 1; }
 
   async function fetchActiveAccounts() {
     const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'ActiveAccounts!A2:A500' });
@@ -381,13 +382,9 @@
   function localReset() {
     editIndex = -1;
     pendingEdit = -1;
-    logTrace("UI Reset Invoked. (v3-05)");
+    logTrace("UI Reset Invoked. (v3-06)");
 
-    ['colT','colV','colG','colK'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-
+    ['colT','colV','colG','colK'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
     document.getElementById('colM').value = "1";
     document.getElementById('flowDisplay').innerText = "--";
 
@@ -400,19 +397,12 @@
       } else s.selectedIndex = 0;
     };
 
-    rS('colA','Roy');
-    rS('colB','v');
-    rS('colF',null);
-    rS('colH',null);
-    rS('colI',null);
-    rS('colFreq','A');
-    rS('colStatus','N');
-    rS('colZ','NEW');
-    rS('colX','GBP');
+    rS('colA','Roy'); rS('colB','v'); rS('colF',null); rS('colH',null); rS('colI',null);
+    rS('colFreq','A'); rS('colStatus','N'); rS('colZ','NEW'); rS('colX','GBP');
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-05)");
+    logTrace("UI Fields Reset. (v3-06)");
   }
 
   function handleResetConfirm() {
@@ -439,25 +429,18 @@
       wipeConfirmed = false;
       btn.innerText = "Clear Staging records";
       renderPreview();
-      logTrace("Staging wiped. (v3-05)");
+      logTrace("Staging wiped. (v3-06)");
     }
   }
 
   function handleAccTrigger() {
     if (isRestoring) return;
-    const h = document.getElementById('colH').value,
-          i = document.getElementById('colI').value,
-          ty = document.getElementById('colB');
-
-    const fAA = AA_LIST.includes(h),
-          tAA = AA_LIST.includes(i);
-
+    const h = document.getElementById('colH').value, i = document.getElementById('colI').value, ty = document.getElementById('colB');
+    const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i);
     let valE = "zOut";
     if (fAA && tAA) valE = "xfer";
     else if (!fAA && tAA) valE = "In";
-
     document.getElementById('flowDisplay').innerText = valE;
-
     if (valE === "xfer") {
       const xf = Array.from(ty.options).find(o => o.value.startsWith('xf'));
       if (xf) ty.value = xf.value;
@@ -465,7 +448,6 @@
     }
   }
 
-  // v3-05: Support helper retained (Who written only for Support categories)
   function isSupportCategory(cat) { return (cat || "").toLowerCase().includes("support"); }
 
   function handleCatTrigger() {
@@ -492,7 +474,6 @@
     const t = parseFloat(document.getElementById('colT').value) || 0,
           u = parseFloat(document.getElementById('colM').value) || 1,
           v = parseFloat(document.getElementById('colV').value) || 0;
-
     const tot = ((t * u) + v).toFixed(2);
     const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP';
     document.getElementById('symbol').innerText = symbols[curCode] || "£";
@@ -501,21 +482,11 @@
   }
 
   function buildFinalPackage() {
-    const fv = document.getElementById('colF').value,
-          hv = document.getElementById('colH').value,
-          iv = document.getElementById('colI').value;
-
-    if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) {
-      alert("Missing data.");
-      return null;
-    }
-
+    const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
+    if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return null; }
     const flowV = document.getElementById('flowDisplay').innerText;
     if (flowV === "--") return { needsFlow: true };
-
     const whoV = isSupportCategory(fv) ? document.getElementById('colA').value : "";
-
-    // v3-05: Maintain 35-column staged row
     const finalPackage = [
       document.getElementById('colA').value, document.getElementById('colB').value, document.getElementById('colC').value,
       "", flowV, document.getElementById('colF').value, document.getElementById('colG').value,
@@ -527,39 +498,28 @@
       document.getElementById('colX').value, "", document.getElementById('colZ').value,
       "", "", "", "", "", "", "", whoV, VER
     ];
-
     return { needsFlow: false, finalPackage };
   }
 
   function handleMainAction(mode = 'create') {
-    logTrace(`Action Triggered. Mode=${mode} (v3-05)`);
-
-    if (rawLookupData.length === 0) {
-      alert("Edit is only possible after Lookups are pulled or refreshed");
-      return;
-    }
+    logTrace(`Action Triggered. Mode=${mode} (v3-06)`);
+    if (rawLookupData.length === 0) { alert("Edit is only possible after Lookups are pulled or refreshed"); return; }
 
     const built = buildFinalPackage();
     if (!built) return;
 
-    if (built.needsFlow) {
-      flowModalContext = mode;
-      openFlowModal();
-      return;
-    }
+    if (built.needsFlow) { flowModalContext = mode; openFlowModal(); return; }
 
     let masterList = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-
     if (mode === 'commit' && editIndex > -1) {
       masterList[editIndex] = built.finalPackage;
-      logTrace(`Logic Update: Row ${editIndex} Overwritten (Commit). (v3-05)`);
+      logTrace(`Logic Update: Row ${editIndex} Overwritten (Commit). (v3-06)`);
     } else {
       masterList.push(built.finalPackage);
-      logTrace("Logic Update: New Record Appended (Create). (v3-05)");
+      logTrace("Logic Update: New Record Appended (Create). (v3-06)");
     }
-
     localStorage.setItem('ebs_trf', JSON.stringify(masterList));
-    logTrace("Storage Synced. (v3-05)");
+    logTrace("Storage Synced. (v3-06)");
     localReset();
   }
 
@@ -567,69 +527,33 @@
     if (rawLookupData.length === 0) { alert("First Refresh Lookups or Pull local Lookups."); return; }
     const trs = document.getElementById('previewArea').getElementsByTagName('tr');
     const btn = trs[idx + 1].getElementsByTagName('button')[0];
-
     if (btn.innerText === 'C') { handleMainAction('commit'); return; }
 
     if (pendingEdit === idx) {
-      isRestoring = true;
-      editIndex = idx;
-      pendingEdit = -1;
-
+      isRestoring = true; editIndex = idx; pendingEdit = -1;
       const d = JSON.parse(localStorage.getItem('ebs_trf'))[idx];
-
       const setUI = (id, val, isDrop = false) => {
-        const el = document.getElementById(id);
-        if (!el) return;
+        const el = document.getElementById(id); if (!el) return;
         if (!isDrop) { el.value = val; return; }
         const opts = el.options;
         for (let i = 0; i < opts.length; i++) {
-          if (opts[i].value === val || opts[i].text === val || opts[i].value === val + " (AA)") {
-            el.selectedIndex = i;
-            break;
-          }
+          if (opts[i].value === val || opts[i].text === val || opts[i].value === val + " (AA)") { el.selectedIndex = i; break; }
         }
       };
-
-      setUI('colA', d[0], true);
-      setUI('colB', d[1], true);
-      setUI('colC', d[2]);
-      setUI('colF', d[5], true);
-      setUI('colG', d[6]);
-      setUI('colH', d[7], true);
-      setUI('colI', d[8], true);
-      setUI('colK', d[10]);
-      setUI('colT', d[19]);
-      setUI('colV', d[21]);
-      setUI('colM', d[20]);
-      setUI('colZ', d[25], true);
-      setUI('colFreq', d[11], true);
-      setUI('colStatus', d[14], true);
-
+      setUI('colA', d[0], true); setUI('colB', d[1], true); setUI('colC', d[2]); setUI('colF', d[5], true);
+      setUI('colG', d[6]); setUI('colH', d[7], true); setUI('colI', d[8], true); setUI('colK', d[10]);
+      setUI('colT', d[19]); setUI('colV', d[21]); setUI('colM', d[20]); setUI('colZ', d[25], true);
+      setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
       document.getElementById('flowDisplay').innerText = d[4] || "--";
-
-      isRestoring = false;
-      handleDateChange();
-      calc();
-      renderPreview();
-      logTrace(`Active Edit: row ${idx + 1} (v3-05)`);
-    } else {
-      pendingEdit = idx;
-      editIndex = -1;
-      renderPreview();
-    }
+      isRestoring = false; handleDateChange(); calc(); renderPreview();
+      logTrace(`Active Edit: row ${idx + 1} (v3-06)`);
+    } else { pendingEdit = idx; editIndex = -1; renderPreview(); }
   }
 
   function openFlowModal() { document.getElementById('flow_modal').style.display = 'block'; }
   function closeFlowModal() { document.getElementById('flow_modal').style.display = 'none'; }
+  function commitFlowSelection() { const selected = document.getElementById('modal_flow_select').value; document.getElementById('flowDisplay').innerText = selected; closeFlowModal(); handleMainAction(flowModalContext); }
 
-  function commitFlowSelection() {
-    const selected = document.getElementById('modal_flow_select').value;
-    document.getElementById('flowDisplay').innerText = selected;
-    closeFlowModal();
-    handleMainAction(flowModalContext);
-  }
-
-  // v3-05: Month column retained in preview
   function renderPreview() {
     const storageData = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
     let h = '<table><tr>'
@@ -668,7 +592,7 @@
     });
 
     document.getElementById('previewArea').innerHTML = h + '</table>';
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-05)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-06)");
   }
 
   function deleteRow(i) {
@@ -683,14 +607,9 @@
   function openNote(idx) {
     activeNoteIdx = idx;
     const d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-    if (d[idx]) {
-      document.getElementById('modal_note_text').value = d[idx][10] || "";
-      document.getElementById('note_modal').style.display = 'block';
-    }
+    if (d[idx]) { document.getElementById('modal_note_text').value = d[idx][10] || ""; document.getElementById('note_modal').style.display = 'block'; }
   }
-
   function closeNote() { document.getElementById('note_modal').style.display = 'none'; }
-
   function commitNote() {
     let d = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
     if (!d[activeNoteIdx]) return;
@@ -702,19 +621,11 @@
 
   function openCalculatorHook() { alert("Calculator Logic Hook: Active"); }
 
-  // v3-05: Quote sheet names safely for ranges
-  function quoteSheet(name) {
-    const safe = String(name || "").replace(/'/g, "''");
-    return `'${safe}'`;
-  }
+  function quoteSheet(name) { const safe = String(name || "").replace(/'/g, "''"); return `'${safe}'`; }
 
-  // v3-05: Get sheetId for row insertion (used only when filling a gap with data below)
   async function getSheetIdByTitle(title) {
     if (stagingSheetIdCache !== null) return stagingSheetIdCache;
-    const res = await gapi.client.sheets.spreadsheets.get({
-      spreadsheetId: SHEET_ID,
-      fields: 'sheets.properties.sheetId,sheets.properties.title'
-    });
+    const res = await gapi.client.sheets.spreadsheets.get({ spreadsheetId: SHEET_ID, fields: 'sheets.properties.sheetId,sheets.properties.title' });
     const sheets = (res.result && res.result.sheets) ? res.result.sheets : [];
     const found = sheets.find(s => s.properties && s.properties.title === title);
     if (!found) throw new Error(`Sheet not found: ${title}`);
@@ -722,7 +633,6 @@
     return stagingSheetIdCache;
   }
 
-  // v3-05: Find first empty row in Column A starting at A2
   async function findFirstEmptyRowInColA(sheetName) {
     const res = await gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
@@ -734,112 +644,81 @@
     const isBlank = (r) => (!r || !r[0] || String(r[0]).trim() === "");
 
     const firstEmptyOffset = rows.findIndex(isBlank);
-    if (firstEmptyOffset === -1) {
-      return { firstEmptyRow: STAGING_START_ROW + rows.length, gapWithDataBelow: false };
-    }
+    if (firstEmptyOffset === -1) return { firstEmptyRow: STAGING_START_ROW + rows.length, gapWithDataBelow: false };
 
     const tailHasData = rows.slice(firstEmptyOffset + 1).some(r => !isBlank(r));
     return { firstEmptyRow: STAGING_START_ROW + firstEmptyOffset, gapWithDataBelow: tailHasData };
   }
 
-  // v3-05: Insert rows to prevent overwrite when filling a gap with data below
   async function insertRowsAt(sheetId, startRow1Based, countRows) {
     const startIndex0 = startRow1Based - 1;
     await gapi.client.sheets.spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
-      resource: {
-        requests: [{
-          insertDimension: {
-            range: { sheetId: sheetId, dimension: 'ROWS', startIndex: startIndex0, endIndex: startIndex0 + countRows },
-            inheritFromBefore: false
-          }
-        }]
-      }
+      resource: { requests: [{ insertDimension: { range: { sheetId: sheetId, dimension: 'ROWS', startIndex: startIndex0, endIndex: startIndex0 + countRows }, inheritFromBefore: false } }] }
     });
   }
 
-  // v3-05: Normalise staged rows to match v2-52 working sync behavior
   function normalizeRowForSheet(row) {
     const rc = Array(STAGING_COLS).fill("");
     const src = Array.isArray(row) ? row : [];
     for (let i = 0; i < Math.min(src.length, STAGING_COLS); i++) rc[i] = src[i];
 
-    // Date: yyyy-mm-dd -> dd/mm/yyyy
     const d = String(rc[2] || "");
     const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (m) rc[2] = `${m[3]}/${m[2]}/${m[1]}`;
 
-    // Drop "code description" -> code (same indices used in v2-52)
-    [1, 5, 11, 14, 23, 25].forEach(i => {
-      rc[i] = String(rc[i] || "").split(' ')[0];
-    });
-
-    // Accounts: remove " (AA)"
-    [7, 8].forEach(i => {
-      rc[i] = String(rc[i] || "").replace(/ \(AA\)/g, '');
-    });
-
-    // Numeric fields (same indices used in v2-52)
-    [19, 21, 22].forEach(i => {
-      const n = parseFloat(rc[i] || 0);
-      rc[i] = isFinite(n) ? n : 0;
-    });
+    [1, 5, 11, 14, 23, 25].forEach(i => { rc[i] = String(rc[i] || "").split(' ')[0]; });
+    [7, 8].forEach(i => { rc[i] = String(rc[i] || "").replace(/ \(AA\)/g, ''); });
+    [19, 21, 22].forEach(i => { const n = parseFloat(rc[i] || 0); rc[i] = isFinite(n) ? n : 0; });
 
     return rc;
   }
 
-  // v3-05: Extract readable error text
   function extractErr(e) {
     try {
       if (!e) return "Unknown error";
       if (typeof e === 'string') return e;
       if (e.message) return e.message;
       if (e.result && e.result.error && e.result.error.message) return e.result.error.message;
-      if (e.body) return e.body;
       return JSON.stringify(e);
-    } catch {
-      return "Unparseable error";
-    }
+    } catch { return "Unparseable error"; }
   }
 
-  // v3-05 FIX: Sync aligned to v2-52 working method + first empty row from A2 rule; never auto-clear staging
+  function isAuthError(e) {
+    try {
+      const code = e && (e.status || (e.result && e.result.error && e.result.error.code));
+      const msg = extractErr(e).toLowerCase();
+      return code === 401 || msg.includes("invalid authentication credentials") || msg.includes("unauthenticated");
+    } catch { return false; }
+  }
+
+  // v3-06: Retry once on 401 by forcing a new token (expired token reuse protection)
   async function handleSync() {
-    if (!gapiReady) {
-      updateStatus("GAPI not ready", "error");
-      logTrace("Sync blocked: GAPI not ready. (v3-05)");
-      alert("GAPI not ready yet.");
-      return;
-    }
+    if (!gapiReady) { updateStatus("GAPI not ready", "error"); logTrace("Sync blocked: GAPI not ready. (v3-06)"); alert("GAPI not ready yet."); return; }
 
     const storageData = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-    if (!Array.isArray(storageData) || storageData.length === 0) {
-      updateStatus("No staging rows", "idle");
-      logTrace("Sync aborted: no staging rows. (v3-05)");
-      alert("No staging rows to send.");
-      return;
-    }
+    if (!Array.isArray(storageData) || storageData.length === 0) { updateStatus("No staging rows", "idle"); logTrace("Sync aborted: no staging rows. (v3-06)"); alert("No staging rows to send."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace(`Sync started. Rows=${storageData.length} Target=${STAGING_SHEET_NAME} (v3-05)`);
+    logTrace(`Sync started. Rows=${storageData.length} Target=${STAGING_SHEET_NAME} (v3-06)`);
 
-    try {
-      await ensureToken('sync');
-      logTrace("Sync token ready. (v3-05)");
+    const attempt = async (forceToken) => {
+      await ensureToken('sync', !!forceToken);
+      logTrace(`Sync token ready. force=${!!forceToken} (v3-06)`);
 
       const { firstEmptyRow, gapWithDataBelow } = await findFirstEmptyRowInColA(STAGING_SHEET_NAME);
-      logTrace(`First empty row in ColA=${firstEmptyRow} GapWithDataBelow=${gapWithDataBelow} (v3-05)`);
+      logTrace(`First empty row in ColA=${firstEmptyRow} GapWithDataBelow=${gapWithDataBelow} (v3-06)`);
 
       if (gapWithDataBelow) {
         const sid = await getSheetIdByTitle(STAGING_SHEET_NAME);
         await insertRowsAt(sid, firstEmptyRow, storageData.length);
-        logTrace(`Inserted ${storageData.length} rows at ${firstEmptyRow} to prevent overwrite. (v3-05)`);
+        logTrace(`Inserted ${storageData.length} rows at ${firstEmptyRow} to prevent overwrite. (v3-06)`);
       }
 
       const values = storageData.map(normalizeRowForSheet);
       const endRow = firstEmptyRow + values.length - 1;
       const range = `${quoteSheet(STAGING_SHEET_NAME)}!A${firstEmptyRow}:${STAGING_END_COL}${endRow}`;
-
-      logTrace(`Sync write range=${range} (v3-05)`);
+      logTrace(`Sync write range=${range} (v3-06)`);
 
       await gapi.client.sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
@@ -849,12 +728,29 @@
       });
 
       updateStatus("Sync complete", "active");
-      logTrace(`Sync complete. Written=${values.length} StartRow=${firstEmptyRow} (v3-05)`);
+      logTrace(`Sync complete. Written=${values.length} StartRow=${firstEmptyRow} (v3-06)`);
       alert("Sync completed.");
-    } catch (e) {
+    };
+
+    try {
+      await attempt(false);
+    } catch (e1) {
+      const msg1 = extractErr(e1);
+      logTrace(`Sync error: ${msg1} (v3-06)`);
+      if (isAuthError(e1)) {
+        logTrace("Auth error detected; clearing token and retrying once. (v3-06)");
+        clearStoredToken();
+        try {
+          await attempt(true);
+          return;
+        } catch (e2) {
+          updateStatus("Sync error", "error");
+          logTrace(`Sync error after retry: ${extractErr(e2)} (v3-06)`);
+          alert("Sync failed. Trace log contains details.");
+          return;
+        }
+      }
       updateStatus("Sync error", "error");
-      const msg = extractErr(e);
-      logTrace(`Sync error: ${msg} (v3-05)`);
       alert("Sync failed. Trace log contains details.");
     }
   }
