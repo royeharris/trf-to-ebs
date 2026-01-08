@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>EBS Entry v3-06</title>
+  <title>EBS Entry v3-07</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
   <style>
@@ -35,20 +35,34 @@
     .w-note { width: 40px; text-align: center; cursor: pointer; font-size: 1rem; }
     .w-freq { width: 100px; } .w-month { width: 55px; text-align:center; }
     .w-tot { width: 80px; text-align: right; } .w-who { width: 45px; text-align:center; } .w-del { width: 30px; text-align: center; }
+
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-    .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .modal-content { background: white; margin: 15% auto; padding: 20px; width: 88%; max-width: 420px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+
     #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; }
     #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; border: none; font-weight: 600; display: block; }
     #trace_log { display: none; margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 150px; overflow-y: auto; white-space: pre-wrap; cursor: pointer; }
+
     .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
     .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
+
+    /* v3-07: Calculator modal styling */
+    .calc-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .calc-btn { padding: 12px 8px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; background: #f1f2f6; color: var(--primary); font-size: 1rem; }
+    .calc-btn.op { background: #dfe6e9; }
+    .calc-btn.danger { background: var(--danger); color: white; }
+    .calc-btn.bridge { background: var(--bridge); color: white; }
+    .calc-btn.accent { background: var(--accent); color: white; }
+    .calc-display { font-size: 0.85rem; color: #7f8c8d; margin-top: 6px; }
+    .calc-result { font-size: 1.2rem; font-weight: 900; color: var(--primary); margin-top: 4px; }
+
     .txt-center { text-align: center; }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header-wrap">
-    <div class="branding-row"><b>EBS Input</b> <span>v3-06</span></div>
+    <div class="branding-row"><b>EBS Input</b> <span>v3-07</span></div>
     <div class="header-btns">
       <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
       <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -111,7 +125,7 @@
   <div class="preview-wrap" id="previewArea"></div>
   <div id="auth_status">iOS Sync Status: Idle</div>
   <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-  <div id="trace_log" onclick="toggleLog(false)">Trace: v3-06 Logic Circuit Breaker active.</div>
+  <div id="trace_log" onclick="toggleLog(false)">Trace: v3-07 Logic Circuit Breaker active.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -140,17 +154,56 @@
   </div>
 </div>
 
+<!-- v3-07: Each-field calculator modal -->
+<div id="calc_modal" class="modal">
+  <div class="modal-content">
+    <label style="font-size:1rem;">Calculator</label>
+    <div class="calc-display">Expression</div>
+    <input id="calc_expr" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" style="margin-top:6px;">
+    <div class="calc-display">Result</div>
+    <div id="calc_result" class="calc-result">0.00</div>
+
+    <div class="calc-row">
+      <button class="calc-btn danger" onclick="calcClear()">C</button>
+      <button class="calc-btn op" onclick="calcBack()">⌫</button>
+      <button class="calc-btn op" onclick="calcAppend('(')">(</button>
+      <button class="calc-btn op" onclick="calcAppend(')')">)</button>
+
+      <button class="calc-btn" onclick="calcAppend('7')">7</button>
+      <button class="calc-btn" onclick="calcAppend('8')">8</button>
+      <button class="calc-btn" onclick="calcAppend('9')">9</button>
+      <button class="calc-btn op" onclick="calcAppend('/')">÷</button>
+
+      <button class="calc-btn" onclick="calcAppend('4')">4</button>
+      <button class="calc-btn" onclick="calcAppend('5')">5</button>
+      <button class="calc-btn" onclick="calcAppend('6')">6</button>
+      <button class="calc-btn op" onclick="calcAppend('*')">×</button>
+
+      <button class="calc-btn" onclick="calcAppend('1')">1</button>
+      <button class="calc-btn" onclick="calcAppend('2')">2</button>
+      <button class="calc-btn" onclick="calcAppend('3')">3</button>
+      <button class="calc-btn op" onclick="calcAppend('-')">−</button>
+
+      <button class="calc-btn" onclick="calcAppend('0')">0</button>
+      <button class="calc-btn" onclick="calcAppend('.')">.</button>
+      <button class="calc-btn bridge" onclick="calcEquals()">=</button>
+      <button class="calc-btn op" onclick="calcAppend('+')">+</button>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button class="calc-btn" style="flex:1;" onclick="closeCalcModal()">Cancel</button>
+      <button class="calc-btn accent" style="flex:1;" onclick="calcApply()">Apply</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
+  const VER = "Excel Budget Sheet Input (v3-07)";
 
-  // v3-06: Version incremented
-  const VER = "Excel Budget Sheet Input (v3-06)";
-
-  // v3-06: Token storage (access tokens expire; store expiry to avoid reusing expired token)
   const TOKEN_KEY = 'g_token';
   const TOKEN_EXP_KEY = 'g_token_exp_ms';
 
-  // v3-06: Sync destination
   const STAGING_SHEET_NAME = 'EBSinput';
   const STAGING_END_COL = 'AI';
   const STAGING_COLS = 35;
@@ -178,6 +231,8 @@
 
   let stagingSheetIdCache = null;
 
+  let calcLastValue = null;
+
   function logTrace(msg) {
     console.log(msg);
     const log = document.getElementById('trace_log');
@@ -196,18 +251,17 @@
       await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' });
       await gapi.client.load('sheets', 'v4');
       gapiReady = true;
-      logTrace("GAPI Ready. (v3-06)");
+      logTrace("GAPI Ready. (v3-07)");
     });
   }
 
-  // v3-06: Store token expiry (expires_in) and always set gapi token for API calls
   function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com',
       scope: 'https://www.googleapis.com/auth/spreadsheets',
       callback: async (resp) => {
         if (resp && resp.error) {
-          logTrace(`Token Error: ${resp.error} (v3-06)`);
+          logTrace(`Token Error: ${resp.error} (v3-07)`);
           updateStatus("Token Error", "error");
           if (tokenPromiseReject) tokenPromiseReject(new Error(resp.error));
           tokenPromiseResolve = null; tokenPromiseReject = null; tokenPurpose = null;
@@ -217,7 +271,6 @@
         if (resp && resp.access_token) {
           localStorage.setItem(TOKEN_KEY, resp.access_token);
 
-          // v3-06: expires_in is seconds; store expiry with 60s safety margin
           const expiresInSec = Number(resp.expires_in || 0);
           const expMs = Date.now() + Math.max(0, (expiresInSec * 1000) - 60000);
           localStorage.setItem(TOKEN_EXP_KEY, String(expMs));
@@ -226,7 +279,7 @@
             gapi.client.setToken({ access_token: resp.access_token });
           }
 
-          logTrace(`Token Received. expires_in=${expiresInSec}s Purpose=${tokenPurpose || 'none'} (v3-06)`);
+          logTrace(`Token Received. expires_in=${expiresInSec}s Purpose=${tokenPurpose || 'none'} (v3-07)`);
 
           const p = tokenPurpose;
           tokenPurpose = null;
@@ -238,7 +291,7 @@
         }
       }
     });
-    logTrace("GIS Ready. (v3-06)");
+    logTrace("GIS Ready. (v3-07)");
   }
 
   function updateStatus(label, state) {
@@ -255,7 +308,6 @@
 
   function initRefresh() { tokenPurpose = 'refresh'; tokenClient.requestAccessToken(); }
 
-  // v3-06: Validate token expiry; force refresh when required
   function ensureToken(purpose, force = false) {
     const existing = localStorage.getItem(TOKEN_KEY);
     const expMs = Number(localStorage.getItem(TOKEN_EXP_KEY) || 0);
@@ -348,12 +400,12 @@
     AA_LIST = ["Santander P (AA)", "Revolut P (AA)"];
     coordinateMap = {"Grouping":{val:0},"F/U":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
     rawLookupData = [["INIT"]];
-    updateDropdown('colA', ["Roy", "John"], 'Roy');
+    updateDropdown('colA', ["Roy", "Ev"], 'Roy');
     updateDropdown('colB', ["v Verified", "xf Transfer", "S Support"], 'v');
-    updateDropdown('colF', ["Food", "Support", "Transfer"], null, '--Select--');
+    updateDropdown('colF', ["Food", "Support Samara", "Transfer"], null, '--Select--');
     updateDropdown('colH', AA_LIST, null, '--Select--');
     updateDropdown('colI', AA_LIST, null, '--Select--');
-    updateDropdown('colFreq', ["A Ad-hoc"], 'A');
+    updateDropdown('colFreq', ["A Ad-hoc", "M Monthly"], 'A');
     updateDropdown('colStatus', ["N Pending"], 'N');
     updateDropdown('colZ', ["NEW"], 'NEW');
     updateDropdown('colX', ["GBP"], 'GBP');
@@ -382,7 +434,7 @@
   function localReset() {
     editIndex = -1;
     pendingEdit = -1;
-    logTrace("UI Reset Invoked. (v3-06)");
+    logTrace("UI Reset Invoked. (v3-07)");
 
     ['colT','colV','colG','colK'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
     document.getElementById('colM').value = "1";
@@ -402,7 +454,7 @@
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-06)");
+    logTrace("UI Fields Reset. (v3-07)");
   }
 
   function handleResetConfirm() {
@@ -429,7 +481,7 @@
       wipeConfirmed = false;
       btn.innerText = "Clear Staging records";
       renderPreview();
-      logTrace("Staging wiped. (v3-06)");
+      logTrace("Staging wiped. (v3-07)");
     }
   }
 
@@ -452,14 +504,21 @@
 
   function handleCatTrigger() {
     if (isRestoring) return;
+
     const cat = document.getElementById('colF').value || "";
     if (isSupportCategory(cat)) {
-      const s = Array.from(document.getElementById('colB').options).find(o => o.value.startsWith('S'));
-      if (s) document.getElementById('colB').value = s.value;
+      const fu = document.getElementById('colB');
+      const s = Array.from(fu.options).find(o => o.value.startsWith('S'));
+      if (s) fu.value = s.value;
+
+      const fr = document.getElementById('colFreq');
+      const a = Array.from(fr.options).find(o => o.value && o.value.startsWith('A'));
+      if (a) fr.value = a.value;
+      logTrace("Support category selected: Frequency forced to Ad-hoc. (v3-07)");
     }
   }
 
-  function handleManualFU() { /* placeholder */ }
+  function handleManualFU() { }
 
   function handleDateChange() {
     const dStr = document.getElementById('colC').value;
@@ -502,7 +561,7 @@
   }
 
   function handleMainAction(mode = 'create') {
-    logTrace(`Action Triggered. Mode=${mode} (v3-06)`);
+    logTrace(`Action Triggered. Mode=${mode} (v3-07)`);
     if (rawLookupData.length === 0) { alert("Edit is only possible after Lookups are pulled or refreshed"); return; }
 
     const built = buildFinalPackage();
@@ -513,13 +572,13 @@
     let masterList = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
     if (mode === 'commit' && editIndex > -1) {
       masterList[editIndex] = built.finalPackage;
-      logTrace(`Logic Update: Row ${editIndex} Overwritten (Commit). (v3-06)`);
+      logTrace(`Logic Update: Row ${editIndex} Overwritten (Commit). (v3-07)`);
     } else {
       masterList.push(built.finalPackage);
-      logTrace("Logic Update: New Record Appended (Create). (v3-06)");
+      logTrace("Logic Update: New Record Appended (Create). (v3-07)");
     }
     localStorage.setItem('ebs_trf', JSON.stringify(masterList));
-    logTrace("Storage Synced. (v3-06)");
+    logTrace("Storage Synced. (v3-07)");
     localReset();
   }
 
@@ -546,7 +605,7 @@
       setUI('colFreq', d[11], true); setUI('colStatus', d[14], true);
       document.getElementById('flowDisplay').innerText = d[4] || "--";
       isRestoring = false; handleDateChange(); calc(); renderPreview();
-      logTrace(`Active Edit: row ${idx + 1} (v3-06)`);
+      logTrace(`Active Edit: row ${idx + 1} (v3-07)`);
     } else { pendingEdit = idx; editIndex = -1; renderPreview(); }
   }
 
@@ -566,7 +625,8 @@
       let bS = (pendingEdit === idx) ? "background:red" : (editIndex === idx ? "background:#f39c12" : "background:#3498db");
       let bL = (pendingEdit === idx) ? "..." : (editIndex === idx ? "C" : "E");
 
-      const [y, m, dn] = (r[2] || "").split('-').map(Number);
+      const parts = String(r[2] || "").split('-').map(Number);
+      const y = parts[0], m = parts[1], dn = parts[2];
       const dt = (y && m && dn) ? new Date(y, m - 1, dn) : new Date();
       const dNam = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
       const dStr = `${String(dt.getDate()).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`;
@@ -592,7 +652,7 @@
     });
 
     document.getElementById('previewArea').innerHTML = h + '</table>';
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-06)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-07)");
   }
 
   function deleteRow(i) {
@@ -618,8 +678,6 @@
     closeNote();
     renderPreview();
   }
-
-  function openCalculatorHook() { alert("Calculator Logic Hook: Active"); }
 
   function quoteSheet(name) { const safe = String(name || "").replace(/'/g, "''"); return `'${safe}'`; }
 
@@ -692,33 +750,32 @@
     } catch { return false; }
   }
 
-  // v3-06: Retry once on 401 by forcing a new token (expired token reuse protection)
   async function handleSync() {
-    if (!gapiReady) { updateStatus("GAPI not ready", "error"); logTrace("Sync blocked: GAPI not ready. (v3-06)"); alert("GAPI not ready yet."); return; }
+    if (!gapiReady) { updateStatus("GAPI not ready", "error"); logTrace("Sync blocked: GAPI not ready. (v3-07)"); alert("GAPI not ready yet."); return; }
 
     const storageData = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-    if (!Array.isArray(storageData) || storageData.length === 0) { updateStatus("No staging rows", "idle"); logTrace("Sync aborted: no staging rows. (v3-06)"); alert("No staging rows to send."); return; }
+    if (!Array.isArray(storageData) || storageData.length === 0) { updateStatus("No staging rows", "idle"); logTrace("Sync aborted: no staging rows. (v3-07)"); alert("No staging rows to send."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace(`Sync started. Rows=${storageData.length} Target=${STAGING_SHEET_NAME} (v3-06)`);
+    logTrace(`Sync started. Rows=${storageData.length} Target=${STAGING_SHEET_NAME} (v3-07)`);
 
     const attempt = async (forceToken) => {
       await ensureToken('sync', !!forceToken);
-      logTrace(`Sync token ready. force=${!!forceToken} (v3-06)`);
+      logTrace(`Sync token ready. force=${!!forceToken} (v3-07)`);
 
       const { firstEmptyRow, gapWithDataBelow } = await findFirstEmptyRowInColA(STAGING_SHEET_NAME);
-      logTrace(`First empty row in ColA=${firstEmptyRow} GapWithDataBelow=${gapWithDataBelow} (v3-06)`);
+      logTrace(`First empty row in ColA=${firstEmptyRow} GapWithDataBelow=${gapWithDataBelow} (v3-07)`);
 
       if (gapWithDataBelow) {
         const sid = await getSheetIdByTitle(STAGING_SHEET_NAME);
         await insertRowsAt(sid, firstEmptyRow, storageData.length);
-        logTrace(`Inserted ${storageData.length} rows at ${firstEmptyRow} to prevent overwrite. (v3-06)`);
+        logTrace(`Inserted ${storageData.length} rows at ${firstEmptyRow} to prevent overwrite. (v3-07)`);
       }
 
       const values = storageData.map(normalizeRowForSheet);
       const endRow = firstEmptyRow + values.length - 1;
       const range = `${quoteSheet(STAGING_SHEET_NAME)}!A${firstEmptyRow}:${STAGING_END_COL}${endRow}`;
-      logTrace(`Sync write range=${range} (v3-06)`);
+      logTrace(`Sync write range=${range} (v3-07)`);
 
       await gapi.client.sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
@@ -728,7 +785,7 @@
       });
 
       updateStatus("Sync complete", "active");
-      logTrace(`Sync complete. Written=${values.length} StartRow=${firstEmptyRow} (v3-06)`);
+      logTrace(`Sync complete. Written=${values.length} StartRow=${firstEmptyRow} (v3-07)`);
       alert("Sync completed.");
     };
 
@@ -736,22 +793,99 @@
       await attempt(false);
     } catch (e1) {
       const msg1 = extractErr(e1);
-      logTrace(`Sync error: ${msg1} (v3-06)`);
+      logTrace(`Sync error: ${msg1} (v3-07)`);
       if (isAuthError(e1)) {
-        logTrace("Auth error detected; clearing token and retrying once. (v3-06)");
+        logTrace("Auth error detected; clearing token and retrying once. (v3-07)");
         clearStoredToken();
-        try {
-          await attempt(true);
-          return;
-        } catch (e2) {
+        try { await attempt(true); return; }
+        catch (e2) {
           updateStatus("Sync error", "error");
-          logTrace(`Sync error after retry: ${extractErr(e2)} (v3-06)`);
+          logTrace(`Sync error after retry: ${extractErr(e2)} (v3-07)`);
           alert("Sync failed. Trace log contains details.");
           return;
         }
       }
       updateStatus("Sync error", "error");
       alert("Sync failed. Trace log contains details.");
+    }
+  }
+
+  /* v3-07 CALCULATOR MODAL LOGIC */
+
+  function openCalculatorHook() {
+    const eachVal = document.getElementById('colT').value;
+    const seed = (eachVal && String(eachVal).trim() !== "") ? String(eachVal).trim() : "0";
+    document.getElementById('calc_expr').value = seed;
+    document.getElementById('calc_result').innerText = "0.00";
+    calcLastValue = null;
+    document.getElementById('calc_modal').style.display = 'block';
+    logTrace(`Calculator opened. Seed=${seed} (v3-07)`);
+  }
+
+  function closeCalcModal() { document.getElementById('calc_modal').style.display = 'none'; }
+
+  function calcAppend(ch) {
+    const el = document.getElementById('calc_expr');
+    el.value = (el.value || "") + ch;
+  }
+
+  function calcClear() {
+    document.getElementById('calc_expr').value = "";
+    document.getElementById('calc_result').innerText = "0.00";
+    calcLastValue = null;
+  }
+
+  function calcBack() {
+    const el = document.getElementById('calc_expr');
+    el.value = (el.value || "").slice(0, -1);
+  }
+
+  function safeEvalExpr(expr) {
+    const s = String(expr || "").trim();
+    if (!s) throw new Error("Empty expression");
+    if (!/^[0-9+\-*/().\s]+$/.test(s)) throw new Error("Invalid characters");
+    if (s.includes("**")) throw new Error("Invalid operator");
+    const fn = Function(`"use strict"; return (${s});`);
+    const val = fn();
+    if (!isFinite(val)) throw new Error("Non-finite result");
+    return val;
+  }
+
+  function setCalcResult(val) {
+    const num = Number(val);
+    const rounded = Math.round(num * 100) / 100;
+    calcLastValue = rounded;
+    document.getElementById('calc_result').innerText = rounded.toFixed(2);
+  }
+
+  function calcEquals() {
+    try {
+      const expr = document.getElementById('calc_expr').value;
+      const val = safeEvalExpr(expr);
+      setCalcResult(val);
+      logTrace(`Calculator "=" ok: ${expr} = ${calcLastValue} (v3-07)`);
+    } catch (e) {
+      document.getElementById('calc_result').innerText = "ERR";
+      calcLastValue = null;
+      logTrace(`Calculator "=" error: ${e.message} (v3-07)`);
+    }
+  }
+
+  function calcApply() {
+    try {
+      if (calcLastValue === null) {
+        const expr = document.getElementById('calc_expr').value;
+        const val = safeEvalExpr(expr);
+        setCalcResult(val);
+      }
+      document.getElementById('colT').value = Number(calcLastValue).toFixed(2);
+      calc();
+      closeCalcModal();
+      logTrace(`Calculator applied: Each=${calcLastValue} (v3-07)`);
+    } catch (e) {
+      document.getElementById('calc_result').innerText = "ERR";
+      calcLastValue = null;
+      logTrace(`Calculator apply error: ${e.message} (v3-07)`);
     }
   }
 
