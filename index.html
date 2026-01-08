@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v2-125</title>
+    <title>EBS Entry v2-126</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -36,7 +36,7 @@
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         #auth_status { font-size: 0.75rem; margin-top: 10px; text-align: center; color: var(--primary); font-weight: 600; }
         #log_btn { margin-top: 15px; width: 100%; background: var(--primary); color: white; font-size: 0.7rem; border-radius: 6px; padding: 8px; border: none; font-weight: 600; display: block; }
-        #trace_log { display: none; margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; cursor: pointer; }
+        #trace_log { display: none; margin-top: 15px; padding: 10px; background: #2c3e50; color: #00ff00; font-family: "Courier New", monospace; font-size: 0.6rem; border-radius: 6px; max-height: 150px; overflow-y: auto; white-space: pre-wrap; cursor: pointer; }
         .calc-input-wrap { display: flex; align-items: center; gap: 4px; }
         .btn-calc-trigger { background: var(--bridge); color: white; border: none; border-radius: 4px; height: 38px; width: 30px; cursor: pointer; font-weight: bold; }
         .txt-center { text-align: center; }
@@ -45,7 +45,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v2-125</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v2-126</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -100,7 +100,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-125 Atomic disk-to-dom reconstruction active.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v2-126 Logic Circuit Breaker active.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -121,7 +121,7 @@
 
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
-    const VER = "Excel Budget Sheet Input (v2-125)";
+    const VER = "Excel Budget Sheet Input (v2-126)";
     let AA_LIST = [], coordinateMap = {}, symbols = { "GBP": "£", "EUR": "€", "USD": "$", "ZAR": "R", "CHF": "Fr", "THB": "฿", "RUR": "₽", "COP": "COL$" };
     let tokenClient, editIndex = -1, pendingEdit = -1, activeNoteIdx = -1, rawLookupData = [], wipeConfirmed = false, resetConfirmed = false, isRestoring = false;
 
@@ -143,7 +143,10 @@
     function populateUI(data) { const pop = (id, key, def, p = null) => { const list = data.filter(r => r[coordinateMap[key].val]).map(r => { const v = r[coordinateMap[key].val], d = coordinateMap[key].desc !== null ? r[coordinateMap[key].desc] : null; return d ? `${v} ${d}` : v; }); updateDropdown(id, list, def, p); }; pop('colA','Grouping','Roy'); pop('colB','F/U','v'); pop('colF','Category',null,'--Select--'); pop('colH','From',null,'--Select--'); pop('colI','To',null,'--Select--'); pop('colFreq','Frequency','A'); pop('colStatus','Status','N'); pop('colZ','Month','NEW'); pop('colX','Currency','GBP'); localReset(); }
     function updateDropdown(id, vals, def, prompt) { const s = document.getElementById(id); let h = prompt ? `<option value="" disabled selected>${prompt}</option>` : ''; h += vals.map(v => `<option value="${v}">${v}</option>`).join(''); s.innerHTML = h; if(def) { const o = Array.from(s.options).find(opt => opt.value.startsWith(def)); if(o) s.value = o.value; } }
     
+    // v2-126 REPAIRED: Logic Circuit Breaker for State traps
     function localReset() { 
+        editIndex = -1; // Force reset at absolute start
+        pendingEdit = -1;
         logTrace("UI Reset Invoked.");
         ['colT','colV','colG','colK'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; }); 
         document.getElementById('colM').value = "1"; 
@@ -154,22 +157,22 @@
             else s.selectedIndex = 0; 
         }; 
         rS('colA','Roy'); rS('colB','v'); rS('colF',null); rS('colH',null); rS('colI',null); rS('colFreq','A'); rS('colStatus','N'); rS('colZ','NEW'); rS('colX','GBP'); 
-        editIndex = -1; pendingEdit = -1; 
-        calc(); // Forced re-zero of total box
+        calc(); // Force total box to zero
+        renderPreview(); // Visual baseline
+        logTrace("UI Fields Reset.");
     }
 
-    function handleResetConfirm() { const btn = document.getElementById('resetBtn'); if(!resetConfirmed) { resetConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ resetConfirmed = false; btn.innerText="Reset"; }, 3000); } else { localReset(); renderPreview(); resetConfirmed = false; btn.innerText="Reset"; } }
+    function handleResetConfirm() { const btn = document.getElementById('resetBtn'); if(!resetConfirmed) { resetConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ resetConfirmed = false; btn.innerText="Reset"; }, 3000); } else { localReset(); resetConfirmed = false; btn.innerText="Reset"; } }
     function handleWipeConfirm() { const btn = document.getElementById('wipeBtn'); if(!wipeConfirmed) { wipeConfirmed = true; btn.innerText = "CONFIRM?"; setTimeout(()=>{ wipeConfirmed = false; btn.innerText="Clear Staging records"; }, 3000); } else { localStorage.removeItem('ebs_trf'); wipeConfirmed = false; btn.innerText="Clear Staging records"; renderPreview(); logTrace("Staging wiped."); } }
     function handleAccTrigger() { if (isRestoring) return; const h = document.getElementById('colH').value, i = document.getElementById('colI').value, ty = document.getElementById('colB'); const fAA = AA_LIST.includes(h), tAA = AA_LIST.includes(i); let valE = "zOut"; if (fAA && tAA) valE = "xfer"; else if (!fAA && tAA) valE = "In"; document.getElementById('flowDisplay').innerText = valE; if (valE === "xfer") { const xf = Array.from(ty.options).find(o => o.value.startsWith('xf')); if(xf) ty.value = xf.value; document.getElementById('colF').value = "Transfer"; } }
     function handleCatTrigger() { if (isRestoring) return; if (document.getElementById('colF').value.startsWith('S')) { const s = Array.from(document.getElementById('colB').options).find(o => o.value.startsWith('S')); if(s) document.getElementById('colB').value = s.value; } }
     function handleDateChange() { const dStr = document.getElementById('colC').value; if(!dStr) { document.getElementById('colCDisp').innerText = ""; return; } const [y, m, d] = dStr.split('-').map(Number); const dt = new Date(y, m-1, d); document.getElementById('colCDisp').innerText = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]} ${dt.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]} '${String(dt.getFullYear()).substr(-2)}`; }
     function calc() { const t = parseFloat(document.getElementById('colT').value)||0, u = parseFloat(document.getElementById('colM').value)||1, v = parseFloat(document.getElementById('colV').value)||0; const tot = ((t * u) + v).toFixed(2); const curCode = document.getElementById('colX').value.split(' ')[0] || 'GBP'; document.getElementById('symbol').innerText = symbols[curCode]||"£"; document.getElementById('totalDisp').innerText = tot; return tot; }
     
-    // v2-125 REPAIRED: Disk-to-DOM Redraw Sequence
     function handleMainAction() {
         logTrace("Action Triggered.");
         if (rawLookupData.length === 0) { alert("Edit is only possible after Lookups are pulled or refreshed"); return; }
-        const currentTargetIdx = editIndex; // Snap the index
+        const lockIdx = editIndex; // Snap the current mode
         
         const fv = document.getElementById('colF').value, hv = document.getElementById('colH').value, iv = document.getElementById('colI').value;
         if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")) { alert("Missing data."); return; }
@@ -189,27 +192,20 @@
             "", "", "", "", "", "", "", wV, VER
         ];
 
-        let databaseClone = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
-        if (currentTargetIdx > -1) { 
-            databaseClone[currentTargetIdx] = finalPackage;
-            logTrace(`Logic Update: Row ${currentTargetIdx} Overwritten.`);
+        let masterList = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
+        if (lockIdx > -1) { 
+            masterList[lockIdx] = finalPackage;
+            logTrace(`Logic Update: Row ${lockIdx} Overwritten.`);
         } else { 
-            databaseClone.push(finalPackage);
+            masterList.push(finalPackage);
             logTrace("Logic Update: New Record Appended.");
         }
         
-        // v2-125 FIX: Non-interruptible storage sync
-        localStorage.setItem('ebs_trf', JSON.stringify(databaseClone)); 
+        localStorage.setItem('ebs_trf', JSON.stringify(masterList)); 
         logTrace("Storage Synced.");
-
-        // v2-125 FIX: Re-render table BEFORE purging memory to prevent ghost state
-        renderPreview(); 
-        logTrace("Table Refresh Requested.");
         
-        setTimeout(() => {
-            localReset();
-            logTrace("UI Fields Reset.");
-        }, 150); 
+        // Critical sequential block
+        localReset(); 
     }
 
     function initiateEdit(idx) {
@@ -238,7 +234,6 @@
     function commitFlowSelection() { const selected = document.getElementById('modal_flow_select').value; document.getElementById('flowDisplay').innerText = selected; closeFlowModal(); handleMainAction(); }
     
     function renderPreview() {
-        // v2-125 FORCE FRESH PULL FROM DISK ON EVERY DRAW
         const storageData = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
         let h = '<table><tr><th class="w-edit">Edit</th><th>Grp</th><th>Type</th><th>Day</th><th>Date</th><th class="w-flow">Flow</th><th>Category</th><th>Sort</th><th>From</th><th>To</th><th class="w-note">Note</th><th class="w-freq">Frequency</th><th>Total</th><th class="w-who">Who</th><th>Del</th></tr>';
         storageData.forEach((r, idx) => {
