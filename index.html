@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBS Entry v3-02</title>
+    <title>EBS Entry v3-03</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <style>
@@ -45,7 +45,7 @@
 <body>
 <div class="container">
     <div class="header-wrap">
-        <div class="branding-row"><b>EBS Input</b> <span>v3-02</span></div>
+        <div class="branding-row"><b>EBS Input</b> <span>v3-03</span></div>
         <div class="header-btns">
             <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br>Lookups</button>
             <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br>Lookups<br>from Sheets</button>
@@ -108,7 +108,7 @@
     <div class="preview-wrap" id="previewArea"></div>
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-02 Logic Circuit Breaker active.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-03 Logic Circuit Breaker active.</div>
 </div>
 
 <div id="flow_modal" class="modal">
@@ -140,8 +140,11 @@
 <script>
     const SHEET_ID = '1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E';
 
-    // v3-02: version increment and persisted into each staged row for traceability
-    const VER = "Excel Budget Sheet Input (v3-02)";
+    // v3-03: Version incremented and stored in each staged record
+    const VER = "Excel Budget Sheet Input (v3-03)";
+
+    // v3-03: Configure destination tab/range for staging sync (adjust tab name if required)
+    const SYNC_TARGET_RANGE = 'TRF!A2';
 
     let AA_LIST = [],
         coordinateMap = {},
@@ -158,6 +161,14 @@
 
     // Context for Flow modal continuation
     let flowModalContext = 'create'; // 'create' | 'commit'
+
+    // v3-03: Track gapi readiness to avoid silent failures
+    let gapiReady = false;
+
+    // v3-03: Token routing (prevents sync token request from triggering lookup refresh)
+    let tokenPurpose = null;              // 'refresh' | 'sync'
+    let tokenPromiseResolve = null;
+    let tokenPromiseReject = null;
 
     function logTrace(msg) {
         console.log(msg);
@@ -176,7 +187,8 @@
         gapi.load('client', async () => {
             await gapi.client.init({ apiKey: 'AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM' });
             await gapi.client.load('sheets', 'v4');
-            logTrace("GAPI Ready.");
+            gapiReady = true; // v3-03
+            logTrace("GAPI Ready. (v3-03)");
         });
     }
 
@@ -184,10 +196,36 @@
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: '23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com',
             scope: 'https://www.googleapis.com/auth/spreadsheets',
-            callback: (resp) => {
-                if (resp.access_token) {
+            callback: async (resp) => {
+                // v3-03: Stronger error handling + purpose routing + trace logging
+                if (resp && resp.error) {
+                    logTrace(`Token Error: ${resp.error} (v3-03)`);
+                    updateStatus("Token Error", "error");
+                    if (tokenPromiseReject) tokenPromiseReject(new Error(resp.error));
+                    tokenPromiseResolve = null; tokenPromiseReject = null; tokenPurpose = null;
+                    return;
+                }
+
+                if (resp && resp.access_token) {
                     localStorage.setItem('g_token', resp.access_token);
-                    fetchLookupRefs();
+
+                    // v3-03: Ensure gapi client uses the OAuth token for Sheets API calls
+                    if (gapi && gapi.client && typeof gapi.client.setToken === 'function') {
+                        gapi.client.setToken({ access_token: resp.access_token });
+                    }
+
+                    logTrace(`Token Received. Purpose=${tokenPurpose || 'none'} (v3-03)`);
+
+                    // v3-03: Route behavior by purpose
+                    const p = tokenPurpose;
+                    tokenPurpose = null;
+
+                    if (tokenPromiseResolve) tokenPromiseResolve(resp.access_token);
+                    tokenPromiseResolve = null; tokenPromiseReject = null;
+
+                    if (p === 'refresh') {
+                        fetchLookupRefs(); // original refresh behavior preserved (v3-03)
+                    }
                 }
             }
         });
@@ -245,7 +283,30 @@
         }
     }
 
-    function initRefresh() { tokenClient.requestAccessToken(); }
+    function initRefresh() {
+        // v3-03: explicit token purpose
+        tokenPurpose = 'refresh';
+        tokenClient.requestAccessToken();
+    }
+
+    // v3-03: Promise-based token getter (sync/refresh)
+    function ensureToken(purpose) {
+        const existing = localStorage.getItem('g_token');
+        if (existing && existing.length > 20) {
+            // v3-03: guarantee gapi has token even when restored from localStorage
+            if (gapi && gapi.client && typeof gapi.client.setToken === 'function') {
+                gapi.client.setToken({ access_token: existing });
+            }
+            return Promise.resolve(existing);
+        }
+
+        return new Promise((resolve, reject) => {
+            tokenPurpose = purpose;
+            tokenPromiseResolve = resolve;
+            tokenPromiseReject = reject;
+            tokenClient.requestAccessToken();
+        });
+    }
 
     async function fetchLookupRefs() {
         updateStatus("Fetching Refs...", "sync");
@@ -401,7 +462,7 @@
         }
     }
 
-    // v3-02: centralize Support match to ensure identical behavior in UI triggers and save logic
+    // v3-02: centralize Support match (retained)
     function isSupportCategory(cat) {
         return (cat || "").toLowerCase().includes("support");
     }
@@ -455,9 +516,7 @@
         const flowV = document.getElementById('flowDisplay').innerText;
         if (flowV === "--") return { needsFlow: true };
 
-        // v3-02 BUG FIX (Who field):
-        // Requirement: Who in Staging must only be populated when Category contains "support"/"Support" (case-insensitive).
-        // Fix: Who value is computed exclusively from Category and stored blank for all non-support Categories.
+        // v3-02 BUG FIX (Who field): only populate Who when Category contains 'support'
         const whoV = isSupportCategory(fv) ? document.getElementById('colA').value : "";
 
         const finalPackage = [
@@ -642,9 +701,57 @@
 
     function openCalculatorHook() { alert("Calculator Logic Hook: Active"); }
 
+    // v3-03 FIX: Real sync to Sheets + Trace logging
     async function handleSync() {
+        if (!gapiReady) {
+            updateStatus("GAPI not ready", "error");
+            logTrace("Sync blocked: GAPI not ready. (v3-03)");
+            alert("GAPI not ready yet.");
+            return;
+        }
+
+        const storageData = JSON.parse(localStorage.getItem('ebs_trf') || '[]');
+        if (!Array.isArray(storageData) || storageData.length === 0) {
+            updateStatus("No staging rows", "idle");
+            logTrace("Sync aborted: no staging rows. (v3-03)");
+            alert("No staging rows to send.");
+            return;
+        }
+
         updateStatus("Syncing...", "sync");
-        setTimeout(() => updateStatus("Token Active", "active"), 1000);
+        logTrace(`Sync started. Rows=${storageData.length} Target=${SYNC_TARGET_RANGE} (v3-03)`);
+
+        try {
+            await ensureToken('sync');
+            logTrace("Sync token ready. (v3-03)");
+
+            const res = await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: SHEET_ID,
+                range: SYNC_TARGET_RANGE,
+                valueInputOption: 'USER_ENTERED',
+                insertDataOption: 'INSERT_ROWS',
+                resource: { values: storageData }
+            });
+
+            const upd = res && res.result && res.result.updates ? res.result.updates : null;
+            const appended = upd && typeof upd.updatedRows === 'number' ? upd.updatedRows : storageData.length;
+
+            updateStatus("Sync complete", "active");
+            logTrace(`Sync complete. Appended rows=${appended} (v3-03)`);
+
+            // v3-03: optional clear local staging after successful sync
+            const clear = confirm("Clear local staging now?");
+            if (clear) {
+                localStorage.removeItem('ebs_trf');
+                renderPreview();
+                logTrace("Local staging cleared after sync. (v3-03)");
+            }
+        } catch (e) {
+            updateStatus("Sync error", "error");
+            const msg = (e && e.message) ? e.message : String(e);
+            logTrace(`Sync error: ${msg} (v3-03)`);
+            alert("Sync failed. Trace log contains details.");
+        }
     }
 
     window.onload = () => {
