@@ -1,14 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>EBS Input v3-21</title>
-
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://apis.google.com/js/api.js" async defer></script>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>EBS Input v3-21</title>
+<script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
+<script async="" defer="" src="https://apis.google.com/js/api.js"></script>
+<style>
     :root{
       --primary:#2c3e50; --accent:#27ae60; --danger:#c0392b; --bg:#f8f9fa;
       --bridge:#2980b9; --cache:#8e44ad; --test:#e67e22;
@@ -173,172 +172,151 @@
     }
 </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="header-wrap">
-      <div class="branding-row"><b>EBS Input</b> <span>v3-21</span></div>
-      <div class="header-btns">
-        <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br/>Lookups</button>
-        <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
-        <button class="btn-lookup btn-save" onclick="checkEditState(() => cacheSave())">Save to<br/>local Lookups</button>
-        <button class="btn-lookup btn-test" onclick="checkEditState(() => useTestData())">Pull test<br/>Lookups</button>
-        <button class="btn-lookup btn-reset" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
-      <div><label>Type</label><select id="colB" onchange="handleManualType()"></select></div>
-      <div><label>Grouping</label><select id="colA"></select></div>
-      <div>
-        <label>Date</label>
-        <div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
-          <span>📅</span><input type="date" id="colC" onchange="handleDateChange()" />
-        </div>
-        <div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
-      <div><label>Category</label><select id="colF" required onchange="handleCatTrigger()"></select></div>
-      <div><label style="text-align:center;">Flow</label><div id="flowDisplay" class="flow-display">--</div></div>
-      <div><label>Sort</label><input type="number" id="colG" placeholder="0" /></div>
-    </div>
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-      <div><label>From</label><select id="colH" required onchange="handleAccTrigger()"></select></div>
-      <div><label>To</label><select id="colI" required onchange="handleAccTrigger()"></select></div>
-    </div>
-
-    <div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2" style="font-size:16px;"></textarea></div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
-      <div><label>Frequency</label><select id="colFreq"></select></div>
-      <div><label>Status</label><select id="colStatus"></select></div>
-      <div><label>Month</label><select id="colZ"></select></div>
-    </div>
-
-    <div id="row_each_grid" style="display:grid; grid-template-columns:1.25fr 1fr 1.05fr 0.7fr; gap:8px; margin-top:10px;">
-      <div>
-        <label>Each</label>
-        <div class="calc-input-wrap">
-          <!-- v3-21: Each focus behaviour -->
-          <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus()" oninput="calc()" />
-          <!-- v3-21: Calculator opens only via ± button -->
-          <button type="button" class="btn-calc-trigger" onclick="openCalculator('colT')">±</button>
-        </div>
-      </div>
-      <div><label>Currency</label><select id="colX" onchange="calc()"></select></div>
-      <div>
-        <label>Fees</label>
-        <div class="calc-input-wrap">
-          <input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()" />
-          <!-- v3-21: Fees calculator -->
-          <button type="button" class="btn-calc-trigger" onclick="openCalculator('colV')">±</button>
-        </div>
-      </div>
-      <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()" /></div>
-    </div>
-
-    <div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
-
-    <div class="actions">
-      <button class="action-main" onclick="handleMainAction()" style="background:var(--accent);">Create Staging record</button>
-      <button class="action-main" id="sync_btn" onclick="checkEditState(() => handleSync())" style="background:var(--bridge);">Send Staging records to Sheets</button>
-      <button class="action-main" id="wipeBtn" onclick="handleWipeConfirm()" style="background:var(--danger); opacity:0.85;">Clear Staging records</button>
-    </div>
-
-    <div class="preview-wrap" id="previewArea"></div>
-
-    <div id="auth_status">iOS Sync Status: Idle</div>
-    <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-21 Logic Circuit Breaker active.</div>
-  </div>
-
-  <!-- v3-21 Flow modal (forced overlay) -->
-  <div id="flow_modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title">Flow cannot be determined</div>
-      <div style="font-size:0.95rem; color:#5f6b75; margin-bottom:10px; font-weight:700;">Select manually:</div>
-      <select id="modal_flow_select" style="margin-bottom:12px;">
-        <option value="xfer">xfer</option>
-        <option value="In">In</option>
-        <option value="zOut">zOut</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-modal btn-green" type="button" onclick="commitFlowSelection()">OK</button>
-        <button class="btn-modal btn-grey" type="button" onclick="closeFlowModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Note modal -->
-  <div id="note_modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title">Edit Transaction Note</div>
-      <textarea id="modal_note_text" rows="5"></textarea>
-      <div class="modal-actions">
-        <button class="btn-modal btn-green" type="button" onclick="commitNote()">Save</button>
-        <button class="btn-modal btn-grey" type="button" onclick="closeNote()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- v3-21 Calculator modal -->
-  <div id="calc_modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title">Calculator</div>
-      <input id="calc_display" inputmode="decimal" />
-      <div class="calc-grid">
-        <button class="calc-key danger" type="button" onclick="calcKey('C')">C</button>
-        <button class="calc-key op" type="button" onclick="calcKey('BK')">⌫</button>
-        <button class="calc-key op" type="button" onclick="calcKey('/')">÷</button>
-        <button class="calc-key op" type="button" onclick="calcKey('*')">×</button>
-
-        <button class="calc-key" type="button" onclick="calcKey('7')">7</button>
-        <button class="calc-key" type="button" onclick="calcKey('8')">8</button>
-        <button class="calc-key" type="button" onclick="calcKey('9')">9</button>
-        <button class="calc-key op" type="button" onclick="calcKey('-')">−</button>
-
-        <button class="calc-key" type="button" onclick="calcKey('4')">4</button>
-        <button class="calc-key" type="button" onclick="calcKey('5')">5</button>
-        <button class="calc-key" type="button" onclick="calcKey('6')">6</button>
-        <button class="calc-key op" type="button" onclick="calcKey('+')">+</button>
-
-        <button class="calc-key" type="button" onclick="calcKey('1')">1</button>
-        <button class="calc-key" type="button" onclick="calcKey('2')">2</button>
-        <button class="calc-key" type="button" onclick="calcKey('3')">3</button>
-        <button class="calc-key eq" type="button" onclick="calcKey('=')">=</button>
-
-        <button class="calc-key" type="button" onclick="calcKey('0')">0</button>
-        <button class="calc-key" type="button" onclick="calcKey('.')">.</button>
-        <button class="calc-key op" type="button" onclick="calcKey('%')">%</button>
-        <!-- v3-21: spacer cell -->
-        <div class="calc-spacer"></div>
-      </div>
-
-      <!-- v3-21: Apply left, Close right -->
-      <div class="modal-actions" style="margin-top:14px;">
-        <button class="btn-modal btn-green" type="button" onclick="applyCalculator()">Apply</button>
-        <button class="btn-modal btn-grey" type="button" onclick="closeCalculator()">Close</button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- v3-21: Searchable picker modal (From / To / Category on iPhone) -->
-  <div id="pick_modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title" id="pick_title">Select</div>
-      <input id="pick_search" placeholder="Search" autocomplete="off" />
-      <div id="pick_list"></div>
-      <div class="modal-actions">
-        <button class="btn-modal btn-grey" type="button" onclick="closePickModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
+<div class="container">
+<div class="header-wrap">
+<div class="branding-row"><b>EBS Input</b> <span>v3-21</span></div>
+<div class="header-btns">
+<button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
+<button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
+<button class="btn-lookup btn-save" onclick="checkEditState(() =&gt; cacheSave())">Save to<br/>local Lookups</button>
+<button class="btn-lookup btn-test" onclick="checkEditState(() =&gt; useTestData())">Pull test<br/>Lookups</button>
+<button class="btn-lookup btn-reset" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
+</div>
+</div>
+<div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
+<div><label>Type</label><select id="colB" onchange="handleManualType()"></select></div>
+<div><label>Grouping</label><select id="colA"></select></div>
+<div>
+<label>Date</label>
+<div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
+<span>📅</span><input id="colC" onchange="handleDateChange()" type="date"/>
+</div>
+<div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
+</div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
+<div><label>Category</label><select id="colF" onchange="handleCatTrigger()" required=""></select></div>
+<div><label style="text-align:center;">Flow</label><div class="flow-display" id="flowDisplay">--</div></div>
+<div><label>Sort</label><input id="colG" placeholder="0" type="number"/></div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+<div><label>From</label><select id="colH" onchange="handleAccTrigger()" required=""></select></div>
+<div><label>To</label><select id="colI" onchange="handleAccTrigger()" required=""></select></div>
+</div>
+<div style="margin-top:10px;"><label>Note</label><textarea id="colK" rows="2" style="font-size:16px;"></textarea></div>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
+<div><label>Frequency</label><select id="colFreq"></select></div>
+<div><label>Status</label><select id="colStatus"></select></div>
+<div><label>Month</label><select id="colZ"></select></div>
+</div>
+<div id="row_each_grid" style="display:grid; grid-template-columns:1.25fr 1fr 1.05fr 0.7fr; gap:8px; margin-top:10px;">
+<div>
+<label>Each</label>
+<div class="calc-input-wrap">
+<!-- v3-21: Each focus behaviour -->
+<input id="colT" onfocus="handleEachFocus()" oninput="calc()" placeholder="0.00" step="0.01" type="number"/>
+<!-- v3-21: Calculator opens only via ± button -->
+<button class="btn-calc-trigger" onclick="openCalculator('colT')" type="button">±</button>
+</div>
+</div>
+<div><label>Currency</label><select id="colX" onchange="calc()"></select></div>
+<div>
+<label>Fees</label>
+<div class="calc-input-wrap">
+<input id="colV" oninput="calc()" placeholder="0.00" step="0.01" type="number"/>
+<!-- v3-21: Fees calculator -->
+<button class="btn-calc-trigger" onclick="openCalculator('colV')" type="button">±</button>
+</div>
+</div>
+<div><label>Multiplier</label><input id="colM" oninput="calc()" step="0.01" type="number" value="1"/></div>
+</div>
+<div class="total-box"><div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div></div>
+<div class="actions">
+<button class="action-main" onclick="handleMainAction()" style="background:var(--accent);">Create Staging record</button>
+<button class="action-main" id="sync_btn" onclick="checkEditState(() =&gt; handleSync())" style="background:var(--bridge);">Send Staging records to Sheets</button>
+<button class="action-main" id="wipeBtn" onclick="handleWipeConfirm()" style="background:var(--danger); opacity:0.85;">Clear Staging records</button>
+</div>
+<div class="preview-wrap" id="previewArea"></div>
+<div id="auth_status">iOS Sync Status: Idle</div>
+<button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-21 Logic Circuit Breaker active.</div>
+</div>
+<!-- v3-21 Flow modal (forced overlay) -->
+<div class="modal" id="flow_modal">
+<div class="modal-content">
+<div class="modal-title">Flow cannot be determined</div>
+<div style="font-size:0.95rem; color:#5f6b75; margin-bottom:10px; font-weight:700;">Select manually:</div>
+<select id="modal_flow_select" style="margin-bottom:12px;">
+<option value="xfer">xfer</option>
+<option value="In">In</option>
+<option value="zOut">zOut</option>
+</select>
+<div class="modal-actions">
+<button class="btn-modal btn-green" onclick="commitFlowSelection()" type="button">OK</button>
+<button class="btn-modal btn-grey" onclick="closeFlowModal()" type="button">Cancel</button>
+</div>
+</div>
+</div>
+<!-- Note modal -->
+<div class="modal" id="note_modal">
+<div class="modal-content">
+<div class="modal-title">Edit Transaction Note</div>
+<textarea id="modal_note_text" rows="5"></textarea>
+<div class="modal-actions">
+<button class="btn-modal btn-green" onclick="commitNote()" type="button">Save</button>
+<button class="btn-modal btn-grey" onclick="closeNote()" type="button">Cancel</button>
+</div>
+</div>
+</div>
+<!-- v3-21 Calculator modal -->
+<div class="modal" id="calc_modal">
+<div class="modal-content">
+<div class="modal-title">Calculator</div>
+<input id="calc_display" inputmode="decimal"/>
+<div class="calc-grid">
+<button class="calc-key danger" onclick="calcKey('C')" type="button">C</button>
+<button class="calc-key op" onclick="calcKey('BK')" type="button">⌫</button>
+<button class="calc-key op" onclick="calcKey('/')" type="button">÷</button>
+<button class="calc-key op" onclick="calcKey('*')" type="button">×</button>
+<button class="calc-key" onclick="calcKey('7')" type="button">7</button>
+<button class="calc-key" onclick="calcKey('8')" type="button">8</button>
+<button class="calc-key" onclick="calcKey('9')" type="button">9</button>
+<button class="calc-key op" onclick="calcKey('-')" type="button">−</button>
+<button class="calc-key" onclick="calcKey('4')" type="button">4</button>
+<button class="calc-key" onclick="calcKey('5')" type="button">5</button>
+<button class="calc-key" onclick="calcKey('6')" type="button">6</button>
+<button class="calc-key op" onclick="calcKey('+')" type="button">+</button>
+<button class="calc-key" onclick="calcKey('1')" type="button">1</button>
+<button class="calc-key" onclick="calcKey('2')" type="button">2</button>
+<button class="calc-key" onclick="calcKey('3')" type="button">3</button>
+<button class="calc-key eq" onclick="calcKey('=')" type="button">=</button>
+<button class="calc-key" onclick="calcKey('0')" type="button">0</button>
+<button class="calc-key" onclick="calcKey('.')" type="button">.</button>
+<button class="calc-key op" onclick="calcKey('%')" type="button">%</button>
+<!-- v3-21: spacer cell -->
+<div class="calc-spacer"></div>
+</div>
+<!-- v3-21: Apply left, Close right -->
+<div class="modal-actions" style="margin-top:14px;">
+<button class="btn-modal btn-green" onclick="applyCalculator()" type="button">Apply</button>
+<button class="btn-modal btn-grey" onclick="closeCalculator()" type="button">Close</button>
+</div>
+</div>
+</div>
+<!-- v3-21: Searchable picker modal (From / To / Category on iPhone) -->
+<div class="modal" id="pick_modal">
+<div class="modal-content">
+<div class="modal-title" id="pick_title">Select</div>
+<input autocomplete="off" id="pick_search" placeholder="Search"/>
+<div id="pick_list"></div>
+<div class="modal-actions">
+<button class="btn-modal btn-grey" onclick="closePickModal()" type="button">Close</button>
+</div>
+</div>
+</div>
 <script>
+
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
   const VER = "Excel Budget Sheet Input (v3-21)";
@@ -419,22 +397,13 @@
       const o = Array.from(s.options).find(opt => opt.value.startsWith(def));
       if (o) s.value = o.value;
     }
+  }
 
   // ---------- Rule helpers (v3-21) ----------
   function setSelectByCode(selectEl, code){
     if (!selectEl) return;
     const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
     if (opt) selectEl.value = opt.value;
-  }
-
-    // Priority 2: Support category -> Type=S and Frequency=A
-    const catVal = (catSel.value || "");
-    if (isSupportCategory(catVal)){
-      setSelectByCode(typeSel, "S");
-      setSelectByCode(freqSel, "A");
-      logTrace("Support category selected. Type->S, Frequency->A applied. (v3-21)");
-    }
-  }
   }
 
   function colToIndex(col){
@@ -690,7 +659,6 @@
 
 
   function handleManualType(){
-(){
     // reserved for future
   }
 
@@ -1050,7 +1018,7 @@
       const cleaned = (expr || "")
         .replace(/×/g,"*")
         .replace(/÷/g,"/")
-        .replace(/[^0-9+\\-*/.%(). ]/g,"");
+        .replace(/[^0-9+\-*/.%(). ]/g,"");
       // eslint-disable-next-line no-new-func
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
