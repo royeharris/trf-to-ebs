@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>EBS Input v3-19</title>
+  <title>EBS Input v3-21</title>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -75,7 +75,7 @@
     th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    /* v3-19 sizing in ch units based on longest observed option strings. */
+    /* v3-21 sizing in ch units based on longest observed option strings. */
     .w-edit{ width:38px; text-align:center; }
     .w-group{ width:12ch; }
     .w-type{ width:14ch; }
@@ -108,7 +108,7 @@
       cursor:pointer; font-weight:900; font-size:1rem;
     }
 
-    /* v3-19: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
+    /* v3-21: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
     @media (max-width: 430px){
       .btn-calc-trigger{ width:28px; border-radius:6px; }
       /* Each | Currency | Fees | Multiplier */
@@ -117,7 +117,7 @@
       #colM{ padding-left:6px; padding-right:6px; }
     }
 
-    /* v3-19: modal overlay (Flow + Calculator + Note) */
+    /* v3-21: modal overlay (Flow + Calculator + Note) */
     .modal{
       display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
       background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
@@ -152,7 +152,7 @@
     .calc-key.eq{ background:#4f7fb8; color:#fff; }
     .calc-spacer{ height:54px; }
   
-    /* v3-20: Searchable picker modal (From/To/Category on iPhone) */
+    /* v3-21: Searchable picker modal (From/To/Category on iPhone) */
     #pick_list{
       margin-top:10px; border:1px solid #dcdde1; border-radius:10px; max-height:55vh; overflow-y:auto;
     }
@@ -177,7 +177,7 @@
 <body>
   <div class="container">
     <div class="header-wrap">
-      <div class="branding-row"><b>EBS Input</b> <span>v3-19</span></div>
+      <div class="branding-row"><b>EBS Input</b> <span>v3-21</span></div>
       <div class="header-btns">
         <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br/>Lookups</button>
         <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -222,9 +222,9 @@
       <div>
         <label>Each</label>
         <div class="calc-input-wrap">
-          <!-- v3-19: Each focus behaviour -->
+          <!-- v3-21: Each focus behaviour -->
           <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus()" oninput="calc()" />
-          <!-- v3-19: Calculator opens only via ± button -->
+          <!-- v3-21: Calculator opens only via ± button -->
           <button type="button" class="btn-calc-trigger" onclick="openCalculator('colT')">±</button>
         </div>
       </div>
@@ -233,7 +233,7 @@
         <label>Fees</label>
         <div class="calc-input-wrap">
           <input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()" />
-          <!-- v3-19: Fees calculator -->
+          <!-- v3-21: Fees calculator -->
           <button type="button" class="btn-calc-trigger" onclick="openCalculator('colV')">±</button>
         </div>
       </div>
@@ -252,10 +252,10 @@
 
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-19 Logic Circuit Breaker active.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-21 Logic Circuit Breaker active.</div>
   </div>
 
-  <!-- v3-19 Flow modal (forced overlay) -->
+  <!-- v3-21 Flow modal (forced overlay) -->
   <div id="flow_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Flow cannot be determined</div>
@@ -284,7 +284,7 @@
     </div>
   </div>
 
-  <!-- v3-19 Calculator modal -->
+  <!-- v3-21 Calculator modal -->
   <div id="calc_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Calculator</div>
@@ -313,11 +313,11 @@
         <button class="calc-key" type="button" onclick="calcKey('0')">0</button>
         <button class="calc-key" type="button" onclick="calcKey('.')">.</button>
         <button class="calc-key op" type="button" onclick="calcKey('%')">%</button>
-        <!-- v3-19: spacer cell -->
+        <!-- v3-21: spacer cell -->
         <div class="calc-spacer"></div>
       </div>
 
-      <!-- v3-19: Apply left, Close right -->
+      <!-- v3-21: Apply left, Close right -->
       <div class="modal-actions" style="margin-top:14px;">
         <button class="btn-modal btn-green" type="button" onclick="applyCalculator()">Apply</button>
         <button class="btn-modal btn-grey" type="button" onclick="closeCalculator()">Close</button>
@@ -326,7 +326,7 @@
   </div>
 
 
-  <!-- v3-20: Searchable picker modal (From / To / Category on iPhone) -->
+  <!-- v3-21: Searchable picker modal (From / To / Category on iPhone) -->
   <div id="pick_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title" id="pick_title">Select</div>
@@ -341,8 +341,8 @@
 <script>
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-19)";
-  // v3-20: Support category detection must be dynamic and strict.
+  const VER = "Excel Budget Sheet Input (v3-21)";
+  // v3-21: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
 
@@ -360,11 +360,11 @@
   let resetConfirmed = false;
   let isRestoring = false;
 
-  // v3-19: Calculator state (supports Each + Fees)
+  // v3-21: Calculator state (supports Each + Fees)
   let calcTargetFieldId = "colT";
   let calcLastApplied = "0";
 
-  // v3-19: Flow modal context to ensure first selection is committed reliably
+  // v3-21: Flow modal context to ensure first selection is committed reliably
   let flowPendingAction = null; // "create" | "edit"
 
   const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
@@ -372,21 +372,21 @@
   function logTrace(msg){
     const log = document.getElementById("trace_log");
     const now = new Date().toLocaleTimeString();
-    // v3-19: enforce newline separation from first append
+    // v3-21: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-19 Logic Circuit Breaker active.";
+      : "Trace: v3-21 Logic Circuit Breaker active.";
     log.textContent = base + "\\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
   }
 
-  // v3-19: fatal JS visibility
+  // v3-21: fatal JS visibility
   window.onerror = function(message, source, lineno, colno){
-    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-19)");
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-21)");
   };
   window.onunhandledrejection = function(ev){
-    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-19)");
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-21)");
   };
 
   function toggleLog(show){
@@ -420,49 +420,19 @@
       if (o) s.value = o.value;
     }
 
-  // ---------- Rule helpers (v3-20) ----------
+  // ---------- Rule helpers (v3-21) ----------
   function setSelectByCode(selectEl, code){
     if (!selectEl) return;
     const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
     if (opt) selectEl.value = opt.value;
   }
 
-  function isAATransfer(){
-    const from = document.getElementById("colH").value;
-    const to = document.getElementById("colI").value;
-    return AA_LIST.includes(from) && AA_LIST.includes(to);
-  }
-
-  // Apply Transfer/Support rules deterministically with Transfer taking precedence.
-  function applyTransferSupportRules(reason){
-    if (isRestoring) return;
-
-    const typeSel = document.getElementById("colB");
-    const catSel  = document.getElementById("colF");
-    const freqSel = document.getElementById("colFreq");
-
-    // Priority 1: AA Transfer override
-    if (isAATransfer()){
-      // Type = xf
-      const xf = Array.from(typeSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toLowerCase()) === "xf");
-      if (xf) typeSel.value = xf.value;
-
-      // Category = Transfer (exact lookup option if present, else literal)
-      const transferOpt = Array.from(catSel.options).find(o => (o.value || "").toLowerCase().includes("transfer"));
-      if (transferOpt) catSel.value = transferOpt.value;
-      else catSel.value = "Transfer";
-
-      // Frequency = K
-      setSelectByCode(freqSel, "K");
-      return;
-    }
-
     // Priority 2: Support category -> Type=S and Frequency=A
     const catVal = (catSel.value || "");
     if (isSupportCategory(catVal)){
       setSelectByCode(typeSel, "S");
       setSelectByCode(freqSel, "A");
-      logTrace("Support category selected. Type->S, Frequency->A applied. (v3-20)");
+      logTrace("Support category selected. Type->S, Frequency->A applied. (v3-21)");
     }
   }
   }
@@ -491,7 +461,7 @@
     updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
 
     localReset();
-    logTrace("Test Lookups loaded. (v3-19)");
+    logTrace("Test Lookups loaded. (v3-21)");
   }
 
   function cacheSave(){
@@ -500,7 +470,7 @@
     localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
     localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
     localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
-    logTrace("Lookup cache saved. (v3-19)");
+    logTrace("Lookup cache saved. (v3-21)");
   }
 
   function cachePull(){
@@ -511,7 +481,7 @@
     coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
     AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
     populateUI(rawLookupData);
-    logTrace("Lookup cache pulled. (v3-19)");
+    logTrace("Lookup cache pulled. (v3-21)");
   }
 
   function populateUI(data){
@@ -529,7 +499,7 @@
     };
 
     pop("colA","Grouping","Roy");
-    // v3-19: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
+    // v3-21: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
     if (coordinateMap["Type"]) pop("colB","Type","v");
     else pop("colB","F/U","v");
 
@@ -546,7 +516,7 @@
 
   // ---------- Reset / Init ----------
   function localReset(){
-    // v3-19: apply defaults on app refresh same as Reset button
+    // v3-21: apply defaults on app refresh same as Reset button
     editIndex = -1;
     pendingEdit = -1;
     flowPendingAction = null;
@@ -580,14 +550,14 @@
     rS("colZ","NEW");
     rS("colX","GBP");
 
-    // v3-19: ensure modals are closed on reset/refresh
+    // v3-21: ensure modals are closed on reset/refresh
     closeFlowModal();
     closeCalculator();
     closeNote();
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-19)");
+    logTrace("UI Fields Reset. (v3-21)");
   }
 
   function handleResetConfirm(){
@@ -615,7 +585,7 @@
     btn.innerText = "Clear Staging records";
     localStorage.removeItem("ebs_trf");
     renderPreview();
-    logTrace("Staging wiped manually. (v3-19)");
+    logTrace("Staging wiped manually. (v3-21)");
   }
 
   // ---------- Field logic ----------
@@ -645,7 +615,7 @@
     const el = document.getElementById("colT");
     const raw = (el.value || "").trim();
     const num = parseFloat(raw);
-    // v3-19: clear if empty OR numeric zero; else keep and move cursor to end
+    // v3-21: clear if empty OR numeric zero; else keep and move cursor to end
     if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
       el.value = "";
       return;
@@ -674,20 +644,50 @@
 
     document.getElementById("flowDisplay").innerText = flow;
 
-    // v3-20: enforce Transfer/Support rule precedence deterministically
-    applyTransferSupportRules("acc");
+    // Transfer rule triggers ONLY when From/To change.
+    if (fAA && tAA){
+      const typeSel = document.getElementById("colB");
+      const catSel  = document.getElementById("colF");
+      const freqSel = document.getElementById("colFreq");
+
+      // Type = xf (option code prefix "xf")
+      const xf = Array.from(typeSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toLowerCase()) === "xf");
+      if (xf) typeSel.value = xf.value;
+
+      // Category = Transfer (prefer existing option that equals/contains Transfer)
+      const transferOpt =
+        Array.from(catSel.options).find(o => (o.value || "") === "Transfer") ||
+        Array.from(catSel.options).find(o => (o.value || "").toLowerCase().includes("transfer"));
+      catSel.value = transferOpt ? transferOpt.value : "Transfer";
+
+      // Frequency = K (option code prefix "K")
+      const k = Array.from(freqSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "K");
+      if (k) freqSel.value = k.value;
+    }
   }
 
-  function handleCatTrigger(){
+
   function handleCatTrigger(){
     if (isRestoring) return;
 
+    // Support rule triggers ONLY when Category changes to Support*
     const cat = (document.getElementById("colF").value || "");
     if (!cat) return;
 
-    // v3-20: enforce Transfer/Support rule precedence deterministically
-    applyTransferSupportRules("cat");
+    if (isSupportCategory(cat)){
+      const typeSel = document.getElementById("colB");
+      const freqSel = document.getElementById("colFreq");
+
+      // Type = S (option code prefix "S")
+      const s = Array.from(typeSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "S");
+      if (s) typeSel.value = s.value;
+
+      // Frequency = A (option code prefix "A")
+      const a = Array.from(freqSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "A");
+      if (a) freqSel.value = a.value;
+    }
   }
+
 
   function handleManualType(){
 (){
@@ -705,8 +705,8 @@
     const from = document.getElementById("colH").value;
     const to = document.getElementById("colI").value;
 
-    // v3-19: Who only for support categories
-    const who = isSupportCategory(category) ? grouping : ""; // v3-19 explicit Support membership
+    // v3-21: Who only for support categories
+    const who = isSupportCategory(category) ? grouping : ""; // v3-21 explicit Support membership
 
     const rec = Array(35).fill("");
     rec[0] = grouping;
@@ -735,7 +735,7 @@
   }
 
   function guidanceIfNoLookups(){
-    // v3-19: message policy
+    // v3-21: message policy
     // - if required dropdowns are empty/unpopulated after refresh, provide guidance
     const colF = document.getElementById("colF");
     const colH = document.getElementById("colH");
@@ -749,18 +749,18 @@
   }
 
   function handleMainAction(){
-    logTrace("Action Triggered. (v3-19)");
+    logTrace("Action Triggered. (v3-21)");
 
     if (guidanceIfNoLookups()) return;
 
-    // v3-19: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
+    // v3-21: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     if (pendingEdit !== -1 || editIndex !== -1){
       const cloneIdx = (editIndex !== -1) ? editIndex : pendingEdit;
       if (masterList[cloneIdx]){
         masterList.push([...masterList[cloneIdx]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-19)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-21)");
         localReset();
         return;
       }
@@ -777,7 +777,7 @@
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "create"; // v3-19
+      flowPendingAction = "create"; // v3-21
       openFlowModal();
       return;
     }
@@ -786,8 +786,8 @@
     masterList.push(finalPackage);
 
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: New Record Appended. (v3-19)");
-    logTrace("Storage Synced. (v3-19)");
+    logTrace("Logic Update: New Record Appended. (v3-21)");
+    logTrace("Storage Synced. (v3-21)");
 
     localReset();
   }
@@ -800,7 +800,7 @@
       pendingEdit = idx;
       editIndex = -1;
       renderPreview();
-      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-19)");
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-21)");
       return;
     }
 
@@ -845,7 +845,7 @@
 
     isRestoring = false;
     renderPreview();
-    logTrace("Active Edit: row " + (idx+1) + ". (v3-19)");
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-21)");
   }
 
   function commitEdit(){
@@ -862,7 +862,7 @@
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "edit"; // v3-19
+      flowPendingAction = "edit"; // v3-21
       openFlowModal();
       return;
     }
@@ -872,14 +872,14 @@
 
     const updated = buildRecordFromUI();
 
-    // v3-19: preserve Who on overwrite when category is not support
-    if (!isSupportCategory(updated[5]) && existing){ // v3-19 explicit Support membership
+    // v3-21: preserve Who on overwrite when category is not support
+    if (!isSupportCategory(updated[5]) && existing){ // v3-21 explicit Support membership
       updated[33] = existing[33] || "";
     }
 
     masterList[editIndex] = updated;
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-19)");
+    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-21)");
 
     localReset();
   }
@@ -952,7 +952,7 @@
     });
 
     document.getElementById("previewArea").innerHTML = h + "</table>";
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-19)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-21)");
   }
 
   function deleteRow(i){
@@ -962,7 +962,7 @@
     editIndex = -1;
     pendingEdit = -1;
     renderPreview();
-    logTrace("Row deleted: " + (i+1) + " (v3-19)");
+    logTrace("Row deleted: " + (i+1) + " (v3-21)");
   }
 
   // ---------- Note modal ----------
@@ -983,7 +983,7 @@
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     closeNote();
     renderPreview();
-    logTrace("Note updated. (v3-19)");
+    logTrace("Note updated. (v3-21)");
   }
 
   // ---------- Flow modal ----------
@@ -994,7 +994,7 @@
     document.getElementById("flowDisplay").innerText = selected;
     closeFlowModal();
 
-    // v3-19: resume pending action deterministically
+    // v3-21: resume pending action deterministically
     if (flowPendingAction === "edit"){
       flowPendingAction = null;
       commitEdit();
@@ -1013,14 +1013,14 @@
 
   // ---------- Calculator ----------
   function openCalculator(targetFieldId){
-    // v3-19: supports Each (colT) and Fees (colV)
+    // v3-21: supports Each (colT) and Fees (colV)
     calcTargetFieldId = targetFieldId || "colT";
     const targetEl = document.getElementById(calcTargetFieldId);
     const cur = (targetEl && targetEl.value ? String(targetEl.value) : "").trim();
     calcLastApplied = cur ? cur : "0";
     document.getElementById("calc_display").value = calcLastApplied;
     document.getElementById("calc_modal").style.display = "flex";
-    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-19)");
+    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-21)");
   }
   function closeCalculator(){
     document.getElementById("calc_modal").style.display = "none";
@@ -1055,7 +1055,7 @@
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
       const fixed = Number(out.toFixed(2));
-      logTrace("Calculator = " + fixed + " (v3-19)");
+      logTrace("Calculator = " + fixed + " (v3-21)");
       return fixed;
     }catch(_){
       alert("Invalid expression.");
@@ -1074,11 +1074,11 @@
     }
     calc();
     closeCalculator();
-    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-19)");
+    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-21)");
   }
 
 
-  // ---------- Searchable picker modal (v3-20) ----------
+  // ---------- Searchable picker modal (v3-21) ----------
   let pickTargetId = null;
   let pickDebounce = null;
 
@@ -1275,7 +1275,7 @@
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
       await gapi.client.load("sheets", "v4");
-      logTrace("GAPI Ready. (v3-19)");
+      logTrace("GAPI Ready. (v3-21)");
     });
   }
 
@@ -1285,7 +1285,7 @@
       scope: "https://www.googleapis.com/auth/spreadsheets",
       callback: () => {}
     });
-    logTrace("GIS Ready. (v3-19)");
+    logTrace("GIS Ready. (v3-21)");
   }
 
   function initRefresh(){
@@ -1316,7 +1316,7 @@
     const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
     const age = (Date.now() - issuedAt) / 1000;
 
-    // v3-19: only prompt if missing/expired
+    // v3-21: only prompt if missing/expired
     if (tok && issuedAt && exp && age < (exp - 60)){
       gapi.client.setToken({ access_token: tok });
       onOk();
@@ -1368,11 +1368,11 @@
     if (!d.length){ alert("No Staging records."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-19)");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-21)");
 
     ensureTokenThen(async () => {
       try{
-        // v3-19: first empty A from A2 downward
+        // v3-21: first empty A from A2 downward
         const meta = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "'" + SHEET_TAB + "'!A2:A"
@@ -1409,11 +1409,11 @@
         });
 
         updateStatus("Token Active", "active");
-        logTrace("Sync complete. StartRow=" + startRow + " (v3-19)");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-21)");
         alert("Sync completed.");
       }catch(e){
         updateStatus("Sync error", "error");
-        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-19)");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-21)");
         alert("Sync failed. Trace log contains details.");
       }
     });
@@ -1436,7 +1436,7 @@
     document.getElementById("colC").value = new Date().toISOString().split("T")[0];
     handleDateChange();
 
-    // v3-19: ensure UI starts usable even before lookups are pulled
+    // v3-21: ensure UI starts usable even before lookups are pulled
     localReset();
     renderPreview();
     initSearchPickers();
@@ -1445,14 +1445,14 @@
       await waitFor(() => typeof gapi !== "undefined", 8000);
       gapiLoaded();
     }catch(_){
-      logTrace("GAPI not available. (v3-19)");
+      logTrace("GAPI not available. (v3-21)");
     }
 
     try{
       await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
       gisLoaded();
     }catch(_){
-      logTrace("GIS not available. (v3-19)");
+      logTrace("GIS not available. (v3-21)");
     }
   }
 
