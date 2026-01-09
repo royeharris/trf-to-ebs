@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-33</title>
+<title>EBS Input v3-34</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -79,7 +79,7 @@
     th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    /* v3-33 sizing in ch units based on longest observed option strings. */
+    /* v3-34 sizing in ch units based on longest observed option strings. */
     .w-edit{ width:38px; text-align:center; }
     .w-group{ width:12ch; }
     .w-type{ width:14ch; }
@@ -115,7 +115,7 @@
       cursor:pointer; font-weight:900; font-size:1rem;
     }
 
-    /* v3-33: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
+    /* v3-34: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
     @media (max-width: 430px){
       .btn-calc-trigger{ width:28px; border-radius:6px; }
       /* Each | Currency | Fees | Multiplier */
@@ -124,7 +124,7 @@
       #colM{ padding-left:6px; padding-right:6px; }
     }
 
-    /* v3-33: modal overlay (Flow + Calculator + Note) */
+    /* v3-34: modal overlay (Flow + Calculator + Note) */
     .modal{
       display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
       background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
@@ -158,7 +158,7 @@
     .calc-key.danger{ background:#f7e6e3; color:#8b2f24; }
     .calc-key.eq{ background:#4f7fb8; color:#fff; grid-column:3 / span 2; width:100%; }
       
-    /* v3-33: Searchable picker modal (From/To/Category on iPhone) */
+    /* v3-34: Searchable picker modal (From/To/Category on iPhone) */
     #pick_list{
       margin-top:10px; border:1px solid #dcdde1; border-radius:10px; max-height:55vh; overflow-y:auto;
     }
@@ -180,7 +180,7 @@
       padding:14px 10px; color:#7f8c8d; font-weight:800; text-align:center;
     }
 
-/* v3-33: Chk toggle dot-only */
+/* v3-34: Chk toggle dot-only */
 .chk-toggle{
   width:220px;
   max-width:240px;
@@ -208,7 +208,7 @@
 }
 
 
-/* v3-33 UI restore + chk + note delete */
+/* v3-34 UI restore + chk + note delete */
 .total-row{ display:flex; align-items:stretch; gap:12px; margin-top:10px; }
 .chk-toggle{ width:84px; min-width:84px; height:68px; border-radius:12px; border:2px solid #cfd8dc; background:#f7f8fa; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 .chk-toggle .chk-dot{ width:26px; height:26px; border-radius:999px; border:3px solid #90a4ae; background:transparent; display:inline-block; }
@@ -218,14 +218,14 @@
 .note-del-btn{ width:44px; min-width:44px; border:none; border-radius:6px; background:var(--danger); color:#fff; font-weight:900; cursor:pointer; }
 
 
-/* v3-33: actions sizing restored to v3-26 */
+/* v3-34: actions sizing restored to v3-26 */
 .actions{ display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:8px; }
 button.action-main{
   padding:10px; border:none; border-radius:6px; font-weight:900; cursor:pointer; color:#fff;
   font-size:0.72rem; -webkit-font-smoothing:antialiased;
 }
 
-/* v3-33: Total display centred */
+/* v3-34: Total display centred */
 .total-val, #totalDisp, .total-box{
   display:flex;
   align-items:center;
@@ -233,7 +233,7 @@ button.action-main{
 }
 .total-box{ min-height:74px; }
 
-/* v3-33: Chk control text inside box */
+/* v3-34: Chk control text inside box */
 .chk-wrap{
   display:flex;
   flex-direction:column;
@@ -252,7 +252,7 @@ button.action-main{
 .chk-top{ margin-top:2px; }
 .chk-bottom{ margin-bottom:2px; }
 
-/* v3-33: Note modal delete button positioned like input Note field */
+/* v3-34: Note modal delete button positioned like input Note field */
 .note-modal-body{
   display:flex;
   gap:10px;
@@ -277,7 +277,7 @@ button.action-main{
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-33</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-34</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -321,9 +321,9 @@ button.action-main{
 <div>
 <label>Each</label>
 <div class="calc-input-wrap">
-<!-- v3-33: Each focus behaviour -->
+<!-- v3-34: Each focus behaviour -->
 <input id="colT" onfocus="handleEachFocus()" oninput="calc()" placeholder="0.00" step="0.01" type="number"/>
-<!-- v3-33: Calculator opens only via ± button -->
+<!-- v3-34: Calculator opens only via ± button -->
 <button class="btn-calc-trigger" onclick="openCalculator('colT')" type="button">±</button>
 </div>
 </div>
@@ -332,7 +332,7 @@ button.action-main{
 <label>Fees</label>
 <div class="calc-input-wrap">
 <input id="colV" oninput="calc()" placeholder="0.00" step="0.01" type="number"/>
-<!-- v3-33: Fees calculator -->
+<!-- v3-34: Fees calculator -->
 <button class="btn-calc-trigger" onclick="openCalculator('colV')" type="button">±</button>
 </div>
 </div>
@@ -350,9 +350,9 @@ button.action-main{
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-33 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-34 Logic Circuit Breaker active.</div>
 </div>
-<!-- v3-33 Flow modal (forced overlay) -->
+<!-- v3-34 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
 <div class="modal-content">
 <div class="modal-title">Flow cannot be determined</div>
@@ -382,7 +382,7 @@ button.action-main{
     </div>
   </div>
 </div>
-<!-- v3-33 Calculator modal -->
+<!-- v3-34 Calculator modal -->
 <div class="modal" id="calc_modal">
 <div class="modal-content">
 <div class="modal-title">Calculator</div>
@@ -418,7 +418,7 @@ button.action-main{
 </div>
 </div>
 </div>
-<!-- v3-33: Searchable picker modal (From / To / Category on iPhone) -->
+<!-- v3-34: Searchable picker modal (From / To / Category on iPhone) -->
 <div class="modal" id="pick_modal">
 <div class="modal-content">
 <div class="modal-title" id="pick_title">Select</div>
@@ -433,8 +433,8 @@ button.action-main{
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-33)";
-  // v3-33: Support category detection must be dynamic and strict.
+  const VER = "Excel Budget Sheet Input (v3-34)";
+  // v3-34: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
 
@@ -452,14 +452,14 @@ button.action-main{
   let resetConfirmed = false;
   let isRestoring = false;
 
-  // v3-33: Chk toggle state (stored into column S when staging)
+  // v3-34: Chk toggle state (stored into column S when staging)
   let chkFlag = false;
 
-  // v3-33: Calculator state (supports Each + Fees)
+  // v3-34: Calculator state (supports Each + Fees)
   let calcTargetFieldId = "colT";
   let calcLastApplied = "0";
 
-  // v3-33: Flow modal context to ensure first selection is committed reliably
+  // v3-34: Flow modal context to ensure first selection is committed reliably
   let flowPendingAction = null; // "create" | "edit"
 
   const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
@@ -467,21 +467,21 @@ button.action-main{
   function logTrace(msg){
     const log = document.getElementById("trace_log");
     const now = new Date().toLocaleTimeString();
-    // v3-33: enforce newline separation from first append
+    // v3-34: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-33 Logic Circuit Breaker active.";
+      : "Trace: v3-34 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
   }
 
-  // v3-33: fatal JS visibility
+  // v3-34: fatal JS visibility
   window.onerror = function(message, source, lineno, colno){
-    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-33)");
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-34)");
   };
   window.onunhandledrejection = function(ev){
-    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-33)");
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-34)");
   };
 
   function toggleLog(show){
@@ -516,7 +516,7 @@ button.action-main{
     }
   }
 
-  // ---------- Rule helpers (v3-33) ----------
+  // ---------- Rule helpers (v3-34) ----------
   function setSelectByCode(selectEl, code){
     if (!selectEl) return;
     const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
@@ -547,7 +547,7 @@ button.action-main{
     updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
 
     localReset();
-    logTrace("Test Lookups loaded. (v3-33)");
+    logTrace("Test Lookups loaded. (v3-34)");
   }
 
   function cacheSave(){
@@ -556,7 +556,7 @@ button.action-main{
     localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
     localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
     localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
-    logTrace("Lookup cache saved. (v3-33)");
+    logTrace("Lookup cache saved. (v3-34)");
   }
 
   function cachePull(){
@@ -567,7 +567,7 @@ button.action-main{
     coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
     AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
     populateUI(rawLookupData);
-    logTrace("Lookup cache pulled. (v3-33)");
+    logTrace("Lookup cache pulled. (v3-34)");
   }
 
   function populateUI(data){
@@ -585,7 +585,7 @@ button.action-main{
     };
 
     pop("colA","Grouping","Roy");
-    // v3-33: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
+    // v3-34: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
     if (coordinateMap["Type"]) pop("colB","Type","v");
     else pop("colB","F/U","v");
 
@@ -602,7 +602,7 @@ button.action-main{
 
   // ---------- Reset / Init ----------
   function localReset(){
-    // v3-33: apply defaults on app refresh same as Reset button
+    // v3-34: apply defaults on app refresh same as Reset button
     editIndex = -1;
     pendingEdit = -1;
     flowPendingAction = null;
@@ -636,7 +636,7 @@ button.action-main{
     rS("colZ","NEW");
     rS("colX","GBP");
 
-    // v3-33: ensure modals are closed on reset/refresh
+    // v3-34: ensure modals are closed on reset/refresh
     closeFlowModal();
     closeCalculator();
     closeNote();
@@ -645,7 +645,7 @@ button.action-main{
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-33)");
+    logTrace("UI Fields Reset. (v3-34)");
   
   }
 
@@ -686,7 +686,7 @@ button.action-main{
     btn.innerText = "Clear Staging records";
     localStorage.removeItem("ebs_trf");
     renderPreview();
-    logTrace("Staging wiped manually. (v3-33)");
+    logTrace("Staging wiped manually. (v3-34)");
   }
 
   // ---------- Field logic ----------
@@ -716,7 +716,7 @@ button.action-main{
     const el = document.getElementById("colT");
     const raw = (el.value || "").trim();
     const num = parseFloat(raw);
-    // v3-33: clear if empty OR numeric zero; else keep and move cursor to end
+    // v3-34: clear if empty OR numeric zero; else keep and move cursor to end
     if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
       el.value = "";
       return;
@@ -751,11 +751,8 @@ button.action-main{
       const catSel  = document.getElementById("colF");
       const freqSel = document.getElementById("colFreq");
 
-      // Type = xfer (preferred) else xf (option code prefix)
-      setSelectByCode(typeSel, "xfer");
-      if (((typeSel.value || "").trim().split(/\s+/)[0]) !== "xfer"){
-        setSelectByCode(typeSel, "xf");
-      }
+      // Type = xf (option code prefix "xf")
+      setSelectByCode(typeSel, "xf");
 
       // Category = Transfer (prefer existing option that equals/contains Transfer)
       const transferOpt =
@@ -807,8 +804,8 @@ button.action-main{
     const from = document.getElementById("colH").value;
     const to = document.getElementById("colI").value;
 
-    // v3-33: Who only for support categories
-    const who = isSupportCategory(category) ? grouping : ""; // v3-33 explicit Support membership
+    // v3-34: Who only for support categories
+    const who = isSupportCategory(category) ? grouping : ""; // v3-34 explicit Support membership
 
     const rec = Array(35).fill("");
     rec[0] = grouping;
@@ -839,7 +836,7 @@ button.action-main{
   }
 
   function guidanceIfNoLookups(){
-    // v3-33: message policy
+    // v3-34: message policy
     // - if required dropdowns are empty/unpopulated after refresh, provide guidance
     const colF = document.getElementById("colF");
     const colH = document.getElementById("colH");
@@ -853,18 +850,18 @@ button.action-main{
   }
 
   function handleMainAction(){
-    logTrace("Action Triggered. (v3-33)");
+    logTrace("Action Triggered. (v3-34)");
 
     if (guidanceIfNoLookups()) return;
 
-    // v3-33: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
+    // v3-34: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     if (pendingEdit !== -1 || editIndex !== -1){
       const cloneIdx = (editIndex !== -1) ? editIndex : pendingEdit;
       if (masterList[cloneIdx]){
         masterList.push([...masterList[cloneIdx]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-33)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-34)");
         localReset();
         return;
       }
@@ -881,7 +878,7 @@ button.action-main{
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "create"; // v3-33
+      flowPendingAction = "create"; // v3-34
       openFlowModal();
       return;
     }
@@ -890,8 +887,8 @@ button.action-main{
     masterList.push(finalPackage);
 
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: New Record Appended. (v3-33)");
-    logTrace("Storage Synced. (v3-33)");
+    logTrace("Logic Update: New Record Appended. (v3-34)");
+    logTrace("Storage Synced. (v3-34)");
 
     localReset();
   }
@@ -904,7 +901,7 @@ button.action-main{
       pendingEdit = idx;
       editIndex = -1;
       renderPreview();
-      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-33)");
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-34)");
       return;
     }
 
@@ -951,7 +948,7 @@ button.action-main{
 
     isRestoring = false;
     renderPreview();
-    logTrace("Active Edit: row " + (idx+1) + ". (v3-33)");
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-34)");
   }
 
   function commitEdit(){
@@ -968,7 +965,7 @@ button.action-main{
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "edit"; // v3-33
+      flowPendingAction = "edit"; // v3-34
       openFlowModal();
       return;
     }
@@ -978,14 +975,14 @@ button.action-main{
 
     const updated = buildRecordFromUI();
 
-    // v3-33: preserve Who on overwrite when category is not support
-    if (!isSupportCategory(updated[5]) && existing){ // v3-33 explicit Support membership
+    // v3-34: preserve Who on overwrite when category is not support
+    if (!isSupportCategory(updated[5]) && existing){ // v3-34 explicit Support membership
       updated[33] = existing[33] || "";
     }
 
     masterList[editIndex] = updated;
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-33)");
+    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-34)");
 
     localReset();
   }
@@ -1060,7 +1057,7 @@ button.action-main{
     });
 
     document.getElementById("previewArea").innerHTML = h + "</table>";
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-33)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-34)");
   }
 
   function deleteRow(i){
@@ -1070,7 +1067,7 @@ button.action-main{
     editIndex = -1;
     pendingEdit = -1;
     renderPreview();
-    logTrace("Row deleted: " + (i+1) + " (v3-33)");
+    logTrace("Row deleted: " + (i+1) + " (v3-34)");
   }
 
   // ---------- Note modal ----------
@@ -1091,7 +1088,7 @@ button.action-main{
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     closeNote();
     renderPreview();
-    logTrace("Note updated. (v3-33)");
+    logTrace("Note updated. (v3-34)");
   }
 
   function clearModalNoteConfirm(){
@@ -1110,7 +1107,7 @@ button.action-main{
     document.getElementById("flowDisplay").innerText = selected;
     closeFlowModal();
 
-    // v3-33: resume pending action deterministically
+    // v3-34: resume pending action deterministically
     if (flowPendingAction === "edit"){
       flowPendingAction = null;
       commitEdit();
@@ -1129,14 +1126,14 @@ button.action-main{
 
   // ---------- Calculator ----------
   function openCalculator(targetFieldId){
-    // v3-33: supports Each (colT) and Fees (colV)
+    // v3-34: supports Each (colT) and Fees (colV)
     calcTargetFieldId = targetFieldId || "colT";
     const targetEl = document.getElementById(calcTargetFieldId);
     const cur = (targetEl && targetEl.value ? String(targetEl.value) : "").trim();
     calcLastApplied = cur ? cur : "0";
     document.getElementById("calc_display").value = calcLastApplied;
     document.getElementById("calc_modal").style.display = "flex";
-    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-33)");
+    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-34)");
   }
   function closeCalculator(){
     document.getElementById("calc_modal").style.display = "none";
@@ -1171,7 +1168,7 @@ button.action-main{
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
       const fixed = Number(out.toFixed(2));
-      logTrace("Calculator = " + fixed + " (v3-33)");
+      logTrace("Calculator = " + fixed + " (v3-34)");
       return fixed;
     }catch(_){
       alert("Invalid expression.");
@@ -1190,11 +1187,11 @@ button.action-main{
     }
     calc();
     closeCalculator();
-    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-33)");
+    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-34)");
   }
 
 
-  // ---------- Searchable picker modal (v3-33) ----------
+  // ---------- Searchable picker modal (v3-34) ----------
   let pickTargetId = null;
   let pickDebounce = null;
 
@@ -1208,7 +1205,7 @@ button.action-main{
 
 
   function isIPhoneModalPickerEnabled(){
-    // v3-33: enable searchable modal picker on all platforms (desktop + mobile)
+    // v3-34: enable searchable modal picker on all platforms (desktop + mobile)
     return true;
   }
 
@@ -1449,7 +1446,7 @@ function renderPickList(query){
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
       await gapi.client.load("sheets", "v4");
-      logTrace("GAPI Ready. (v3-33)");
+      logTrace("GAPI Ready. (v3-34)");
     });
   }
 
@@ -1459,7 +1456,7 @@ function renderPickList(query){
       scope: "https://www.googleapis.com/auth/spreadsheets",
       callback: () => {}
     });
-    logTrace("GIS Ready. (v3-33)");
+    logTrace("GIS Ready. (v3-34)");
   }
 
   function initRefresh(){
@@ -1490,7 +1487,7 @@ function renderPickList(query){
     const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
     const age = (Date.now() - issuedAt) / 1000;
 
-    // v3-33: only prompt if missing/expired
+    // v3-34: only prompt if missing/expired
     if (tok && issuedAt && exp && age < (exp - 60)){
       gapi.client.setToken({ access_token: tok });
       onOk();
@@ -1508,7 +1505,9 @@ function renderPickList(query){
 
     coordinateMap = {};
     (res.result.values || []).forEach(r => {
-      coordinateMap[r[0]] = {
+      const k = String(r[0] || "").trim();
+      if (!k) return;
+      coordinateMap[k] = {
         val: colToIndex(String(r[1] || "").toUpperCase().replace(/[0-9]/g,"")),
         desc: (r[2] && String(r[2]).toLowerCase() !== "n/a") ? colToIndex(String(r[2])) : null
       };
@@ -1542,11 +1541,11 @@ function renderPickList(query){
     if (!d.length){ alert("No Staging records."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-33)");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-34)");
 
     ensureTokenThen(async () => {
       try{
-        // v3-33: first empty A from A2 downward
+        // v3-34: first empty A from A2 downward
         const meta = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "'" + SHEET_TAB + "'!A2:A"
@@ -1583,11 +1582,11 @@ function renderPickList(query){
         });
 
         updateStatus("Token Active", "active");
-        logTrace("Sync complete. StartRow=" + startRow + " (v3-33)");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-34)");
         alert("Sync completed.");
       }catch(e){
         updateStatus("Sync error", "error");
-        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-33)");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-34)");
         alert("Sync failed. Trace log contains details.");
       }
     });
@@ -1610,7 +1609,7 @@ function renderPickList(query){
     document.getElementById("colC").value = new Date().toISOString().split("T")[0];
     handleDateChange();
 
-    // v3-33: ensure UI starts usable even before lookups are pulled
+    // v3-34: ensure UI starts usable even before lookups are pulled
     localReset();
     renderPreview();
     initSearchPickers();
@@ -1619,20 +1618,20 @@ function renderPickList(query){
       await waitFor(() => typeof gapi !== "undefined", 8000);
       gapiLoaded();
     }catch(_){
-      logTrace("GAPI not available. (v3-33)");
+      logTrace("GAPI not available. (v3-34)");
     }
 
     try{
       await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
       gisLoaded();
     }catch(_){
-      logTrace("GIS not available. (v3-33)");
+      logTrace("GIS not available. (v3-34)");
     }
   }
 
   window.addEventListener("load", boot);
 
-  // v3-33: Note clear with confirm
+  // v3-34: Note clear with confirm
   function clearNoteConfirm(){
     const t = document.getElementById("colK");
     if (!t) return;
