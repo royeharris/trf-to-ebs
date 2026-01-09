@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>EBS Input v3-18</title>
+  <title>EBS Input v3-19</title>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -70,12 +70,12 @@
 
     .preview-wrap{ width:100%; overflow-x:auto; margin-top:15px; border:1px solid #ddd; border-radius:6px; }
     table{
-      min-width:1400px; width:1400px; border-collapse:collapse; font-size:0.58rem; table-layout:fixed; font-family:inherit;
+      min-width:1500px; width:1500px; border-collapse:collapse; font-size:0.58rem; table-layout:fixed; font-family:inherit;
     }
     th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    /* v3-18 sizing in ch units based on longest observed option strings. */
+    /* v3-19 sizing in ch units based on longest observed option strings. */
     .w-edit{ width:38px; text-align:center; }
     .w-group{ width:12ch; }
     .w-type{ width:14ch; }
@@ -105,19 +105,19 @@
     .calc-input-wrap{ display:flex; align-items:center; gap:6px; }
     .btn-calc-trigger{
       background:var(--bridge); color:#fff; border:none; border-radius:6px; height:38px; width:34px;
-      cursor:pointer; font-weight:900; font-size:1rem; flex:0 0 auto;
+      cursor:pointer; font-weight:900; font-size:1rem;
     }
 
-    /* v3-18: iPhone sizing—widen Each/Fees by shaving Currency/Multiplier and ± */
+    /* v3-19: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
     @media (max-width: 430px){
-      .btn-calc-trigger{ width:28px; }
-      #row_each_grid{ grid-template-columns: 1.65fr 0.78fr 1.10fr 0.40fr; gap:6px; }
+      .btn-calc-trigger{ width:28px; border-radius:6px; }
+      /* Each | Currency | Fees | Multiplier */
+      #row_each_grid{ grid-template-columns: 1.55fr 0.85fr 0.90fr 0.45fr; gap:6px; }
       #row_each_grid .calc-input-wrap{ gap:5px; }
       #colM{ padding-left:6px; padding-right:6px; }
-      #colX{ padding-left:6px; padding-right:6px; }
     }
 
-    /* v3-18: modal overlay (Flow + Calculator + Note) */
+    /* v3-19: modal overlay (Flow + Calculator + Note) */
     .modal{
       display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
       background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
@@ -151,13 +151,33 @@
     .calc-key.danger{ background:#f7e6e3; color:#8b2f24; }
     .calc-key.eq{ background:#4f7fb8; color:#fff; }
     .calc-spacer{ height:54px; }
-  </style>
+  
+    /* v3-20: Searchable picker modal (From/To/Category on iPhone) */
+    #pick_list{
+      margin-top:10px; border:1px solid #dcdde1; border-radius:10px; max-height:55vh; overflow-y:auto;
+    }
+    .pick-item{
+      padding:12px 10px; border-bottom:1px solid #eef2f7; font-weight:800; color:var(--primary);
+      cursor:pointer; user-select:none;
+    }
+    .pick-item:last-child{ border-bottom:none; }
+    .pick-item mark{
+      background:#fff3b0; padding:0 2px; border-radius:4px;
+    }
+    #pick_search{
+      width:100%; height:44px; font-size:16px; padding:10px 12px; border:1px solid #dcdde1; border-radius:10px;
+      box-sizing:border-box;
+    }
+    #pick_empty{
+      padding:14px 10px; color:#7f8c8d; font-weight:800; text-align:center;
+    }
+</style>
 </head>
 
 <body>
   <div class="container">
     <div class="header-wrap">
-      <div class="branding-row"><b>EBS Input</b> <span>v3-18</span></div>
+      <div class="branding-row"><b>EBS Input</b> <span>v3-19</span></div>
       <div class="header-btns">
         <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br/>Lookups</button>
         <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -198,13 +218,13 @@
       <div><label>Month</label><select id="colZ"></select></div>
     </div>
 
-    <div id="row_each_grid" style="display:grid; grid-template-columns:1.2fr 1fr 1.2fr 0.8fr; gap:8px; margin-top:10px;">
+    <div id="row_each_grid" style="display:grid; grid-template-columns:1.25fr 1fr 1.05fr 0.7fr; gap:8px; margin-top:10px;">
       <div>
         <label>Each</label>
         <div class="calc-input-wrap">
-          <!-- v3-18: Each focus behaviour -->
-          <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus('colT')" oninput="calc()" />
-          <!-- v3-18: Calculator opens only via ± button -->
+          <!-- v3-19: Each focus behaviour -->
+          <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus()" oninput="calc()" />
+          <!-- v3-19: Calculator opens only via ± button -->
           <button type="button" class="btn-calc-trigger" onclick="openCalculator('colT')">±</button>
         </div>
       </div>
@@ -212,8 +232,8 @@
       <div>
         <label>Fees</label>
         <div class="calc-input-wrap">
-          <input type="number" id="colV" placeholder="0.00" step="0.01" onfocus="handleEachFocus('colV')" oninput="calc()" />
-          <!-- v3-18: Fees calculator -->
+          <input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()" />
+          <!-- v3-19: Fees calculator -->
           <button type="button" class="btn-calc-trigger" onclick="openCalculator('colV')">±</button>
         </div>
       </div>
@@ -232,10 +252,10 @@
 
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-18 Logic Circuit Breaker active.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-19 Logic Circuit Breaker active.</div>
   </div>
 
-  <!-- v3-18 Flow modal (forced overlay) -->
+  <!-- v3-19 Flow modal (forced overlay) -->
   <div id="flow_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Flow cannot be determined</div>
@@ -246,8 +266,8 @@
         <option value="zOut">zOut</option>
       </select>
       <div class="modal-actions">
-        <button class="btn-modal btn-green" onclick="commitFlowSelection()">OK</button>
-        <button class="btn-modal btn-grey" onclick="closeFlowModal()">Cancel</button>
+        <button class="btn-modal btn-green" type="button" onclick="commitFlowSelection()">OK</button>
+        <button class="btn-modal btn-grey" type="button" onclick="closeFlowModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -258,48 +278,62 @@
       <div class="modal-title">Edit Transaction Note</div>
       <textarea id="modal_note_text" rows="5"></textarea>
       <div class="modal-actions">
-        <button class="btn-modal btn-green" onclick="commitNote()">Save</button>
-        <button class="btn-modal btn-grey" onclick="closeNote()">Cancel</button>
+        <button class="btn-modal btn-green" type="button" onclick="commitNote()">Save</button>
+        <button class="btn-modal btn-grey" type="button" onclick="closeNote()">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- v3-18 Calculator modal -->
+  <!-- v3-19 Calculator modal -->
   <div id="calc_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Calculator</div>
       <input id="calc_display" inputmode="decimal" />
       <div class="calc-grid">
-        <button class="calc-key danger" onclick="calcKey('C')">C</button>
-        <button class="calc-key op" onclick="calcKey('BK')">⌫</button>
-        <button class="calc-key op" onclick="calcKey('/')">÷</button>
-        <button class="calc-key op" onclick="calcKey('*')">×</button>
+        <button class="calc-key danger" type="button" onclick="calcKey('C')">C</button>
+        <button class="calc-key op" type="button" onclick="calcKey('BK')">⌫</button>
+        <button class="calc-key op" type="button" onclick="calcKey('/')">÷</button>
+        <button class="calc-key op" type="button" onclick="calcKey('*')">×</button>
 
-        <button class="calc-key" onclick="calcKey('7')">7</button>
-        <button class="calc-key" onclick="calcKey('8')">8</button>
-        <button class="calc-key" onclick="calcKey('9')">9</button>
-        <button class="calc-key op" onclick="calcKey('-')">−</button>
+        <button class="calc-key" type="button" onclick="calcKey('7')">7</button>
+        <button class="calc-key" type="button" onclick="calcKey('8')">8</button>
+        <button class="calc-key" type="button" onclick="calcKey('9')">9</button>
+        <button class="calc-key op" type="button" onclick="calcKey('-')">−</button>
 
-        <button class="calc-key" onclick="calcKey('4')">4</button>
-        <button class="calc-key" onclick="calcKey('5')">5</button>
-        <button class="calc-key" onclick="calcKey('6')">6</button>
-        <button class="calc-key op" onclick="calcKey('+')">+</button>
+        <button class="calc-key" type="button" onclick="calcKey('4')">4</button>
+        <button class="calc-key" type="button" onclick="calcKey('5')">5</button>
+        <button class="calc-key" type="button" onclick="calcKey('6')">6</button>
+        <button class="calc-key op" type="button" onclick="calcKey('+')">+</button>
 
-        <button class="calc-key" onclick="calcKey('1')">1</button>
-        <button class="calc-key" onclick="calcKey('2')">2</button>
-        <button class="calc-key" onclick="calcKey('3')">3</button>
-        <button class="calc-key eq" onclick="calcKey('=')">=</button>
+        <button class="calc-key" type="button" onclick="calcKey('1')">1</button>
+        <button class="calc-key" type="button" onclick="calcKey('2')">2</button>
+        <button class="calc-key" type="button" onclick="calcKey('3')">3</button>
+        <button class="calc-key eq" type="button" onclick="calcKey('=')">=</button>
 
-        <button class="calc-key" onclick="calcKey('0')">0</button>
-        <button class="calc-key" onclick="calcKey('.')">.</button>
-        <button class="calc-key op" onclick="calcKey('%')">%</button>
+        <button class="calc-key" type="button" onclick="calcKey('0')">0</button>
+        <button class="calc-key" type="button" onclick="calcKey('.')">.</button>
+        <button class="calc-key op" type="button" onclick="calcKey('%')">%</button>
+        <!-- v3-19: spacer cell -->
         <div class="calc-spacer"></div>
       </div>
 
-      <!-- v3-18: Apply then Close -->
+      <!-- v3-19: Apply left, Close right -->
       <div class="modal-actions" style="margin-top:14px;">
-        <button class="btn-modal btn-green" onclick="applyCalculator()">Apply</button>
-        <button class="btn-modal btn-grey" onclick="closeCalculator()">Close</button>
+        <button class="btn-modal btn-green" type="button" onclick="applyCalculator()">Apply</button>
+        <button class="btn-modal btn-grey" type="button" onclick="closeCalculator()">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- v3-20: Searchable picker modal (From / To / Category on iPhone) -->
+  <div id="pick_modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="pick_title">Select</div>
+      <input id="pick_search" placeholder="Search" autocomplete="off" />
+      <div id="pick_list"></div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-grey" type="button" onclick="closePickModal()">Close</button>
       </div>
     </div>
   </div>
@@ -307,7 +341,11 @@
 <script>
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-18)";
+  const VER = "Excel Budget Sheet Input (v3-19)";
+  // v3-20: Support category detection must be dynamic and strict.
+  // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
+  function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
+
 
   let AA_LIST = [];
   let coordinateMap = {};
@@ -322,31 +360,33 @@
   let resetConfirmed = false;
   let isRestoring = false;
 
-  // v3-18: modal resume state (Flow)
-  let flowPendingMode = null; // "create" | "edit"
-  let flowPendingForced = null;
-
-  // v3-18: Calculator state
+  // v3-19: Calculator state (supports Each + Fees)
+  let calcTargetFieldId = "colT";
   let calcLastApplied = "0";
-  let calcTargetId = "colT"; // "colT" (Each) or "colV" (Fees)
+
+  // v3-19: Flow modal context to ensure first selection is committed reliably
+  let flowPendingAction = null; // "create" | "edit"
 
   const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
 
   function logTrace(msg){
     const log = document.getElementById("trace_log");
     const now = new Date().toLocaleTimeString();
-    // v3-18: enforce newline separation (works in Firefox/macOS and iOS)
-    log.textContent = (log.textContent || "Trace: v3-18 Logic Circuit Breaker active.") + "\n[" + now + "] " + msg;
+    // v3-19: enforce newline separation from first append
+    const base = log.textContent && log.textContent.trim().length
+      ? log.textContent
+      : "Trace: v3-19 Logic Circuit Breaker active.";
+    log.textContent = base + "\\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
   }
 
-  // v3-18: fatal JS visibility
+  // v3-19: fatal JS visibility
   window.onerror = function(message, source, lineno, colno){
-    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-18)");
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-19)");
   };
   window.onunhandledrejection = function(ev){
-    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-18)");
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-19)");
   };
 
   function toggleLog(show){
@@ -379,6 +419,52 @@
       const o = Array.from(s.options).find(opt => opt.value.startsWith(def));
       if (o) s.value = o.value;
     }
+
+  // ---------- Rule helpers (v3-20) ----------
+  function setSelectByCode(selectEl, code){
+    if (!selectEl) return;
+    const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
+    if (opt) selectEl.value = opt.value;
+  }
+
+  function isAATransfer(){
+    const from = document.getElementById("colH").value;
+    const to = document.getElementById("colI").value;
+    return AA_LIST.includes(from) && AA_LIST.includes(to);
+  }
+
+  // Apply Transfer/Support rules deterministically with Transfer taking precedence.
+  function applyTransferSupportRules(reason){
+    if (isRestoring) return;
+
+    const typeSel = document.getElementById("colB");
+    const catSel  = document.getElementById("colF");
+    const freqSel = document.getElementById("colFreq");
+
+    // Priority 1: AA Transfer override
+    if (isAATransfer()){
+      // Type = xf
+      const xf = Array.from(typeSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toLowerCase()) === "xf");
+      if (xf) typeSel.value = xf.value;
+
+      // Category = Transfer (exact lookup option if present, else literal)
+      const transferOpt = Array.from(catSel.options).find(o => (o.value || "").toLowerCase().includes("transfer"));
+      if (transferOpt) catSel.value = transferOpt.value;
+      else catSel.value = "Transfer";
+
+      // Frequency = K
+      setSelectByCode(freqSel, "K");
+      return;
+    }
+
+    // Priority 2: Support category -> Type=S and Frequency=A
+    const catVal = (catSel.value || "");
+    if (isSupportCategory(catVal)){
+      setSelectByCode(typeSel, "S");
+      setSelectByCode(freqSel, "A");
+      logTrace("Support category selected. Type->S, Frequency->A applied. (v3-20)");
+    }
+  }
   }
 
   function colToIndex(col){
@@ -397,15 +483,15 @@
     updateDropdown("colA", ["Roy","Peter","Ev","John","Jose"], "Roy");
     updateDropdown("colB", ["v variable","xf transfer","S Support","aj adjustment","zOut"], "v");
     updateDropdown("colF", ["Card payment","Computer consumables","Support rent","Support Samara","Support","Adjustment"], null, "--Select--");
-    updateDropdown("colH", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU","Computer Futures extra"]), null, "--Select--");
-    updateDropdown("colI", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU","Computer Futures extra"]), null, "--Select--");
+    updateDropdown("colH", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU"]), null, "--Select--");
+    updateDropdown("colI", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU"]), null, "--Select--");
     updateDropdown("colFreq", ["A Ad-hoc","W Weekly","K Keep in credit","M Monthly"], "A");
     updateDropdown("colStatus", ["N Pending","P Paid","aj adjustment"], "N");
     updateDropdown("colZ", ["NEW","JAN","FEB"], "NEW");
     updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
 
     localReset();
-    logTrace("Test Lookups loaded. (v3-18)");
+    logTrace("Test Lookups loaded. (v3-19)");
   }
 
   function cacheSave(){
@@ -414,7 +500,7 @@
     localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
     localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
     localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
-    logTrace("Lookup cache saved. (v3-18)");
+    logTrace("Lookup cache saved. (v3-19)");
   }
 
   function cachePull(){
@@ -425,7 +511,7 @@
     coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
     AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
     populateUI(rawLookupData);
-    logTrace("Lookup cache pulled. (v3-18)");
+    logTrace("Lookup cache pulled. (v3-19)");
   }
 
   function populateUI(data){
@@ -443,6 +529,7 @@
     };
 
     pop("colA","Grouping","Roy");
+    // v3-19: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
     if (coordinateMap["Type"]) pop("colB","Type","v");
     else pop("colB","F/U","v");
 
@@ -459,9 +546,10 @@
 
   // ---------- Reset / Init ----------
   function localReset(){
-    // v3-18: apply defaults on app refresh same as Reset button
+    // v3-19: apply defaults on app refresh same as Reset button
     editIndex = -1;
     pendingEdit = -1;
+    flowPendingAction = null;
 
     ["colT","colV","colG","colK"].forEach(id => {
       const el = document.getElementById(id);
@@ -492,9 +580,14 @@
     rS("colZ","NEW");
     rS("colX","GBP");
 
+    // v3-19: ensure modals are closed on reset/refresh
+    closeFlowModal();
+    closeCalculator();
+    closeNote();
+
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-18)");
+    logTrace("UI Fields Reset. (v3-19)");
   }
 
   function handleResetConfirm(){
@@ -522,7 +615,7 @@
     btn.innerText = "Clear Staging records";
     localStorage.removeItem("ebs_trf");
     renderPreview();
-    logTrace("Staging wiped manually. (v3-18)");
+    logTrace("Staging wiped manually. (v3-19)");
   }
 
   // ---------- Field logic ----------
@@ -548,11 +641,11 @@
     return tot;
   }
 
-  function handleEachFocus(fieldId){
-    const el = document.getElementById(fieldId);
+  function handleEachFocus(){
+    const el = document.getElementById("colT");
     const raw = (el.value || "").trim();
     const num = parseFloat(raw);
-    // v3-18: clear if empty OR numeric zero; else keep and move cursor to end
+    // v3-19: clear if empty OR numeric zero; else keep and move cursor to end
     if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
       el.value = "";
       return;
@@ -581,41 +674,29 @@
 
     document.getElementById("flowDisplay").innerText = flow;
 
-    if (flow === "xfer"){
-      const typeSel = document.getElementById("colB");
-      const xf = Array.from(typeSel.options).find(o => o.value.toLowerCase().startsWith("xf"));
-      if (xf) typeSel.value = xf.value;
-      const catSel = document.getElementById("colF");
-      const transferOpt = Array.from(catSel.options).find(o => o.value.toLowerCase().includes("transfer"));
-      if (transferOpt) catSel.value = transferOpt.value;
-    }
+    // v3-20: enforce Transfer/Support rule precedence deterministically
+    applyTransferSupportRules("acc");
   }
 
   function handleCatTrigger(){
+  function handleCatTrigger(){
     if (isRestoring) return;
 
-    const cat = document.getElementById("colF").value || "";
-    const lower = cat.toLowerCase();
+    const cat = (document.getElementById("colF").value || "");
+    if (!cat) return;
 
-    if (lower.includes("support")){
-      const typeSel = document.getElementById("colB");
-      const sOpt = Array.from(typeSel.options).find(o => o.value.startsWith("S"));
-      if (sOpt) typeSel.value = sOpt.value;
-
-      // v3-18: Support implies Frequency = Ad-hoc
-      const freqSel = document.getElementById("colFreq");
-      const aOpt = Array.from(freqSel.options).find(o => o.value.startsWith("A"));
-      if (aOpt) freqSel.value = aOpt.value;
-    }
+    // v3-20: enforce Transfer/Support rule precedence deterministically
+    applyTransferSupportRules("cat");
   }
 
   function handleManualType(){
+(){
     // reserved for future
   }
 
   // ---------- Edit / Staging ----------
-  function buildRecordFromUI(forcedFlow){
-    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
+  function buildRecordFromUI(){
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
 
     const grouping = document.getElementById("colA").value;
     const typeV = document.getElementById("colB").value;
@@ -624,8 +705,8 @@
     const from = document.getElementById("colH").value;
     const to = document.getElementById("colI").value;
 
-    // v3-18: Who only for support categories
-    const who = (category || "").toLowerCase().includes("support") ? grouping : "";
+    // v3-19: Who only for support categories
+    const who = isSupportCategory(category) ? grouping : ""; // v3-19 explicit Support membership
 
     const rec = Array(35).fill("");
     rec[0] = grouping;
@@ -653,27 +734,33 @@
     return rec;
   }
 
-  function ensureLookupsForCreate(){
-    if (rawLookupData.length === 0){
+  function guidanceIfNoLookups(){
+    // v3-19: message policy
+    // - if required dropdowns are empty/unpopulated after refresh, provide guidance
+    const colF = document.getElementById("colF");
+    const colH = document.getElementById("colH");
+    const colI = document.getElementById("colI");
+    const lookupsAppearEmpty = (!colF || colF.options.length === 0) || (!colH || colH.options.length === 0) || (!colI || colI.options.length === 0);
+    if (rawLookupData.length === 0 || lookupsAppearEmpty){
       alert("First Pull local Lookups, or Refresh Lookups from Sheets.");
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 
-  function handleMainAction(forcedFlow){
-    logTrace("Action Triggered. (v3-18)");
+  function handleMainAction(){
+    logTrace("Action Triggered. (v3-19)");
 
-    if (!ensureLookupsForCreate()) return;
+    if (guidanceIfNoLookups()) return;
 
-    // v3-18: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
+    // v3-19: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     if (pendingEdit !== -1 || editIndex !== -1){
       const cloneIdx = (editIndex !== -1) ? editIndex : pendingEdit;
       if (masterList[cloneIdx]){
         masterList.push([...masterList[cloneIdx]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-18)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-19)");
         localReset();
         return;
       }
@@ -688,33 +775,36 @@
       return;
     }
 
-    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
-    if (flowV === "--"){
-      openFlowModal("create");
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+    if (!flowV || flowV === "--"){
+      flowPendingAction = "create"; // v3-19
+      openFlowModal();
       return;
     }
 
-    const finalPackage = buildRecordFromUI(flowV);
+    const finalPackage = buildRecordFromUI();
     masterList.push(finalPackage);
 
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: New Record Appended. (v3-18)");
-    logTrace("Storage Synced. (v3-18)");
+    logTrace("Logic Update: New Record Appended. (v3-19)");
+    logTrace("Storage Synced. (v3-19)");
 
     localReset();
   }
 
   function initiateEdit(idx){
-    if (!ensureLookupsForCreate()) return;
+    if (guidanceIfNoLookups()) return;
 
+    // First press = pending confirm
     if (pendingEdit !== idx){
       pendingEdit = idx;
       editIndex = -1;
       renderPreview();
-      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-18)");
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-19)");
       return;
     }
 
+    // Second press = load into edit
     pendingEdit = -1;
     editIndex = idx;
 
@@ -748,17 +838,17 @@
     document.getElementById("colT").value = d[19] || "";
     document.getElementById("colM").value = d[20] || "1";
     document.getElementById("colV").value = d[21] || "";
-    document.getElementById("flowDisplay").innerText = d[4] || "--";
+    document.getElementById("flowDisplay").innerText = (d[4] && String(d[4]).trim().length) ? d[4] : "--";
 
     handleDateChange();
     calc();
 
     isRestoring = false;
     renderPreview();
-    logTrace("Active Edit: row " + (idx+1) + ". (v3-18)");
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-19)");
   }
 
-  function commitEdit(forcedFlow){
+  function commitEdit(){
     if (editIndex === -1) return;
 
     const fv = document.getElementById("colF").value;
@@ -770,25 +860,26 @@
       return;
     }
 
-    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
-    if (flowV === "--"){
-      openFlowModal("edit");
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+    if (!flowV || flowV === "--"){
+      flowPendingAction = "edit"; // v3-19
+      openFlowModal();
       return;
     }
 
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     const existing = masterList[editIndex];
 
-    const updated = buildRecordFromUI(flowV);
+    const updated = buildRecordFromUI();
 
-    // v3-18: preserve Who on overwrite when category is not support
-    if (!(updated[5] || "").toLowerCase().includes("support") && existing){
+    // v3-19: preserve Who on overwrite when category is not support
+    if (!isSupportCategory(updated[5]) && existing){ // v3-19 explicit Support membership
       updated[33] = existing[33] || "";
     }
 
     masterList[editIndex] = updated;
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: Row " + (editIndex+1) + " Overwritten. (v3-18)");
+    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-19)");
 
     localReset();
   }
@@ -821,14 +912,15 @@
       const isPending = (pendingEdit === idx);
       const isEditing = (editIndex === idx);
 
-      const bS = isPending ? "background:#c0392b" : (isEditing ? "background:#f39c12" : "background:#3498db");
-      const bL = isPending ? "..." : (isEditing ? "C" : "E");
-      const clickFn = isEditing ? "commitEdit()" : ("initiateEdit(" + idx + ")");
+      let bS = isPending ? "background:#c0392b" : (isEditing ? "background:#f39c12" : "background:#3498db");
+      let bL = isPending ? "..." : (isEditing ? "C" : "E");
+      let clickFn = isEditing ? "commitEdit()" : ("initiateEdit(" + idx + ")");
 
+      // Date display
       let dNam = "";
       let dStr = "";
       if (r[2]){
-        const [y, m, dn] = r[2].split("-").map(Number);
+        const [y, m, dn] = String(r[2]).split("-").map(Number);
         const dt = new Date(y, m-1, dn);
         dNam = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
         dStr = String(dn).padStart(2,"0") + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][dt.getMonth()] + " '" + String(dt.getFullYear()).slice(-2);
@@ -838,7 +930,7 @@
       const noteIcon = r[10] ? "📄" : "▫️";
 
       h += "<tr>"
-        + '<td class="w-edit"><button onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:4px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
+        + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:4px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
         + '<td class="w-group">' + (r[0] || "") + "</td>"
         + '<td class="w-type">' + (r[1] || "") + "</td>"
         + '<td class="w-day">' + dNam + "</td>"
@@ -855,12 +947,12 @@
         + '<td class="w-tot">' + (r[22] || "") + "</td>"
         + '<td class="w-mnth">' + (r[25] || "") + "</td>"
         + '<td class="w-who">' + (r[33] || "") + "</td>"
-        + '<td class="w-del"><button onclick="deleteRow(' + idx + ')" style="background:#c0392b;color:white;border:none;border-radius:6px;padding:4px 6px;font-weight:900;cursor:pointer;">X</button></td>'
+        + '<td class="w-del"><button type="button" onclick="deleteRow(' + idx + ')" style="background:#c0392b;color:white;border:none;border-radius:6px;padding:4px 6px;font-weight:900;cursor:pointer;">X</button></td>'
         + "</tr>";
     });
 
     document.getElementById("previewArea").innerHTML = h + "</table>";
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-18)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-19)");
   }
 
   function deleteRow(i){
@@ -870,7 +962,7 @@
     editIndex = -1;
     pendingEdit = -1;
     renderPreview();
-    logTrace("Row deleted: " + (i+1) + " (v3-18)");
+    logTrace("Row deleted: " + (i+1) + " (v3-19)");
   }
 
   // ---------- Note modal ----------
@@ -891,40 +983,44 @@
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     closeNote();
     renderPreview();
-    logTrace("Note updated. (v3-18)");
+    logTrace("Note updated. (v3-19)");
   }
 
   // ---------- Flow modal ----------
-  function openFlowModal(mode){
-    flowPendingMode = mode || "create";
-    document.getElementById("flow_modal").style.display = "flex";
-  }
-  function closeFlowModal(){
-    document.getElementById("flow_modal").style.display = "none";
-    flowPendingMode = null;
-    flowPendingForced = null;
-  }
+  function openFlowModal(){ document.getElementById("flow_modal").style.display = "flex"; }
+  function closeFlowModal(){ document.getElementById("flow_modal").style.display = "none"; }
   function commitFlowSelection(){
     const selected = document.getElementById("modal_flow_select").value;
     document.getElementById("flowDisplay").innerText = selected;
-    document.getElementById("flow_modal").style.display = "none";
+    closeFlowModal();
 
-    const mode = flowPendingMode;
-    flowPendingMode = null;
+    // v3-19: resume pending action deterministically
+    if (flowPendingAction === "edit"){
+      flowPendingAction = null;
+      commitEdit();
+      return;
+    }
+    if (flowPendingAction === "create"){
+      flowPendingAction = null;
+      handleMainAction();
+      return;
+    }
 
-    // v3-18: forcedFlow parameter prevents "Flow blank on first commit" edge case
-    if (mode === "edit") commitEdit(selected);
-    else handleMainAction(selected);
+    // fallback
+    if (editIndex !== -1) commitEdit();
+    else handleMainAction();
   }
 
   // ---------- Calculator ----------
-  function openCalculator(targetId){
-    calcTargetId = targetId || "colT";
-    const cur = (document.getElementById(calcTargetId).value || "").trim();
+  function openCalculator(targetFieldId){
+    // v3-19: supports Each (colT) and Fees (colV)
+    calcTargetFieldId = targetFieldId || "colT";
+    const targetEl = document.getElementById(calcTargetFieldId);
+    const cur = (targetEl && targetEl.value ? String(targetEl.value) : "").trim();
     calcLastApplied = cur ? cur : "0";
     document.getElementById("calc_display").value = calcLastApplied;
     document.getElementById("calc_modal").style.display = "flex";
-    logTrace("Calculator opened. Field=" + calcTargetId + " Seed=" + calcLastApplied + " (v3-18)");
+    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-19)");
   }
   function closeCalculator(){
     document.getElementById("calc_modal").style.display = "none";
@@ -944,6 +1040,7 @@
       return;
     }
 
+    // append tokens
     if (v === "0" && "0123456789".includes(k)) v = "";
     el.value = v + k;
   }
@@ -953,11 +1050,12 @@
       const cleaned = (expr || "")
         .replace(/×/g,"*")
         .replace(/÷/g,"/")
-        .replace(/[^0-9+\-*/.%(). ]/g,"");
+        .replace(/[^0-9+\\-*/.%(). ]/g,"");
+      // eslint-disable-next-line no-new-func
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
       const fixed = Number(out.toFixed(2));
-      logTrace("Calculator = " + fixed + " (v3-18)");
+      logTrace("Calculator = " + fixed + " (v3-19)");
       return fixed;
     }catch(_){
       alert("Invalid expression.");
@@ -970,20 +1068,214 @@
     const res = safeEval(el.value);
     if (res === null) return;
 
-    const tgt = document.getElementById(calcTargetId || "colT");
-    tgt.value = res.toFixed(2);
-
+    const tgt = document.getElementById(calcTargetFieldId || "colT");
+    if (tgt){
+      tgt.value = res.toFixed(2);
+    }
     calc();
     closeCalculator();
-    logTrace("Calculator applied to " + (calcTargetId || "colT") + ": " + res.toFixed(2) + " (v3-18)");
+    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-19)");
   }
 
+
+  // ---------- Searchable picker modal (v3-20) ----------
+  let pickTargetId = null;
+  let pickDebounce = null;
+
+  function isIPhoneModalPickerEnabled(){
+    // Only enable on small iPhone-sized screens and touch devices
+    return window.matchMedia && window.matchMedia("(max-width: 430px)").matches && ("ontouchstart" in window);
+  }
+
+  function foldStr(s){
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
+  }
+
+  function buildFoldIndexMap(original){
+    // Map each folded-string index to the corresponding original-string index
+    const map = [];
+    let foldedPos = 0;
+    for (let i = 0; i < original.length; i++){
+      const foldedChunk = foldStr(original[i]);
+      const n = foldedChunk.length;
+      for (let k = 0; k < n; k++){
+        map[foldedPos + k] = i;
+      }
+      foldedPos += n;
+    }
+    return map;
+  }
+
+  function highlightAllOccurrences(label, query){
+    const qFold = foldStr(query);
+    if (!qFold) return escapeHtml(label);
+
+    const o = String(label || "");
+    const oFold = foldStr(o);
+
+    const map = buildFoldIndexMap(o);
+    const ranges = [];
+    let start = 0;
+
+    while (true){
+      const idx = oFold.indexOf(qFold, start);
+      if (idx === -1) break;
+      const endFold = idx + qFold.length - 1;
+
+      const origStart = map[idx];
+      const origEnd = map[endFold];
+
+      if (origStart !== undefined && origEnd !== undefined){
+        ranges.push([origStart, origEnd + 1]); // [start, endExclusive]
+      }
+      start = idx + Math.max(1, qFold.length);
+    }
+
+    if (!ranges.length) return escapeHtml(o);
+
+    // merge overlapping ranges
+    ranges.sort((a,b) => a[0]-b[0]);
+    const merged = [];
+    for (const r of ranges){
+      if (!merged.length || r[0] > merged[merged.length-1][1]){
+        merged.push(r);
+      }else{
+        merged[merged.length-1][1] = Math.max(merged[merged.length-1][1], r[1]);
+      }
+    }
+
+    let out = "";
+    let cursor = 0;
+    for (const [a,b] of merged){
+      out += escapeHtml(o.slice(cursor, a));
+      out += "<mark>" + escapeHtml(o.slice(a, b)) + "</mark>";
+      cursor = b;
+    }
+    out += escapeHtml(o.slice(cursor));
+    return out;
+  }
+
+  function escapeHtml(s){
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function initSearchPickers(){
+    if (!isIPhoneModalPickerEnabled()) return;
+
+    const targets = [
+      { id:"colH", title:"Select From" },
+      { id:"colI", title:"Select To" },
+      { id:"colF", title:"Select Category" }
+    ];
+
+    targets.forEach(t => {
+      const sel = document.getElementById(t.id);
+      if (!sel) return;
+
+      // Prevent native iOS picker by intercepting touchstart.
+      sel.addEventListener("touchstart", (ev) => {
+        ev.preventDefault();
+        openPickModal(t.id, t.title);
+      }, { passive:false });
+
+      // Also intercept pointerdown (some iOS versions)
+      sel.addEventListener("pointerdown", (ev) => {
+        if (ev.pointerType === "touch"){
+          ev.preventDefault();
+          openPickModal(t.id, t.title);
+        }
+      });
+    });
+  }
+
+  function openPickModal(selectId, title){
+    pickTargetId = selectId;
+    document.getElementById("pick_title").innerText = title || "Select";
+
+    // Do not retain query (explicit requirement)
+    const inp = document.getElementById("pick_search");
+    inp.value = "";
+
+    renderPickList("");
+
+    document.getElementById("pick_modal").style.display = "flex";
+    setTimeout(() => { try{ inp.focus(); }catch(_){} }, 0);
+
+    inp.oninput = () => {
+      if (pickDebounce) clearTimeout(pickDebounce);
+      pickDebounce = setTimeout(() => {
+        renderPickList(inp.value || "");
+      }, 200);
+    };
+  }
+
+  function closePickModal(){
+    document.getElementById("pick_modal").style.display = "none";
+    pickTargetId = null;
+    const inp = document.getElementById("pick_search");
+    inp.oninput = null;
+  }
+
+  function renderPickList(query){
+    const sel = document.getElementById(pickTargetId);
+    const list = document.getElementById("pick_list");
+    if (!sel || !list) return;
+
+    const qFold = foldStr(query);
+
+    // candidate options (skip disabled prompt entries)
+    const opts = Array.from(sel.options)
+      .filter(o => !o.disabled && o.value !== "" && !(o.value || "").includes("--"));
+
+    const items = opts.map(o => ({ value:o.value, label:o.value, fold:foldStr(o.value) }));
+
+    let filtered = items;
+    if (qFold){
+      filtered = items.filter(it => it.fold.includes(qFold));
+
+      // prefix prioritisation (stable within groups)
+      const prefix = filtered.filter(it => it.fold.startsWith(qFold));
+      const contains = filtered.filter(it => !it.fold.startsWith(qFold));
+      filtered = prefix.concat(contains);
+    }
+
+    if (!filtered.length){
+      list.innerHTML = '<div id="pick_empty">No results</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(it => (
+      '<div class="pick-item" data-val="' + escapeHtml(it.value) + '">' +
+        highlightAllOccurrences(it.label, query) +
+      "</div>"
+    )).join("");
+
+    Array.from(list.querySelectorAll(".pick-item")).forEach(el => {
+      el.onclick = () => {
+        const val = el.getAttribute("data-val");
+        sel.value = val;
+
+        // Fire change handlers consistently
+        sel.dispatchEvent(new Event("change", { bubbles:true }));
+
+        closePickModal();
+      };
+    });
+  }
   // ---------- Google auth / sync ----------
   function gapiLoaded(){
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
       await gapi.client.load("sheets", "v4");
-      logTrace("GAPI Ready. (v3-18)");
+      logTrace("GAPI Ready. (v3-19)");
     });
   }
 
@@ -993,10 +1285,11 @@
       scope: "https://www.googleapis.com/auth/spreadsheets",
       callback: () => {}
     });
-    logTrace("GIS Ready. (v3-18)");
+    logTrace("GIS Ready. (v3-19)");
   }
 
   function initRefresh(){
+    // Standard refresh: obtain token and then load lookup refs
     requestToken(true, () => fetchLookupRefs());
   }
 
@@ -1023,6 +1316,7 @@
     const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
     const age = (Date.now() - issuedAt) / 1000;
 
+    // v3-19: only prompt if missing/expired
     if (tok && issuedAt && exp && age < (exp - 60)){
       gapi.client.setToken({ access_token: tok });
       onOk();
@@ -1074,10 +1368,11 @@
     if (!d.length){ alert("No Staging records."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-18)");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-19)");
 
     ensureTokenThen(async () => {
       try{
+        // v3-19: first empty A from A2 downward
         const meta = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "'" + SHEET_TAB + "'!A2:A"
@@ -1088,13 +1383,19 @@
         const vls = d.map(r => {
           const rc = [...r];
 
+          // date ISO -> dd/mm/yyyy
           if (rc[2]){
-            const dp = rc[2].split("-");
-            rc[2] = dp[2] + "/" + dp[1] + "/" + dp[0];
+            const dp = String(rc[2]).split("-");
+            if (dp.length === 3) rc[2] = dp[2] + "/" + dp[1] + "/" + dp[0];
           }
 
+          // code fields: keep first token
           [1,5,11,14,23,25].forEach(i => { rc[i] = (rc[i] || "").split(" ")[0]; });
-          [7,8].forEach(i => { rc[i] = String(rc[i] || "").replace(/ \(AA\)/g, ""); });
+
+          // accounts: remove (AA)
+          [7,8].forEach(i => { rc[i] = String(rc[i] || "").replace(/ \\(AA\\)/g, ""); });
+
+          // numeric
           [19,21,22].forEach(i => { rc[i] = parseFloat(rc[i] || 0); });
 
           return rc;
@@ -1108,11 +1409,11 @@
         });
 
         updateStatus("Token Active", "active");
-        logTrace("Sync complete. StartRow=" + startRow + " (v3-18)");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-19)");
         alert("Sync completed.");
       }catch(e){
         updateStatus("Sync error", "error");
-        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-18)");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-19)");
         alert("Sync failed. Trace log contains details.");
       }
     });
@@ -1134,22 +1435,24 @@
   async function boot(){
     document.getElementById("colC").value = new Date().toISOString().split("T")[0];
     handleDateChange();
-    // v3-18: local reset on refresh ensures defaults (Each/Fees cleared, Multiplier=1, etc.)
+
+    // v3-19: ensure UI starts usable even before lookups are pulled
     localReset();
     renderPreview();
+    initSearchPickers();
 
     try{
       await waitFor(() => typeof gapi !== "undefined", 8000);
       gapiLoaded();
     }catch(_){
-      logTrace("GAPI not available. (v3-18)");
+      logTrace("GAPI not available. (v3-19)");
     }
 
     try{
       await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
       gisLoaded();
     }catch(_){
-      logTrace("GIS not available. (v3-18)");
+      logTrace("GIS not available. (v3-19)");
     }
   }
 
