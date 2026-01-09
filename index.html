@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>EBS Input v3-17</title>
+  <title>EBS Input v3-18</title>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -75,7 +75,7 @@
     th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    /* v3-17 sizing in ch units based on longest observed option strings. */
+    /* v3-18 sizing in ch units based on longest observed option strings. */
     .w-edit{ width:38px; text-align:center; }
     .w-group{ width:12ch; }
     .w-type{ width:14ch; }
@@ -104,18 +104,20 @@
 
     .calc-input-wrap{ display:flex; align-items:center; gap:6px; }
     .btn-calc-trigger{
-      background:var(--bridge); color:#fff; border:none; border-radius:6px; height:38px; width:36px;
-      cursor:pointer; font-weight:900; font-size:1rem;
+      background:var(--bridge); color:#fff; border:none; border-radius:6px; height:38px; width:34px;
+      cursor:pointer; font-weight:900; font-size:1rem; flex:0 0 auto;
     }
 
-    /* v3-17: iPhone sizing—widen Each by shaving Currency/Fees/Multiplier and ± */
+    /* v3-18: iPhone sizing—widen Each/Fees by shaving Currency/Multiplier and ± */
     @media (max-width: 430px){
-      .btn-calc-trigger{ width:32px; border-radius:6px; }
-      #row_each_grid{ grid-template-columns: 1.35fr 0.85fr 0.75fr 0.55fr; gap:6px; }
+      .btn-calc-trigger{ width:28px; }
+      #row_each_grid{ grid-template-columns: 1.65fr 0.78fr 1.10fr 0.40fr; gap:6px; }
       #row_each_grid .calc-input-wrap{ gap:5px; }
+      #colM{ padding-left:6px; padding-right:6px; }
+      #colX{ padding-left:6px; padding-right:6px; }
     }
 
-    /* v3-17: modal overlay (Flow + Calculator + Note) */
+    /* v3-18: modal overlay (Flow + Calculator + Note) */
     .modal{
       display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
       background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
@@ -155,7 +157,7 @@
 <body>
   <div class="container">
     <div class="header-wrap">
-      <div class="branding-row"><b>EBS Input</b> <span>v3-17</span></div>
+      <div class="branding-row"><b>EBS Input</b> <span>v3-18</span></div>
       <div class="header-btns">
         <button class="btn-lookup btn-pull" onclick="checkEditState(() => cachePull())">Pull local<br/>Lookups</button>
         <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() => initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -196,18 +198,25 @@
       <div><label>Month</label><select id="colZ"></select></div>
     </div>
 
-    <div id="row_each_grid" style="display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:8px; margin-top:10px;">
+    <div id="row_each_grid" style="display:grid; grid-template-columns:1.2fr 1fr 1.2fr 0.8fr; gap:8px; margin-top:10px;">
       <div>
         <label>Each</label>
         <div class="calc-input-wrap">
-          <!-- v3-17: Each focus behaviour -->
-          <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus()" oninput="calc()" />
-          <!-- v3-17: Calculator opens only via ± button -->
-          <button type="button" class="btn-calc-trigger" onclick="openCalculator()">±</button>
+          <!-- v3-18: Each focus behaviour -->
+          <input type="number" id="colT" placeholder="0.00" step="0.01" onfocus="handleEachFocus('colT')" oninput="calc()" />
+          <!-- v3-18: Calculator opens only via ± button -->
+          <button type="button" class="btn-calc-trigger" onclick="openCalculator('colT')">±</button>
         </div>
       </div>
       <div><label>Currency</label><select id="colX" onchange="calc()"></select></div>
-      <div><label>Fees</label><input type="number" id="colV" placeholder="0.00" step="0.01" oninput="calc()" /></div>
+      <div>
+        <label>Fees</label>
+        <div class="calc-input-wrap">
+          <input type="number" id="colV" placeholder="0.00" step="0.01" onfocus="handleEachFocus('colV')" oninput="calc()" />
+          <!-- v3-18: Fees calculator -->
+          <button type="button" class="btn-calc-trigger" onclick="openCalculator('colV')">±</button>
+        </div>
+      </div>
       <div><label>Multiplier</label><input type="number" id="colM" value="1" step="0.01" oninput="calc()" /></div>
     </div>
 
@@ -223,10 +232,10 @@
 
     <div id="auth_status">iOS Sync Status: Idle</div>
     <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-17 Logic Circuit Breaker active.</div>
+    <div id="trace_log" onclick="toggleLog(false)">Trace: v3-18 Logic Circuit Breaker active.</div>
   </div>
 
-  <!-- v3-17 Flow modal (forced overlay) -->
+  <!-- v3-18 Flow modal (forced overlay) -->
   <div id="flow_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Flow cannot be determined</div>
@@ -255,7 +264,7 @@
     </div>
   </div>
 
-  <!-- v3-17 Calculator modal -->
+  <!-- v3-18 Calculator modal -->
   <div id="calc_modal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Calculator</div>
@@ -284,14 +293,13 @@
         <button class="calc-key" onclick="calcKey('0')">0</button>
         <button class="calc-key" onclick="calcKey('.')">.</button>
         <button class="calc-key op" onclick="calcKey('%')">%</button>
-        <!-- v3-17: blank button removed (spacer cell instead) -->
         <div class="calc-spacer"></div>
       </div>
 
-      <!-- v3-17: Swap Close/Apply order -->
+      <!-- v3-18: Apply then Close -->
       <div class="modal-actions" style="margin-top:14px;">
-        <button class="btn-modal btn-grey" onclick="closeCalculator()">Close</button>
         <button class="btn-modal btn-green" onclick="applyCalculator()">Apply</button>
+        <button class="btn-modal btn-grey" onclick="closeCalculator()">Close</button>
       </div>
     </div>
   </div>
@@ -299,7 +307,7 @@
 <script>
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-17)";
+  const VER = "Excel Budget Sheet Input (v3-18)";
 
   let AA_LIST = [];
   let coordinateMap = {};
@@ -314,30 +322,34 @@
   let resetConfirmed = false;
   let isRestoring = false;
 
-  // v3-17: Calculator state
+  // v3-18: modal resume state (Flow)
+  let flowPendingMode = null; // "create" | "edit"
+  let flowPendingForced = null;
+
+  // v3-18: Calculator state
   let calcLastApplied = "0";
+  let calcTargetId = "colT"; // "colT" (Each) or "colV" (Fees)
 
   const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
 
   function logTrace(msg){
     const log = document.getElementById("trace_log");
     const now = new Date().toLocaleTimeString();
-    // v3-17: enforce newline separation
-    log.textContent = (log.textContent || "Trace: v3-17 Logic Circuit Breaker active.") + "\n[" + now + "] " + msg;
+    // v3-18: enforce newline separation (works in Firefox/macOS and iOS)
+    log.textContent = (log.textContent || "Trace: v3-18 Logic Circuit Breaker active.") + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
   }
 
-  // v3-17: fatal JS visibility
+  // v3-18: fatal JS visibility
   window.onerror = function(message, source, lineno, colno){
-    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-17)");
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-18)");
   };
   window.onunhandledrejection = function(ev){
-    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-17)");
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-18)");
   };
 
   function toggleLog(show){
-    // v3-17: fixed syntax (previous parse-break made app appear dead)
     document.getElementById("log_btn").style.display = show ? "none" : "block";
     document.getElementById("trace_log").style.display = show ? "block" : "none";
   }
@@ -382,18 +394,18 @@
     coordinateMap = {"Grouping":{val:0},"Type":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
     rawLookupData = [["INIT"]];
 
-    updateDropdown("colA", ["Roy","Peter","Ev","John"], "Roy");
-    updateDropdown("colB", ["v variable","xf transfer","S Support","aj adjustment"], "v");
-    updateDropdown("colF", ["Card payment","Computer consumables","Support rent","Support Samara","Adjustment"], null, "--Select--");
-    updateDropdown("colH", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password"]), null, "--Select--");
-    updateDropdown("colI", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password"]), null, "--Select--");
+    updateDropdown("colA", ["Roy","Peter","Ev","John","Jose"], "Roy");
+    updateDropdown("colB", ["v variable","xf transfer","S Support","aj adjustment","zOut"], "v");
+    updateDropdown("colF", ["Card payment","Computer consumables","Support rent","Support Samara","Support","Adjustment"], null, "--Select--");
+    updateDropdown("colH", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU","Computer Futures extra"]), null, "--Select--");
+    updateDropdown("colI", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU","Computer Futures extra"]), null, "--Select--");
     updateDropdown("colFreq", ["A Ad-hoc","W Weekly","K Keep in credit","M Monthly"], "A");
     updateDropdown("colStatus", ["N Pending","P Paid","aj adjustment"], "N");
     updateDropdown("colZ", ["NEW","JAN","FEB"], "NEW");
     updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
 
     localReset();
-    logTrace("Test Lookups loaded. (v3-17)");
+    logTrace("Test Lookups loaded. (v3-18)");
   }
 
   function cacheSave(){
@@ -402,7 +414,7 @@
     localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
     localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
     localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
-    logTrace("Lookup cache saved. (v3-17)");
+    logTrace("Lookup cache saved. (v3-18)");
   }
 
   function cachePull(){
@@ -413,7 +425,7 @@
     coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
     AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
     populateUI(rawLookupData);
-    logTrace("Lookup cache pulled. (v3-17)");
+    logTrace("Lookup cache pulled. (v3-18)");
   }
 
   function populateUI(data){
@@ -431,7 +443,6 @@
     };
 
     pop("colA","Grouping","Roy");
-    // v3-17: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
     if (coordinateMap["Type"]) pop("colB","Type","v");
     else pop("colB","F/U","v");
 
@@ -448,7 +459,7 @@
 
   // ---------- Reset / Init ----------
   function localReset(){
-    // v3-17: apply defaults on app refresh same as Reset button
+    // v3-18: apply defaults on app refresh same as Reset button
     editIndex = -1;
     pendingEdit = -1;
 
@@ -483,7 +494,7 @@
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-17)");
+    logTrace("UI Fields Reset. (v3-18)");
   }
 
   function handleResetConfirm(){
@@ -511,7 +522,7 @@
     btn.innerText = "Clear Staging records";
     localStorage.removeItem("ebs_trf");
     renderPreview();
-    logTrace("Staging wiped manually. (v3-17)");
+    logTrace("Staging wiped manually. (v3-18)");
   }
 
   // ---------- Field logic ----------
@@ -537,11 +548,11 @@
     return tot;
   }
 
-  function handleEachFocus(){
-    const el = document.getElementById("colT");
+  function handleEachFocus(fieldId){
+    const el = document.getElementById(fieldId);
     const raw = (el.value || "").trim();
     const num = parseFloat(raw);
-    // v3-17: clear if empty OR numeric zero; else keep and move cursor to end
+    // v3-18: clear if empty OR numeric zero; else keep and move cursor to end
     if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
       el.value = "";
       return;
@@ -570,7 +581,6 @@
 
     document.getElementById("flowDisplay").innerText = flow;
 
-    // Optional: xfer implies Transfer
     if (flow === "xfer"){
       const typeSel = document.getElementById("colB");
       const xf = Array.from(typeSel.options).find(o => o.value.toLowerCase().startsWith("xf"));
@@ -587,13 +597,12 @@
     const cat = document.getElementById("colF").value || "";
     const lower = cat.toLowerCase();
 
-    // v3-17: Support implies Type "S..." when present
     if (lower.includes("support")){
       const typeSel = document.getElementById("colB");
       const sOpt = Array.from(typeSel.options).find(o => o.value.startsWith("S"));
       if (sOpt) typeSel.value = sOpt.value;
 
-      // v3-17: Support implies Frequency = Ad-hoc
+      // v3-18: Support implies Frequency = Ad-hoc
       const freqSel = document.getElementById("colFreq");
       const aOpt = Array.from(freqSel.options).find(o => o.value.startsWith("A"));
       if (aOpt) freqSel.value = aOpt.value;
@@ -605,8 +614,8 @@
   }
 
   // ---------- Edit / Staging ----------
-  function buildRecordFromUI(){
-    const flowV = document.getElementById("flowDisplay").innerText;
+  function buildRecordFromUI(forcedFlow){
+    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
 
     const grouping = document.getElementById("colA").value;
     const typeV = document.getElementById("colB").value;
@@ -615,7 +624,7 @@
     const from = document.getElementById("colH").value;
     const to = document.getElementById("colI").value;
 
-    // v3-17: Who only for support categories
+    // v3-18: Who only for support categories
     const who = (category || "").toLowerCase().includes("support") ? grouping : "";
 
     const rec = Array(35).fill("");
@@ -644,23 +653,27 @@
     return rec;
   }
 
-  function handleMainAction(){
-    logTrace("Action Triggered. (v3-17)");
-
-    // v3-17: if app refreshed and lookups missing, give explicit guidance
+  function ensureLookupsForCreate(){
     if (rawLookupData.length === 0){
       alert("First Pull local Lookups, or Refresh Lookups from Sheets.");
-      return;
+      return false;
     }
+    return true;
+  }
 
-    // v3-17: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
+  function handleMainAction(forcedFlow){
+    logTrace("Action Triggered. (v3-18)");
+
+    if (!ensureLookupsForCreate()) return;
+
+    // v3-18: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     if (pendingEdit !== -1 || editIndex !== -1){
       const cloneIdx = (editIndex !== -1) ? editIndex : pendingEdit;
       if (masterList[cloneIdx]){
         masterList.push([...masterList[cloneIdx]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-17)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-18)");
         localReset();
         return;
       }
@@ -675,38 +688,33 @@
       return;
     }
 
-    const flowV = document.getElementById("flowDisplay").innerText;
+    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
     if (flowV === "--"){
-      openFlowModal();
+      openFlowModal("create");
       return;
     }
 
-    const finalPackage = buildRecordFromUI();
+    const finalPackage = buildRecordFromUI(flowV);
     masterList.push(finalPackage);
 
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: New Record Appended. (v3-17)");
-    logTrace("Storage Synced. (v3-17)");
+    logTrace("Logic Update: New Record Appended. (v3-18)");
+    logTrace("Storage Synced. (v3-18)");
 
     localReset();
   }
 
   function initiateEdit(idx){
-    if (rawLookupData.length === 0){
-      alert("First Pull local Lookups, or Refresh Lookups from Sheets.");
-      return;
-    }
+    if (!ensureLookupsForCreate()) return;
 
-    // First press = pending confirm
     if (pendingEdit !== idx){
       pendingEdit = idx;
       editIndex = -1;
       renderPreview();
-      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-17)");
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-18)");
       return;
     }
 
-    // Second press = load into edit
     pendingEdit = -1;
     editIndex = idx;
 
@@ -747,10 +755,10 @@
 
     isRestoring = false;
     renderPreview();
-    logTrace("Active Edit: row " + (idx+1) + ". (v3-17)");
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-18)");
   }
 
-  function commitEdit(){
+  function commitEdit(forcedFlow){
     if (editIndex === -1) return;
 
     const fv = document.getElementById("colF").value;
@@ -762,25 +770,25 @@
       return;
     }
 
-    const flowV = document.getElementById("flowDisplay").innerText;
+    const flowV = forcedFlow || document.getElementById("flowDisplay").innerText;
     if (flowV === "--"){
-      openFlowModal();
+      openFlowModal("edit");
       return;
     }
 
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     const existing = masterList[editIndex];
 
-    const updated = buildRecordFromUI();
+    const updated = buildRecordFromUI(flowV);
 
-    // v3-17: preserve Who on overwrite when category is not support
+    // v3-18: preserve Who on overwrite when category is not support
     if (!(updated[5] || "").toLowerCase().includes("support") && existing){
       updated[33] = existing[33] || "";
     }
 
     masterList[editIndex] = updated;
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-17)");
+    logTrace("Logic Update: Row " + (editIndex+1) + " Overwritten. (v3-18)");
 
     localReset();
   }
@@ -813,11 +821,10 @@
       const isPending = (pendingEdit === idx);
       const isEditing = (editIndex === idx);
 
-      let bS = isPending ? "background:#c0392b" : (isEditing ? "background:#f39c12" : "background:#3498db");
-      let bL = isPending ? "..." : (isEditing ? "C" : "E");
-      let clickFn = isEditing ? "commitEdit()" : ("initiateEdit(" + idx + ")");
+      const bS = isPending ? "background:#c0392b" : (isEditing ? "background:#f39c12" : "background:#3498db");
+      const bL = isPending ? "..." : (isEditing ? "C" : "E");
+      const clickFn = isEditing ? "commitEdit()" : ("initiateEdit(" + idx + ")");
 
-      // Date display
       let dNam = "";
       let dStr = "";
       if (r[2]){
@@ -853,7 +860,7 @@
     });
 
     document.getElementById("previewArea").innerHTML = h + "</table>";
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-17)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-18)");
   }
 
   function deleteRow(i){
@@ -863,7 +870,7 @@
     editIndex = -1;
     pendingEdit = -1;
     renderPreview();
-    logTrace("Row deleted: " + (i+1) + " (v3-17)");
+    logTrace("Row deleted: " + (i+1) + " (v3-18)");
   }
 
   // ---------- Note modal ----------
@@ -884,28 +891,40 @@
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     closeNote();
     renderPreview();
-    logTrace("Note updated. (v3-17)");
+    logTrace("Note updated. (v3-18)");
   }
 
   // ---------- Flow modal ----------
-  function openFlowModal(){ document.getElementById("flow_modal").style.display = "flex"; }
-  function closeFlowModal(){ document.getElementById("flow_modal").style.display = "none"; }
+  function openFlowModal(mode){
+    flowPendingMode = mode || "create";
+    document.getElementById("flow_modal").style.display = "flex";
+  }
+  function closeFlowModal(){
+    document.getElementById("flow_modal").style.display = "none";
+    flowPendingMode = null;
+    flowPendingForced = null;
+  }
   function commitFlowSelection(){
     const selected = document.getElementById("modal_flow_select").value;
     document.getElementById("flowDisplay").innerText = selected;
-    closeFlowModal();
-    // v3-17: resume whichever action needs flow
-    if (editIndex !== -1) commitEdit();
-    else handleMainAction();
+    document.getElementById("flow_modal").style.display = "none";
+
+    const mode = flowPendingMode;
+    flowPendingMode = null;
+
+    // v3-18: forcedFlow parameter prevents "Flow blank on first commit" edge case
+    if (mode === "edit") commitEdit(selected);
+    else handleMainAction(selected);
   }
 
   // ---------- Calculator ----------
-  function openCalculator(){
-    const cur = (document.getElementById("colT").value || "").trim();
+  function openCalculator(targetId){
+    calcTargetId = targetId || "colT";
+    const cur = (document.getElementById(calcTargetId).value || "").trim();
     calcLastApplied = cur ? cur : "0";
     document.getElementById("calc_display").value = calcLastApplied;
     document.getElementById("calc_modal").style.display = "flex";
-    logTrace("Calculator opened. Seed=" + calcLastApplied + " (v3-17)");
+    logTrace("Calculator opened. Field=" + calcTargetId + " Seed=" + calcLastApplied + " (v3-18)");
   }
   function closeCalculator(){
     document.getElementById("calc_modal").style.display = "none";
@@ -925,7 +944,6 @@
       return;
     }
 
-    // append tokens
     if (v === "0" && "0123456789".includes(k)) v = "";
     el.value = v + k;
   }
@@ -936,11 +954,10 @@
         .replace(/×/g,"*")
         .replace(/÷/g,"/")
         .replace(/[^0-9+\-*/.%(). ]/g,"");
-      // eslint-disable-next-line no-new-func
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
       const fixed = Number(out.toFixed(2));
-      logTrace("Calculator = " + fixed + " (v3-17)");
+      logTrace("Calculator = " + fixed + " (v3-18)");
       return fixed;
     }catch(_){
       alert("Invalid expression.");
@@ -952,10 +969,13 @@
     const el = document.getElementById("calc_display");
     const res = safeEval(el.value);
     if (res === null) return;
-    document.getElementById("colT").value = res.toFixed(2);
+
+    const tgt = document.getElementById(calcTargetId || "colT");
+    tgt.value = res.toFixed(2);
+
     calc();
     closeCalculator();
-    logTrace("Calculator applied to Each: " + res.toFixed(2) + " (v3-17)");
+    logTrace("Calculator applied to " + (calcTargetId || "colT") + ": " + res.toFixed(2) + " (v3-18)");
   }
 
   // ---------- Google auth / sync ----------
@@ -963,7 +983,7 @@
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
       await gapi.client.load("sheets", "v4");
-      logTrace("GAPI Ready. (v3-17)");
+      logTrace("GAPI Ready. (v3-18)");
     });
   }
 
@@ -973,11 +993,10 @@
       scope: "https://www.googleapis.com/auth/spreadsheets",
       callback: () => {}
     });
-    logTrace("GIS Ready. (v3-17)");
+    logTrace("GIS Ready. (v3-18)");
   }
 
   function initRefresh(){
-    // Standard refresh: obtain token and then load lookup refs
     requestToken(true, () => fetchLookupRefs());
   }
 
@@ -1004,7 +1023,6 @@
     const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
     const age = (Date.now() - issuedAt) / 1000;
 
-    // v3-17: only prompt if missing/expired
     if (tok && issuedAt && exp && age < (exp - 60)){
       gapi.client.setToken({ access_token: tok });
       onOk();
@@ -1056,11 +1074,10 @@
     if (!d.length){ alert("No Staging records."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-17)");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-18)");
 
     ensureTokenThen(async () => {
       try{
-        // v3-17: first empty A from A2 downward
         const meta = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "'" + SHEET_TAB + "'!A2:A"
@@ -1071,19 +1088,13 @@
         const vls = d.map(r => {
           const rc = [...r];
 
-          // date ISO -> dd/mm/yyyy
           if (rc[2]){
             const dp = rc[2].split("-");
             rc[2] = dp[2] + "/" + dp[1] + "/" + dp[0];
           }
 
-          // code fields: keep first token
           [1,5,11,14,23,25].forEach(i => { rc[i] = (rc[i] || "").split(" ")[0]; });
-
-          // accounts: remove (AA)
           [7,8].forEach(i => { rc[i] = String(rc[i] || "").replace(/ \(AA\)/g, ""); });
-
-          // numeric
           [19,21,22].forEach(i => { rc[i] = parseFloat(rc[i] || 0); });
 
           return rc;
@@ -1097,11 +1108,11 @@
         });
 
         updateStatus("Token Active", "active");
-        logTrace("Sync complete. StartRow=" + startRow + " (v3-17)");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-18)");
         alert("Sync completed.");
       }catch(e){
         updateStatus("Sync error", "error");
-        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-17)");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-18)");
         alert("Sync failed. Trace log contains details.");
       }
     });
@@ -1123,6 +1134,7 @@
   async function boot(){
     document.getElementById("colC").value = new Date().toISOString().split("T")[0];
     handleDateChange();
+    // v3-18: local reset on refresh ensures defaults (Each/Fees cleared, Multiplier=1, etc.)
     localReset();
     renderPreview();
 
@@ -1130,14 +1142,14 @@
       await waitFor(() => typeof gapi !== "undefined", 8000);
       gapiLoaded();
     }catch(_){
-      logTrace("GAPI not available. (v3-17)");
+      logTrace("GAPI not available. (v3-18)");
     }
 
     try{
       await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
       gisLoaded();
     }catch(_){
-      logTrace("GIS not available. (v3-17)");
+      logTrace("GIS not available. (v3-18)");
     }
   }
 
