@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-55</title>
+<title>EBS Input v3-56</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -44,7 +44,7 @@
       width:100%; padding:8px; border:1px solid #dcdde1; border-radius:6px; font-size:16px;
       box-sizing:border-box; height:38px; -webkit-text-size-adjust:100%; font-family:inherit;
     }
-    /* v3-55: compact numeric inputs */
+    /* v3-56: compact numeric inputs */
     #colT,#colV,#colM{ padding:6px; }
     #colM{ text-align:center; }
     .currency-side select{width:100%; min-width:0; text-align:center; text-align-last:center;}
@@ -63,7 +63,7 @@
       height:38px; line-height:36px; border:1px solid #dcdde1; border-radius:6px;
       background:#f1f2f6; box-sizing:border-box;
     }
-    /* v3-55: Total + Chk row (single dashed total; single circle) */
+    /* v3-56: Total + Chk row (single dashed total; single circle) */
     
     .total-row{display:grid; grid-template-columns: 72px 1fr 92px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
     .cur-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; top:-1px;}
@@ -77,7 +77,7 @@
     .currency-side select{ padding:8px 6px; }
 
 
-    /* v3-55: Chk flag = single circle, no outer box outline; full area remains tappable */
+    /* v3-56: Chk flag = single circle, no outer box outline; full area remains tappable */
     .chk-wrap{
       width:92px; flex:0 0 92px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -103,7 +103,7 @@
       border-color: var(--bridge);
     }
 
-    /* v3-55: Staging table chk toggle (dot only) */
+    /* v3-56: Staging table chk toggle (dot only) */
     .stg-chk-toggle{
       width:18px; height:18px; border-radius:50%;
       border:2px solid #9aa7b3; background:transparent;
@@ -115,7 +115,7 @@
       box-shadow:inset 0 2px 4px rgba(0,0,0,0.22);
     }
 
-    /* v3-55: Total box shorter */
+    /* v3-56: Total box shorter */
     .total-box{background:#e8f5e9; border:2px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
     .total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
 
@@ -130,7 +130,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    /* v3-55 sizing in ch units based on longest observed option strings. */
+    /* v3-56 sizing in ch units based on longest observed option strings. */
     .w-edit{ width:38px; text-align:center; }
     .w-group{ width:12ch; }
     .w-type{ width:14ch; }
@@ -164,13 +164,13 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
     .btn-calc-trigger svg{ width:18px; height:18px; display:block; }
     
-    /* v3-55: lock grid widths to container (prevents overflow on iPhone/desktop) */
+    /* v3-56: lock grid widths to container (prevents overflow on iPhone/desktop) */
     #row_each_grid{ width:100%; grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.8fr) !important; }
     #row_each_grid .calc-input-wrap{ min-width:0; }
     #row_each_grid input, #row_each_grid select{ min-width:0; }
 .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;}
 
-    /* v3-55: iPhone layout tuning */
+    /* v3-56: iPhone layout tuning */
 @media (max-width: 430px){
   #row_each_grid{ grid-template-columns:2.6fr 1.3fr 0.9fr; gap:6px; }
   .calc-input-wrap{ gap:5px; }
@@ -181,7 +181,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   .actions{ gap:6px; }
   button.action-main{ min-height:54px; padding:8px 10px; }
 }
-/* v3-55: modal overlay (Flow + Calculator + Note) */
+/* v3-56: modal overlay (Flow + Calculator + Note) */
     .modal{
       display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
       background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
@@ -215,7 +215,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     .calc-key.danger{ background:#f7e6e3; color:#8b2f24; }
     .calc-key.eq{ background:#4f7fb8; color:#fff; grid-column:3 / span 2; width:100%; }
       
-    /* v3-55: Searchable picker modal (From/To/Category on iPhone) */
+    /* v3-56: Searchable picker modal (From/To/Category on iPhone) */
     #pick_list{
       margin-top:10px; border:1px solid #dcdde1; border-radius:10px; max-height:55vh; overflow-y:auto;
     }
@@ -237,24 +237,24 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
       padding:14px 10px; color:#7f8c8d; font-weight:800; text-align:center;
     }
 
-/* v3-55: Chk toggle dot-only */
-/* v3-55 UI restore + chk + note delete */
+/* v3-56: Chk toggle dot-only */
+/* v3-56 UI restore + chk + note delete */
 #colK{ height:38px; resize:none; overflow-x:auto; overflow-y:hidden; white-space:pre; }
 .note-row{ display:flex; gap:8px; align-items:stretch; }
 .note-del-btn{ height:38px; width:44px; border:none; border-radius:10px; background:var(--danger); color:#fff; font-weight:900; font-size:1.1rem; cursor:pointer; }
 
 
-/* v3-55: actions sizing restored to v3-55 */
+/* v3-56: actions sizing restored to v3-56 */
 .actions{ display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:8px; width:100%; }
 button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weight:900; cursor:pointer; color:#fff; font-size:0.72rem; -webkit-font-smoothing:antialiased; min-height:52px; }
 
-/* v3-55: Total display centred */
-/* v3-55: Chk control text inside box */
+/* v3-56: Total display centred */
+/* v3-56: Chk control text inside box */
 .chk-txt{ font-size:0.62rem; font-weight:900; color:#4d5a66; line-height:1.0; }
 .chk-top{ font-size:0.7rem; font-weight:800; line-height:1; }
 .chk-bottom{ font-size:0.7rem; font-weight:800; line-height:1; }
 
-/* v3-55: Note modal delete button positioned like input Note field */
+/* v3-56: Note modal delete button positioned like input Note field */
 .note-modal-body{
   display:flex;
   gap:10px;
@@ -267,16 +267,16 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .note-del-btn{ height:38px; width:44px; border:none; border-radius:10px; background:var(--danger); color:#fff; font-weight:900; font-size:1.1rem; cursor:pointer; }
 
 
-    /* v3-55: compact single-line Note fields */
+    /* v3-56: compact single-line Note fields */
     .note-input{ height:38px; resize:none; overflow-y:auto; overflow-x:hidden; }
     .note-input::-webkit-scrollbar{ height:6px; }
   
-/* v3-55: tighten Total + chk row to standard control height */
+/* v3-56: tighten Total + chk row to standard control height */
 .total-row{display:grid; grid-template-columns: 72px 1fr 92px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
 .total-box{background:#e8f5e9; border:2px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
 .total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
 
-/* v3-55: compact chk flag control (single circle, pressed blue) */
+/* v3-56: compact chk flag control (single circle, pressed blue) */
 .chk-wrap{
   width:78px;
   display:flex;
@@ -311,10 +311,10 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   box-shadow:inset 0 2px 4px rgba(0,0,0,0.25);
 }
 
-/* v3-55: keep Currency value centered */
+/* v3-56: keep Currency value centered */
 #colX{ text-align:center; text-align-last:center; }
 
-/* v3-55: slightly increase spacing after total row without changing other rows */
+/* v3-56: slightly increase spacing after total row without changing other rows */
 .total-row + .actions{ margin-top:10px; }
 
 </style>
@@ -322,7 +322,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-55</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-56</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -425,9 +425,9 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-55 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-56 Logic Circuit Breaker active.</div>
 </div>
-<!-- v3-55 Flow modal (forced overlay) -->
+<!-- v3-56 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
 <div class="modal-content">
 <div class="modal-title">Flow cannot be determined</div>
@@ -457,7 +457,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     </div>
   </div>
 </div>
-<!-- v3-55 Calculator modal -->
+<!-- v3-56 Calculator modal -->
 <div class="modal" id="calc_modal">
 <div class="modal-content">
 <div class="modal-title">Calculator</div>
@@ -493,7 +493,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 </div>
 </div>
 </div>
-<!-- v3-55: Searchable picker modal (From / To / Category on iPhone) -->
+<!-- v3-56: Searchable picker modal (From / To / Category on iPhone) -->
 <div class="modal" id="pick_modal">
 <div class="modal-content">
 <div class="modal-title" id="pick_title">Select</div>
@@ -508,8 +508,8 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-55)";
-  // v3-55: Support category detection must be dynamic and strict.
+  const VER = "Excel Budget Sheet Input (v3-56)";
+  // v3-56: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
 
@@ -527,14 +527,14 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   let resetConfirmed = false;
   let isRestoring = false;
 
-  // v3-55: Chk toggle state (stored into column S when staging)
+  // v3-56: Chk toggle state (stored into column S when staging)
   let chkFlag = false;
 
-  // v3-55: Calculator state (supports Each + Fees)
+  // v3-56: Calculator state (supports Each + Fees)
   let calcTargetFieldId = "colT";
   let calcLastApplied = "0";
 
-  // v3-55: Flow modal context to ensure first selection is committed reliably
+  // v3-56: Flow modal context to ensure first selection is committed reliably
   let flowPendingAction = null; // "create" | "edit"
 
   const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
@@ -542,21 +542,21 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   function logTrace(msg){
     const log = document.getElementById("trace_log");
     const now = new Date().toLocaleTimeString();
-    // v3-55: enforce newline separation from first append
+    // v3-56: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-55 Logic Circuit Breaker active.";
+      : "Trace: v3-56 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
   }
 
-  // v3-55: fatal JS visibility
+  // v3-56: fatal JS visibility
   window.onerror = function(message, source, lineno, colno){
-    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-55)");
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-56)");
   };
   window.onunhandledrejection = function(ev){
-    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-55)");
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-56)");
   };
 
   function toggleLog(show){
@@ -591,7 +591,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     }
   }
 
-  // ---------- Rule helpers (v3-55) ----------
+  // ---------- Rule helpers (v3-56) ----------
   function setSelectByCode(selectEl, code){
     if (!selectEl) return;
     const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
@@ -622,7 +622,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
 
     localReset();
-    logTrace("Test Lookups loaded. (v3-55)");
+    logTrace("Test Lookups loaded. (v3-56)");
   }
 
   function cacheSave(){
@@ -631,7 +631,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
     localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
     localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
-    logTrace("Lookup cache saved. (v3-55)");
+    logTrace("Lookup cache saved. (v3-56)");
   }
 
   function cachePull(){
@@ -640,15 +640,15 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     if (!cached){ alert("No local Lookups found."); return; }
     rawLookupData = JSON.parse(cached);
     coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
-    // v3-55: validate cached coords to avoid swapped Type/Flow lists
+    // v3-56: validate cached coords to avoid swapped Type/Flow lists
     if (coordinateMap.Type && coordinateMap.Flow && coordinateMap.Type.val === coordinateMap.Flow.val){
       alert("Local Lookups invalid (Type/Flow mapping). Use Refresh Lookups from Sheets.");
-      logTrace("Local cache rejected: Type/Flow mapping conflict. (v3-55)");
+      logTrace("Local cache rejected: Type/Flow mapping conflict. (v3-56)");
       return;
     }
     AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
     populateUI(rawLookupData);
-    logTrace("Lookup cache pulled. (v3-55)");
+    logTrace("Lookup cache pulled. (v3-56)");
   }
 
   function populateUI(data){
@@ -666,7 +666,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     };
 
 
-    // v3-55: defensive swap if LookupRefs labels are inverted (Type showing Flow values).
+    // v3-56: defensive swap if LookupRefs labels are inverted (Type showing Flow values).
     if (coordinateMap["Type"] && coordinateMap["Flow"]){
       const flowSet = new Set(["xfer","In","zOut"]);
       const typeVals = (data || []).map(r => r[coordinateMap["Type"].val]).filter(v => v).slice(0, 80)
@@ -681,7 +681,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     }
 
     pop("colA","Grouping","Roy");
-    // v3-55: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
+    // v3-56: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
     if (coordinateMap["Type"]) pop("colB","Type","v");
     else pop("colB","F/U","v");
 
@@ -698,7 +698,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   // ---------- Reset / Init ----------
   function localReset(){
-    // v3-55: apply defaults on app refresh same as Reset button
+    // v3-56: apply defaults on app refresh same as Reset button
     editIndex = -1;
     pendingEdit = -1;
     flowPendingAction = null;
@@ -732,7 +732,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     rS("colZ","NEW");
     rS("colX","GBP");
 
-    // v3-55: ensure modals are closed on reset/refresh
+    // v3-56: ensure modals are closed on reset/refresh
     closeFlowModal();
     closeCalculator();
     closeNote();
@@ -741,7 +741,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
     calc();
     renderPreview();
-    logTrace("UI Fields Reset. (v3-55)");
+    logTrace("UI Fields Reset. (v3-56)");
   
   }
 
@@ -782,7 +782,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     btn.innerText = "Clear Staging records";
     localStorage.removeItem("ebs_trf");
     renderPreview();
-    logTrace("Staging wiped manually. (v3-55)");
+    logTrace("Staging wiped manually. (v3-56)");
   }
 
   // ---------- Field logic ----------
@@ -812,7 +812,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     const el = document.getElementById("colT");
     const raw = (el.value || "").trim();
     const num = parseFloat(raw);
-    // v3-55: clear if empty OR numeric zero; else keep and move cursor to end
+    // v3-56: clear if empty OR numeric zero; else keep and move cursor to end
     if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
       el.value = "";
       return;
@@ -874,7 +874,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
     document.getElementById("flowDisplay").innerText = flow;
 
-// v3-55: auto-set Type based on Flow (trigger: From/To change)
+// v3-56: auto-set Type based on Flow (trigger: From/To change)
 // - If Flow is In  => Type = I (income)
 // - If Flow is zOut => Type = v (variable)
 // Support Category keeps Type=S (set by Category rule) and must not be overwritten here.
@@ -947,8 +947,8 @@ if (!isSupportCategory(catNow) && typeSel){
     const from = document.getElementById("colH").value;
     const to = document.getElementById("colI").value;
 
-    // v3-55: Who only for support categories
-    const who = isSupportCategory(category) ? grouping : ""; // v3-55 explicit Support membership
+    // v3-56: Who only for support categories
+    const who = isSupportCategory(category) ? grouping : ""; // v3-56 explicit Support membership
 
     const rec = Array(35).fill("");
     rec[0] = grouping;
@@ -979,7 +979,7 @@ if (!isSupportCategory(catNow) && typeSel){
   }
 
   function guidanceIfNoLookups(){
-    // v3-55: message policy
+    // v3-56: message policy
     // - if required dropdowns are empty/unpopulated after refresh, provide guidance
     const colF = document.getElementById("colF");
     const colH = document.getElementById("colH");
@@ -993,18 +993,18 @@ if (!isSupportCategory(catNow) && typeSel){
   }
 
   function handleMainAction(){
-    logTrace("Action Triggered. (v3-55)");
+    logTrace("Action Triggered. (v3-56)");
 
     if (guidanceIfNoLookups()) return;
 
-    // v3-55: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
+    // v3-56: If edit is in confirm ("...") or active ("C"), allow Create to clone that row and abandon edit
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
     if (pendingEdit !== -1 || editIndex !== -1){
       const cloneIdx = (editIndex !== -1) ? editIndex : pendingEdit;
       if (masterList[cloneIdx]){
         masterList.push([...masterList[cloneIdx]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-55)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-56)");
         localReset();
         return;
       }
@@ -1021,7 +1021,7 @@ if (!isSupportCategory(catNow) && typeSel){
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "create"; // v3-55
+      flowPendingAction = "create"; // v3-56
       openFlowModal();
       return;
     }
@@ -1030,8 +1030,8 @@ if (!isSupportCategory(catNow) && typeSel){
     masterList.push(finalPackage);
 
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: New Record Appended. (v3-55)");
-    logTrace("Storage Synced. (v3-55)");
+    logTrace("Logic Update: New Record Appended. (v3-56)");
+    logTrace("Storage Synced. (v3-56)");
 
     localReset();
   }
@@ -1044,7 +1044,7 @@ if (!isSupportCategory(catNow) && typeSel){
       pendingEdit = idx;
       editIndex = -1;
       renderPreview();
-      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-55)");
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-56)");
       return;
     }
 
@@ -1091,7 +1091,7 @@ if (!isSupportCategory(catNow) && typeSel){
 
     isRestoring = false;
     renderPreview();
-    logTrace("Active Edit: row " + (idx+1) + ". (v3-55)");
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-56)");
   }
 
   function commitEdit(){
@@ -1108,7 +1108,7 @@ if (!isSupportCategory(catNow) && typeSel){
 
     const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
     if (!flowV || flowV === "--"){
-      flowPendingAction = "edit"; // v3-55
+      flowPendingAction = "edit"; // v3-56
       openFlowModal();
       return;
     }
@@ -1118,14 +1118,14 @@ if (!isSupportCategory(catNow) && typeSel){
 
     const updated = buildRecordFromUI();
 
-    // v3-55: preserve Who on overwrite when category is not support
-    if (!isSupportCategory(updated[5]) && existing){ // v3-55 explicit Support membership
+    // v3-56: preserve Who on overwrite when category is not support
+    if (!isSupportCategory(updated[5]) && existing){ // v3-56 explicit Support membership
       updated[33] = existing[33] || "";
     }
 
     masterList[editIndex] = updated;
     localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-55)");
+    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-56)");
 
     localReset();
   }
@@ -1151,7 +1151,7 @@ if (!isSupportCategory(catNow) && typeSel){
     d[idx][18] = (String(d[idx][18] || "").trim().toLowerCase() === "x") ? "" : "x";
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     renderPreview();
-    logTrace("Chk flag toggled for row " + (idx+1) + ". (v3-55)");
+    logTrace("Chk flag toggled for row " + (idx+1) + ". (v3-56)");
   }
 
 function renderPreview(){
@@ -1224,7 +1224,7 @@ function renderPreview(){
     });
 
     document.getElementById("previewArea").innerHTML = h + "</table>";
-    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-55)");
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-56)");
   }
 
   function deleteRow(i){
@@ -1234,12 +1234,12 @@ function renderPreview(){
     editIndex = -1;
     pendingEdit = -1;
     renderPreview();
-    logTrace("Row deleted: " + (i+1) + " (v3-55)");
+    logTrace("Row deleted: " + (i+1) + " (v3-56)");
   }
 
   // ---------- Note modal ----------
   function openNote(idx){
-    // v3-55: prevent staging-note edits during Edit mode
+    // v3-56: prevent staging-note edits during Edit mode
     if (editIndex !== -1){
       if (idx === editIndex){
         alert("Notes cannot be edited in the Staging table during edit; change Note only possible on the input screen during edit.");
@@ -1274,7 +1274,7 @@ function renderPreview(){
     localStorage.setItem("ebs_trf", JSON.stringify(d));
     closeNote();
     renderPreview();
-    logTrace("Note updated. (v3-55)");
+    logTrace("Note updated. (v3-56)");
   }
 
   function clearModalNoteConfirm(){
@@ -1293,7 +1293,7 @@ function renderPreview(){
     document.getElementById("flowDisplay").innerText = selected;
     closeFlowModal();
 
-    // v3-55: resume pending action deterministically
+    // v3-56: resume pending action deterministically
     if (flowPendingAction === "edit"){
       flowPendingAction = null;
       commitEdit();
@@ -1312,14 +1312,14 @@ function renderPreview(){
 
   // ---------- Calculator ----------
   function openCalculator(targetFieldId){
-    // v3-55: supports Each (colT) and Fees (colV)
+    // v3-56: supports Each (colT) and Fees (colV)
     calcTargetFieldId = targetFieldId || "colT";
     const targetEl = document.getElementById(calcTargetFieldId);
     const cur = (targetEl && targetEl.value ? String(targetEl.value) : "").trim();
     calcLastApplied = cur ? cur : "0";
     document.getElementById("calc_display").value = calcLastApplied;
     document.getElementById("calc_modal").style.display = "flex";
-    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-55)");
+    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-56)");
   }
   function closeCalculator(){
     document.getElementById("calc_modal").style.display = "none";
@@ -1354,7 +1354,7 @@ function renderPreview(){
       const out = Function('"use strict"; return (' + cleaned + ')')();
       if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
       const fixed = Number(out.toFixed(2));
-      logTrace("Calculator = " + fixed + " (v3-55)");
+      logTrace("Calculator = " + fixed + " (v3-56)");
       return fixed;
     }catch(_){
       alert("Invalid expression.");
@@ -1373,11 +1373,11 @@ function renderPreview(){
     }
     calc();
     closeCalculator();
-    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-55)");
+    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-56)");
   }
 
 
-  // ---------- Searchable picker modal (v3-55) ----------
+  // ---------- Searchable picker modal (v3-56) ----------
   let pickTargetId = null;
   let pickDebounce = null;
 
@@ -1391,7 +1391,7 @@ function renderPreview(){
 
 
   function isIPhoneModalPickerEnabled(){
-    // v3-55: enable searchable modal picker on all platforms (desktop + mobile)
+    // v3-56: enable searchable modal picker on all platforms (desktop + mobile)
     return true;
   }
 
@@ -1547,25 +1547,27 @@ function renderPreview(){
     document.getElementById("pick_modal").style.display = "flex";
     // Position list at current selection (or top if blank)
     setTimeout(() => { scrollPickToSelection(); }, 0);
-    // v3-55: always autofocus search input when picker opens (iPhone keyboard + cursor)
+    // v3-56: always autofocus search input when picker opens (iPhone keyboard + cursor)
     // Uses delayed focus attempts for iOS Safari/WebView reliability.
     const focusSearch = () => {
-      try{
-        inp.focus({ preventScroll: true });
-      }catch(_){
-        try{ inp.focus(); }catch(__){}
-      }
+      // iOS: try to focus within the user gesture, then retry a few times
+      try{ inp.click(); }catch(_){}
+      try{ inp.focus({ preventScroll: false }); }catch(_){ try{ inp.focus(); }catch(__){} }
       try{ inp.setSelectionRange(inp.value.length, inp.value.length); }catch(_){}
     };
-    setTimeout(focusSearch, 0);
-    setTimeout(focusSearch, 60);
-    setTimeout(focusSearch, 180);
+    focusSearch();
+    setTimeout(focusSearch, 80);
+    setTimeout(focusSearch, 220);
+    setTimeout(focusSearch, 450);
 
-    inp.oninput = () => {
-      if (pickDebounce) clearTimeout(pickDebounce);
-      pickDebounce = setTimeout(() => {
-        renderPickList(inp.value || "");
-      }, 200);
+    inp.addEventListener("input", () => {
+      renderPickList(inp.value || "");
+    });
+
+    // Keep iOS Safari/Opera from losing focus immediately after open
+    setTimeout(() => {
+      renderPickList(inp.value || "");
+    }, 200);
     };
   }
 
@@ -1650,7 +1652,7 @@ function renderPickList(query){
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
       await gapi.client.load("sheets", "v4");
-      logTrace("GAPI Ready. (v3-55)");
+      logTrace("GAPI Ready. (v3-56)");
     });
   }
 
@@ -1660,7 +1662,7 @@ function renderPickList(query){
       scope: "https://www.googleapis.com/auth/spreadsheets",
       callback: () => {}
     });
-    logTrace("GIS Ready. (v3-55)");
+    logTrace("GIS Ready. (v3-56)");
   }
 
   function initRefresh(){
@@ -1691,7 +1693,7 @@ function renderPickList(query){
     const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
     const age = (Date.now() - issuedAt) / 1000;
 
-    // v3-55: only prompt if missing/expired
+    // v3-56: only prompt if missing/expired
     if (tok && issuedAt && exp && age < (exp - 60)){
       gapi.client.setToken({ access_token: tok });
       onOk();
@@ -1745,11 +1747,11 @@ function renderPickList(query){
     if (!d.length){ alert("No Staging records."); return; }
 
     updateStatus("Syncing...", "sync");
-    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-55)");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-56)");
 
     ensureTokenThen(async () => {
       try{
-        // v3-55: first empty A from A2 downward
+        // v3-56: first empty A from A2 downward
         const meta = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "'" + SHEET_TAB + "'!A2:A"
@@ -1786,11 +1788,11 @@ function renderPickList(query){
         });
 
         updateStatus("Token Active", "active");
-        logTrace("Sync complete. StartRow=" + startRow + " (v3-55)");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-56)");
         alert("Sync completed.");
       }catch(e){
         updateStatus("Sync error", "error");
-        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-55)");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-56)");
         alert("Sync failed. Trace log contains details.");
       }
     });
@@ -1813,15 +1815,31 @@ function renderPickList(query){
     document.getElementById("colC").value = new Date().toISOString().split("T")[0];
     handleDateChange();
 
-    // v3-55: ensure UI starts usable even before lookups are pulled
+    // v3-56: ensure UI starts usable even before lookups are pulled
     localReset();
     renderPreview();
     initSearchPickers();
-    // v3-55: allow closing selection popups by clicking outside the dialog (Close button still available)
-    const __pm = document.getElementById("pick_modal");
-    if (__pm && !__pm.dataset.backdropBound){
-      __pm.dataset.backdropBound = "1";
-      __pm.addEventListener("click", (ev) => { if (ev.target === __pm) closePickModal(); });
+    // v3-56: allow closing selection popups by clicking outside the dialog (Close button still available)
+    const bindBackdropClose = (id, closeFn) => {
+      const m = document.getElementById(id);
+      if (!m || m.dataset.backdropBound) return;
+      m.dataset.backdropBound = "1";
+      const handler = (ev) => {
+        if (m.style.display !== "flex") return;
+        if (ev.target !== m) return;
+        try{ ev.preventDefault(); }catch(_){}
+        closeFn();
+      };
+      ["pointerdown","touchstart","mousedown","click"].forEach((t) => {
+        try{ m.addEventListener(t, handler, { passive:false }); }
+        catch(_){ m.addEventListener(t, handler); }
+      });
+    };
+
+    bindBackdropClose("pick_modal", closePickModal);
+    bindBackdropClose("calc_modal", closeCalculator);
+    bindBackdropClose("note_modal", closeNote);
+    bindBackdropClose("flow_modal", closeFlowModal);
     }
 
 
@@ -1829,20 +1847,20 @@ function renderPickList(query){
       await waitFor(() => typeof gapi !== "undefined", 8000);
       gapiLoaded();
     }catch(_){
-      logTrace("GAPI not available. (v3-55)");
+      logTrace("GAPI not available. (v3-56)");
     }
 
     try{
       await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
       gisLoaded();
     }catch(_){
-      logTrace("GIS not available. (v3-55)");
+      logTrace("GIS not available. (v3-56)");
     }
   }
 
   window.addEventListener("load", boot);
 
-  // v3-55: Note clear with confirm
+  // v3-56: Note clear with confirm
   function clearNoteConfirm(){
     const t = document.getElementById("colK");
     if (!t) return;
