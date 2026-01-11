@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-67</title>
+<title>EBS Input v3-68</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -65,7 +65,7 @@
     }
     /* v3-58: Total + Chk row (single dashed total; single circle) */
     
-    .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+    .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
     .cur-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; top:-4px; width:74px;}
     .cur-wrap label{width:100%; text-align:center; font-size:10px;}
     .cur-wrap select{width:68px; text-align-last:center; font-size:13px; height:30px; padding:5px 6px; margin:0 auto;}
@@ -178,7 +178,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   #row_each_grid{ grid-template-columns:2.6fr 1.3fr 0.9fr; gap:6px; }
   .calc-input-wrap{ gap:5px; }
   .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-4px;}
-  .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+  .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
   .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
   .chk-dot{width:28px; height:28px; border-radius:50%; border:2px solid #95a5a6; background:#fff; box-sizing:border-box; transition:transform .08s ease, background .08s ease, border-color .08s ease;}
   .actions{ gap:6px; }
@@ -280,7 +280,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     .note-input::-webkit-scrollbar{ height:6px; }
   
 /* v3-58: tighten Total + chk row to standard control height */
-.total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+.total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
 .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
 .total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
 
@@ -294,13 +294,13 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   user-select:none;
 }
 .chk-top,.chk-bottom{
-  font-size:0.7rem;
+  font-size:10px;
   font-weight:800;
   color:var(--primary);
-  line-height:1.05;
+  line-height:1;
 }
-.chk-top{ margin-bottom:6px; }
-.chk-bottom{ margin-top:6px; }
+.chk-top{ margin-bottom:3px; }
+.chk-bottom{ margin-top:3px; }
 
 .chk-toggle{
   width:22px;
@@ -325,7 +325,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 /* v3-58: slightly increase spacing after total row without changing other rows */
 .total-row + .actions{ margin-top:10px; }
 
-/* v3-67: visual balance - shift Currency + Total right edge left */
+/* v3-68: visual balance - shift Currency + Total right edge left */
 .cur-wrap{ transform: translateX(-4px); }
 .total-box{ margin-right:4px; }
 
@@ -335,7 +335,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-67</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-68</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -442,7 +442,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-67 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-68 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -529,7 +529,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-67)";
+  const VER = "Excel Budget Sheet Input (v3-68)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -566,7 +566,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-67 Logic Circuit Breaker active.";
+      : "Trace: v3-68 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
