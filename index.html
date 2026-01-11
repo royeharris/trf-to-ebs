@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-70</title>
+<title>EBS Input v3-71</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -89,7 +89,7 @@
     .chk-txt.chk-bottom{ margin-top:4px; }
 
     .chk-toggle{
-      width:26px; height:26px;
+      width:14px; height:14px;
       border-radius:50%;
       border:2px solid #9aa7b3;
       background:transparent;
@@ -106,7 +106,7 @@
 
     /* v3-58: Staging table chk toggle (dot only) */
     .stg-chk-toggle{
-      width:18px; height:18px; border-radius:50%;
+      width:14px; height:14px; border-radius:50%;
       border:2px solid #9aa7b3; background:transparent;
       display:inline-block; cursor:pointer; padding:0; margin:0;
       box-sizing:border-box;
@@ -325,7 +325,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 /* v3-58: slightly increase spacing after total row without changing other rows */
 .total-row + .actions{ margin-top:10px; }
 
-/* v3-70: visual balance - shift Currency + Total right edge left */
+/* v3-71: visual balance - shift Currency + Total right edge left */
 .cur-wrap{ transform: translateX(-4px); }
 .total-box{ margin-right:4px; }
 
@@ -335,7 +335,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-70</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-71</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -442,7 +442,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-70 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-71 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -529,7 +529,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-70)";
+  const VER = "Excel Budget Sheet Input (v3-71)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -566,7 +566,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-70 Logic Circuit Breaker active.";
+      : "Trace: v3-71 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -1018,7 +1018,7 @@ logTrace("Action Triggered. (v3-58)");
 
     if (guidanceIfNoLookups()) return;
 
-    // v3-70: Create is allowed during edit states:
+    // v3-71: Create is allowed during edit states:
 // - If confirm pending ("..."): clone that staging row and abandon edit.
 // - If active edit ("C"): create NEW row from current UI values (after validation) and abandon edit.
     const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
@@ -1027,7 +1027,7 @@ logTrace("Action Triggered. (v3-58)");
       if (masterList[pendingEdit]){
         masterList.push([...masterList[pendingEdit]]);
         localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-        logTrace("Edit abandoned; record cloned into new staged row. (v3-70)");
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-71)");
         localReset();
         return;
       }
@@ -1045,7 +1045,7 @@ logTrace("Action Triggered. (v3-58)");
 
       const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
       if (!flowV || flowV === "--"){
-        flowPendingAction = "create"; // v3-70
+        flowPendingAction = "create"; // v3-71
         openFlowModal();
         return;
       }
@@ -1053,7 +1053,7 @@ logTrace("Action Triggered. (v3-58)");
       const finalPackage = buildRecordFromUI(); // uses current UI (edited) values
       masterList.push(finalPackage);
       localStorage.setItem("ebs_trf", JSON.stringify(masterList));
-      logTrace("Edit abandoned; NEW record created from current UI values. (v3-70)");
+      logTrace("Edit abandoned; NEW record created from current UI values. (v3-71)");
       localReset();
       return;
     }
