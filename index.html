@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-64</title>
+<title>EBS Input v3-65</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -68,7 +68,7 @@
     .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
     .cur-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; top:-4px; width:74px;}
     .cur-wrap label{width:100%; text-align:center; font-size:10px;}
-    .cur-wrap select{width:74px; text-align-last:center; font-size:13px; height:30px; padding:5px 6px;}
+    .cur-wrap select{width:68px; text-align-last:center; font-size:13px; height:30px; padding:5px 6px; margin:0 auto;}
 
 
     .currency-side{width:84px; margin-left:6px;}
@@ -128,7 +128,9 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     table{
       min-width:1500px; width:1500px; border-collapse:collapse; font-size:0.58rem; table-layout:fixed; font-family:inherit;
     }
-    th,td{ border:1px solid #eee; padding:6px 4px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    th,td{ border:1px solid #eee; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    th{ padding:6px 4px; }
+    td{ padding:4px 3px; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
     /* v3-58 sizing in ch units based on longest observed option strings. */
@@ -244,7 +246,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .note-row{ display:flex; gap:8px; align-items:stretch; }
 .del-stack{ height:38px; width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .del-top,.del-bottom{ font-size:10px; line-height:1; font-weight:700; color:#333; }
-.del-btn-small{ height:16px; width:16px; border:none; border-radius:50%; background:var(--danger); color:#fff; font-weight:900; font-size:12px; line-height:16px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.del-btn-small{ height:14px; width:14px; border:none; border-radius:50%; background:var(--danger); color:#fff; font-weight:900; font-size:11px; line-height:14px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .note-del-btn:not(.del-btn-small){ all:unset; display:flex; align-items:center; justify-content:center; }
 
 
@@ -327,7 +329,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-64</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-65</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -434,7 +436,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-64 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-65 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -521,7 +523,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-64)";
+  const VER = "Excel Budget Sheet Input (v3-65)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -558,7 +560,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-64 Logic Circuit Breaker active.";
+      : "Trace: v3-65 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
