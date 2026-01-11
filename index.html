@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-68</title>
+<title>EBS Input v3-69</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -325,7 +325,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 /* v3-58: slightly increase spacing after total row without changing other rows */
 .total-row + .actions{ margin-top:10px; }
 
-/* v3-68: visual balance - shift Currency + Total right edge left */
+/* v3-69: visual balance - shift Currency + Total right edge left */
 .cur-wrap{ transform: translateX(-4px); }
 .total-box{ margin-right:4px; }
 
@@ -335,7 +335,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-68</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-69</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -435,14 +435,14 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
 
     <div class="actions">
-<button class="action-main" onclick="checkEditState(() => handleMainAction())" style="background:var(--accent);">Create Staging record</button>
+<button class="action-main" onclick="handleMainAction()" style="background:var(--accent);">Create Staging record</button>
 <button class="action-main" id="sync_btn" onclick="checkEditState(() =&gt; handleSync())" style="background:var(--bridge);">Send Staging records to Sheets</button>
 <button class="action-main" id="wipeBtn" onclick="checkEditState(() => handleWipeConfirm())" style="background:var(--danger); opacity:0.85;">Clear Staging records</button>
 </div>
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-68 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-69 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -529,7 +529,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-68)";
+  const VER = "Excel Budget Sheet Input (v3-69)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -566,7 +566,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-68 Logic Circuit Breaker active.";
+      : "Trace: v3-69 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -1014,12 +1014,7 @@ if (!isSupportCategory(catNow) && typeSel){
   }
 
   function handleMainAction(){
-    if (pendingEdit !== -1 || editIndex !== -1){
-      alert("Function locked during Edit.");
-      return;
-    }
-
-    logTrace("Action Triggered. (v3-58)");
+logTrace("Action Triggered. (v3-58)");
 
     if (guidanceIfNoLookups()) return;
 
