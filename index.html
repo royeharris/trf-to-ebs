@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-65</title>
+<title>EBS Input v3-66</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -130,7 +130,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     }
     th,td{ border:1px solid #eee; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     th{ padding:6px 4px; }
-    td{ padding:4px 3px; }
+    td{ padding:2px 3px; }
     th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
     /* v3-58 sizing in ch units based on longest observed option strings. */
@@ -247,6 +247,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .del-stack{ height:38px; width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .del-top,.del-bottom{ font-size:10px; line-height:1; font-weight:700; color:#333; }
 .del-btn-small{ height:14px; width:14px; border:none; border-radius:50%; background:var(--danger); color:#fff; font-weight:900; font-size:11px; line-height:14px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.stg-del-btn{ margin:0 auto; }
 .note-del-btn:not(.del-btn-small){ all:unset; display:flex; align-items:center; justify-content:center; }
 
 
@@ -324,12 +325,17 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 /* v3-58: slightly increase spacing after total row without changing other rows */
 .total-row + .actions{ margin-top:10px; }
 
+/* v3-66: visual balance - shift Currency + Total right edge left */
+.cur-wrap{ transform: translateX(-4px); }
+.total-box{ margin-right:4px; }
+
+
 </style>
 </head>
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-65</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-66</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -436,7 +442,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-65 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-66 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -523,7 +529,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-65)";
+  const VER = "Excel Budget Sheet Input (v3-66)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -560,7 +566,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-65 Logic Circuit Breaker active.";
+      : "Trace: v3-66 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -1216,7 +1222,7 @@ function renderPreview(){
       const noteIcon = r[10] ? "📄" : "▫️";
 
       h += "<tr>"
-        + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:4px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
+        + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:2px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
         + '<td class="w-group">' + (r[0] || "") + "</td>"
         + '<td class="w-type">' + (r[1] || "") + "</td>"
         + '<td class="w-day">' + dNam + "</td>"
@@ -1234,7 +1240,7 @@ function renderPreview(){
         + '<td class="w-tot">' + (r[22] || "") + "</td>"
         + '<td class="w-mnth">' + (r[25] || "") + "</td>"
         + '<td class="w-who">' + (r[33] || "") + "</td>"
-        + '<td class="w-del"><div class="del-stack"><div class="del-top">DEL</div><button type="button" class="del-btn-small" onclick="deleteRow(' + idx + ')">x</button><div class="del-bottom">text</div></div></td>'
+        + '<td class="w-del"><button type="button" class="del-btn-small stg-del-btn" onclick="deleteRow(' + idx + ')">x</button></td>'
         + "</tr>";
     });
 
