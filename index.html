@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-62</title>
+<title>EBS Input v3-63</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -65,10 +65,10 @@
     }
     /* v3-58: Total + Chk row (single dashed total; single circle) */
     
-    .total-row{display:grid; grid-template-columns: 72px 1fr 92px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+    .total-row{display:grid; grid-template-columns: 72px 1fr 84px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
     .cur-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; top:-4px;}
-    .cur-wrap label{width:100%; text-align:center; font-size:13px;}
-    .cur-wrap select{text-align-last:center; font-size:14px; height:34px; padding:6px 6px;}
+    .cur-wrap label{width:100%; text-align:center; font-size:10px;}
+    .cur-wrap select{text-align-last:center; font-size:13px; height:30px; padding:5px 6px;}
 
 
     .currency-side{width:84px; margin-left:6px;}
@@ -161,7 +161,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
     .calc-input-wrap{ display:flex; align-items:center; gap:6px; }
     .calc-input-wrap input{ flex:1 1 auto; min-width:0; position:relative; z-index:1; }
-    .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+    .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-2px;}
 
     .btn-calc-trigger svg{ width:18px; height:18px; display:block; }
     
@@ -169,14 +169,14 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     #row_each_grid{ width:100%; grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.8fr) !important; }
     #row_each_grid .calc-input-wrap{ min-width:0; }
     #row_each_grid input, #row_each_grid select{ min-width:0; }
-.btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+.btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-2px;}
 
     /* v3-58: iPhone layout tuning */
 @media (max-width: 430px){
   #row_each_grid{ grid-template-columns:2.6fr 1.3fr 0.9fr; gap:6px; }
   .calc-input-wrap{ gap:5px; }
-  .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;}
-  .total-row{display:grid; grid-template-columns: 72px 1fr 92px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+  .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-2px;}
+  .total-row{display:grid; grid-template-columns: 72px 1fr 84px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
   .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
   .chk-dot{width:28px; height:28px; border-radius:50%; border:2px solid #95a5a6; background:#fff; box-sizing:border-box; transition:transform .08s ease, background .08s ease, border-color .08s ease;}
   .actions{ gap:6px; }
@@ -244,7 +244,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .note-row{ display:flex; gap:8px; align-items:stretch; }
 .del-stack{ height:38px; width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .del-top,.del-bottom{ font-size:10px; line-height:1; font-weight:700; color:#333; }
-.del-btn-small{ height:18px; width:22px; border:none; border-radius:8px; background:var(--danger); color:#fff; font-weight:900; font-size:0.9rem; line-height:18px; padding:0; cursor:pointer; }
+.del-btn-small{ height:18px; width:18px; border:none; border-radius:9px; background:var(--danger); color:#fff; font-weight:900; font-size:0.9rem; line-height:18px; padding:0; cursor:pointer; }
 .note-del-btn{ all:unset; display:flex; align-items:center; justify-content:center; }
 
 
@@ -269,7 +269,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .note-modal-body textarea{
   flex:1;
 }
-.note-del-btn{ height:38px; width:44px; border:none; border-radius:10px; background:var(--danger); color:#fff; font-weight:900; font-size:1.1rem; cursor:pointer; }
+.note-del-btn:not(.del-btn-small){ height:38px; width:44px; border:none; border-radius:10px; background:var(--danger); color:#fff; font-weight:900; font-size:1.1rem; cursor:pointer; }
 
 
     /* v3-58: compact single-line Note fields */
@@ -277,7 +277,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     .note-input::-webkit-scrollbar{ height:6px; }
   
 /* v3-58: tighten Total + chk row to standard control height */
-.total-row{display:grid; grid-template-columns: 72px 1fr 92px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
+.total-row{display:grid; grid-template-columns: 72px 1fr 84px; column-gap:8px; align-items:center; margin:8px 0 8px 0;}
 .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
 .total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
 
@@ -327,7 +327,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-62</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-63</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -434,7 +434,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-62 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-63 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -521,7 +521,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-62)";
+  const VER = "Excel Budget Sheet Input (v3-63)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -558,7 +558,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-62 Logic Circuit Breaker active.";
+      : "Trace: v3-63 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
