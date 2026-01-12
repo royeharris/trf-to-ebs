@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-73</title>
+<title>EBS Input v3-74</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -59,7 +59,7 @@
     }
 
     .flow-display{
-      font-size:0.85rem; font-weight:800; color:var(--primary); text-align:center;
+      font-size:0.85rem; font-weight: 400; color:var(--primary); text-align:center;
       height:38px; line-height:36px; border:1px solid #dcdde1; border-radius:6px;
       background:#f1f2f6; box-sizing:border-box;
     }
@@ -166,6 +166,12 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-4px;}
 
     .btn-calc-trigger svg{ width:18px; height:18px; display:block; }
+
+    /* v3-74: SVG icons (avoid iOS charset mojibake for emoji) */
+    .ico{display:inline-flex; align-items:center; justify-content:center; color:var(--primary);}
+    .cal-svg{width:16px; height:16px; display:block; fill:currentColor;}
+    .note-svg{width:16px; height:16px; display:inline-block; vertical-align:middle; fill:currentColor;}
+
     
     /* v3-58: lock grid widths to container (prevents overflow on iPhone/desktop) */
     #row_each_grid{ width:100%; grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.8fr) !important; }
@@ -330,7 +336,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .total-box{ margin-right:4px; }
 
 
-/* v3-73: iOS double-tap zoom guard (Reset + Clear Staging records) */
+/* v3-74: iOS double-tap zoom guard (Reset + Clear Staging records) */
 #resetBtn,
 #wipeBtn{
   touch-action: manipulation;
@@ -342,7 +348,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-73</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-74</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -357,7 +363,11 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div>
 <label>Date</label>
 <div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
-<span>ð</span><input id="colC" onchange="handleDateChange()" type="date"/>
+<span class="ico" aria-hidden="true">
+<svg class="cal-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+<path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8H4.5v9.5c0 .276.224.5.5.5h14.5c.276 0 .5-.224.5-.5V10ZM6 6H4.5a.5.5 0 0 0-.5.5V8h16V6.5a.5.5 0 0 0-.5-.5H18v1a1 1 0 1 1-2 0V6H8v1a1 1 0 1 1-2 0V6Z"></path>
+</svg>
+</span><input id="colC" onchange="handleDateChange()" type="date"/>
 </div>
 <div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
 </div>
@@ -431,7 +441,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
       </div>
 
       <div class="total-box">
-        <div class="total-val"><span id="symbol">Â£</span> <span id="totalDisp">0.00</span></div>
+        <div class="total-val"><span id="symbol">&pound;</span> <span id="totalDisp">0.00</span></div>
       </div>
 
       <div class="cur-wrap">
@@ -449,7 +459,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-73 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-74 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -536,7 +546,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-73)";
+  const VER = "Excel Budget Sheet Input (v3-74)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -565,7 +575,11 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   // v3-58: Flow modal context to ensure first selection is committed reliably
   let flowPendingAction = null; // "create" | "edit"
 
-  const symbols = { "GBP":"Â£","EUR":"â¬","USD":"$","ZAR":"R","CHF":"Fr","THB":"à¸¿","RUR":"â½","COP":"COL$" };
+  const symbolsHtml = { "GBP":"&pound;","EUR":"&euro;","USD":"$","ZAR":"R","CHF":"Fr","THB":"&#3647;","RUR":"&#8381;","COP":"COL$" };
+
+  const ICON_NOTE = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0-8a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H8Z"></path></svg>';
+  const ICON_NOTE_EMPTY = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z"></path></svg>';
+
 
   function logTrace(msg){
     const log = document.getElementById("trace_log");
@@ -573,7 +587,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-73 Logic Circuit Breaker active.";
+      : "Trace: v3-74 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -831,7 +845,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     const tot = ((t*u) + v).toFixed(2);
 
     const curCode = (document.getElementById("colX").value || "GBP").split(" ")[0];
-    document.getElementById("symbol").innerText = symbols[curCode] || "Â£";
+    document.getElementById("symbol").innerHTML = symbolsHtml[curCode] || "&pound;";
     document.getElementById("totalDisp").innerText = tot;
     return tot;
   }
@@ -1252,7 +1266,7 @@ function renderPreview(){
       }
 
       const curCode = (r[23] || "").split(" ")[0];
-      const noteIcon = r[10] ? "ð" : "â«ï¸";
+      const noteIcon = r[10] ? ICON_NOTE : ICON_NOTE_EMPTY;
 
       h += "<tr>"
         + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:2px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
@@ -1700,7 +1714,7 @@ function renderPickList(query){
   }
   
 
-  // v3-73: iOS Safari double-tap zoom guard for Reset + Clear Staging records
+  // v3-74: iOS Safari double-tap zoom guard for Reset + Clear Staging records
   // Goal: allow fast double-tap to register as 2 button presses (confirm flows) instead of zooming the page.
   function installDoubleTapGuard(){
     const ids = ["resetBtn","wipeBtn"];
