@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-72</title>
+<title>EBS Input v3-73</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -330,12 +330,19 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 .total-box{ margin-right:4px; }
 
 
+/* v3-73: iOS double-tap zoom guard (Reset + Clear Staging records) */
+#resetBtn,
+#wipeBtn{
+  touch-action: manipulation;
+}
+
+
 </style>
 </head>
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-72</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-73</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -350,7 +357,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div>
 <label>Date</label>
 <div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
-<span>📅</span><input id="colC" onchange="handleDateChange()" type="date"/>
+<span>ð</span><input id="colC" onchange="handleDateChange()" type="date"/>
 </div>
 <div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
 </div>
@@ -424,7 +431,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
       </div>
 
       <div class="total-box">
-        <div class="total-val"><span id="symbol">£</span> <span id="totalDisp">0.00</span></div>
+        <div class="total-val"><span id="symbol">Â£</span> <span id="totalDisp">0.00</span></div>
       </div>
 
       <div class="cur-wrap">
@@ -442,7 +449,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-72 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-73 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -485,19 +492,19 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <input id="calc_display" inputmode="decimal"/>
 <div class="calc-grid">
 <button class="calc-key danger" onclick="calcKey('C')" type="button">C</button>
-<button class="calc-key op" onclick="calcKey('BK')" type="button">⌫</button>
+<button class="calc-key op" onclick="calcKey('BK')" type="button">â«</button>
 <button class="calc-key op" onclick="calcKey('%')" type="button">%</button>
-<button class="calc-key op" onclick="calcKey('/')" type="button">÷</button>
+<button class="calc-key op" onclick="calcKey('/')" type="button">Ã·</button>
 
 <button class="calc-key" onclick="calcKey('7')" type="button">7</button>
 <button class="calc-key" onclick="calcKey('8')" type="button">8</button>
 <button class="calc-key" onclick="calcKey('9')" type="button">9</button>
-<button class="calc-key op" onclick="calcKey('*')" type="button">×</button>
+<button class="calc-key op" onclick="calcKey('*')" type="button">Ã</button>
 
 <button class="calc-key" onclick="calcKey('4')" type="button">4</button>
 <button class="calc-key" onclick="calcKey('5')" type="button">5</button>
 <button class="calc-key" onclick="calcKey('6')" type="button">6</button>
-<button class="calc-key op" onclick="calcKey('-')" type="button">−</button>
+<button class="calc-key op" onclick="calcKey('-')" type="button">â</button>
 
 <button class="calc-key" onclick="calcKey('1')" type="button">1</button>
 <button class="calc-key" onclick="calcKey('2')" type="button">2</button>
@@ -529,7 +536,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-72)";
+  const VER = "Excel Budget Sheet Input (v3-73)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -558,7 +565,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   // v3-58: Flow modal context to ensure first selection is committed reliably
   let flowPendingAction = null; // "create" | "edit"
 
-  const symbols = { "GBP":"£","EUR":"€","USD":"$","ZAR":"R","CHF":"Fr","THB":"฿","RUR":"₽","COP":"COL$" };
+  const symbols = { "GBP":"Â£","EUR":"â¬","USD":"$","ZAR":"R","CHF":"Fr","THB":"à¸¿","RUR":"â½","COP":"COL$" };
 
   function logTrace(msg){
     const log = document.getElementById("trace_log");
@@ -566,7 +573,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-72 Logic Circuit Breaker active.";
+      : "Trace: v3-73 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -824,7 +831,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     const tot = ((t*u) + v).toFixed(2);
 
     const curCode = (document.getElementById("colX").value || "GBP").split(" ")[0];
-    document.getElementById("symbol").innerText = symbols[curCode] || "£";
+    document.getElementById("symbol").innerText = symbols[curCode] || "Â£";
     document.getElementById("totalDisp").innerText = tot;
     return tot;
   }
@@ -1245,7 +1252,7 @@ function renderPreview(){
       }
 
       const curCode = (r[23] || "").split(" ")[0];
-      const noteIcon = r[10] ? "📄" : "▫️";
+      const noteIcon = r[10] ? "ð" : "â«ï¸";
 
       h += "<tr>"
         + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:2px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
@@ -1399,8 +1406,8 @@ function renderPreview(){
   function safeEval(expr){
     try{
       const cleaned = (expr || "")
-        .replace(/×/g,"*")
-        .replace(/÷/g,"/")
+        .replace(/Ã/g,"*")
+        .replace(/Ã·/g,"/")
         .replace(/[^0-9+\-*/.%(). ]/g,"");
       // eslint-disable-next-line no-new-func
       const out = Function('"use strict"; return (' + cleaned + ')')();
@@ -1691,7 +1698,35 @@ function renderPickList(query){
       };
     });
   }
-  // ---------- Google auth / sync ----------
+  
+
+  // v3-73: iOS Safari double-tap zoom guard for Reset + Clear Staging records
+  // Goal: allow fast double-tap to register as 2 button presses (confirm flows) instead of zooming the page.
+  function installDoubleTapGuard(){
+    const ids = ["resetBtn","wipeBtn"];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // Redundant with CSS, but ensures inline precedence if CSS is overridden
+      try{ el.style.touchAction = "manipulation"; }catch(_){}
+
+      let lastTouchEnd = 0;
+      el.addEventListener("touchend", function(e){
+        const now = Date.now();
+
+        // If 2nd tap occurs quickly, prevent Safari zoom and force a normal click.
+        if (now - lastTouchEnd <= 350){
+          e.preventDefault();
+          try{ el.click(); }catch(_){}
+        }
+        lastTouchEnd = now;
+      }, { passive:false });
+    });
+  }
+
+
+// ---------- Google auth / sync ----------
   function gapiLoaded(){
     gapi.load("client", async () => {
       await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
@@ -1863,6 +1898,7 @@ function renderPickList(query){
     localReset();
     renderPreview();
     initSearchPickers();
+    installDoubleTapGuard();
     // v3-58: allow closing selection popups by clicking outside the dialog (Close button still available)
     const bindBackdropClose = (id, closeFn) => {
       const m = document.getElementById(id);
