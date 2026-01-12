@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>EBS Input v3-74</title>
+<title>EBS Input v3-75</title>
 <script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
 <script async="" defer="" src="https://apis.google.com/js/api.js"></script>
 <style>
@@ -171,6 +171,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     .ico{display:inline-flex; align-items:center; justify-content:center; color:var(--primary);}
     .cal-svg{width:16px; height:16px; display:block; fill:currentColor;}
     .note-svg{width:16px; height:16px; display:inline-block; vertical-align:middle; fill:currentColor;}
+    .note-svg-empty{width:12px; height:12px;}
 
     
     /* v3-58: lock grid widths to container (prevents overflow on iPhone/desktop) */
@@ -348,7 +349,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <body>
 <div class="container">
 <div class="header-wrap">
-<div class="branding-row"><b>EBS Input</b> <span>v3-74</span></div>
+<div class="branding-row"><b>EBS Input</b> <span>v3-75</span></div>
 <div class="header-btns">
 <button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
 <button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
@@ -459,7 +460,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 <div class="preview-wrap" id="previewArea"></div>
 <div id="auth_status">iOS Sync Status: Idle</div>
 <button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
-<div id="trace_log" onclick="toggleLog(false)">Trace: v3-74 Logic Circuit Breaker active.</div>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-75 Logic Circuit Breaker active.</div>
 </div>
 <!-- v3-58 Flow modal (forced overlay) -->
 <div class="modal" id="flow_modal">
@@ -546,7 +547,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
 
   const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
   const SHEET_TAB = "EBSinput";
-  const VER = "Excel Budget Sheet Input (v3-74)";
+  const VER = "Excel Budget Sheet Input (v3-75)";
   // v3-58: Support category detection must be dynamic and strict.
   // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
   function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
@@ -578,7 +579,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
   const symbolsHtml = { "GBP":"&pound;","EUR":"&euro;","USD":"$","ZAR":"R","CHF":"Fr","THB":"&#3647;","RUR":"&#8381;","COP":"COL$" };
 
   const ICON_NOTE = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0-8a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H8Z"></path></svg>';
-  const ICON_NOTE_EMPTY = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z"></path></svg>';
+  const ICON_NOTE_EMPTY = '<svg class="note-svg note-svg-empty" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5Z"></path></svg>';
 
 
   function logTrace(msg){
@@ -587,7 +588,7 @@ button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weigh
     // v3-58: enforce newline separation from first append
     const base = log.textContent && log.textContent.trim().length
       ? log.textContent
-      : "Trace: v3-74 Logic Circuit Breaker active.";
+      : "Trace: v3-75 Logic Circuit Breaker active.";
     log.textContent = base + "\n[" + now + "] " + msg;
     log.scrollTop = log.scrollHeight;
     console.log(msg);
@@ -1266,7 +1267,8 @@ function renderPreview(){
       }
 
       const curCode = (r[23] || "").split(" ")[0];
-      const noteIcon = r[10] ? ICON_NOTE : ICON_NOTE_EMPTY;
+      const noteHasText = (r[10] || "").toString().trim().length > 0;
+      const noteIcon = noteHasText ? ICON_NOTE : ICON_NOTE_EMPTY;
 
       h += "<tr>"
         + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:2px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
