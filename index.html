@@ -1,824 +1,1967 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>EBS Input v3-74.1</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>EBS Input v3-74</title>
+<script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
+<script async="" defer="" src="https://apis.google.com/js/api.js"></script>
+<style>
 
-  <style>
     :root{
-      --bg:#f4f6f8;
-      --card:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --line:#d1d5db;
-      --soft:#eef2f7;
-      --green:#16a34a;
-      --blue:#1d73b7;
-      --red:#c0392b;
-      --btnText:#ffffff;
+      --primary:#2c3e50; --accent:#27ae60; --danger:#c0392b; --bg:#f8f9fa;
+      --bridge:#2980b9; --cache:#8e44ad; --test:#e67e22;
     }
-
-    *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg); margin:0; padding:10px;
+    }
+    .container{
+      max-width:960px; margin:auto; background:#fff; padding:15px;
+      border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);
     }
 
-    .page{
-      max-width:980px;
-      margin:0 auto;
-      padding:12px;
+    .branding-row{ margin-bottom:10px; font-size:1.1rem; line-height:1.1; color:var(--primary); }
+    .branding-row b{ font-weight:800; }
+    .branding-row span{ font-weight:500; font-size:0.75rem; color:#7f8c8d; margin-left:6px; }
+
+    .header-wrap{ display:flex; flex-direction:column; margin-bottom:15px; gap:8px; }
+    .header-btns{ display:flex; justify-content:space-between; gap:6px; width:100%; }
+    .btn-lookup{
+      padding:6px; font-size:0.72rem; border-radius:6px; border:none; color:#fff;
+      cursor:pointer; font-weight:700; flex:1; height:52px; line-height:1.1; text-align:center;
+      display:flex; align-items:center; justify-content:center; min-width:0;
+    }
+    .btn-pull{ background:var(--cache); }
+    .btn-refresh{ background:var(--bridge); }
+    .btn-save{ background:var(--accent); }
+    .btn-test{ background:var(--test); }
+    .btn-reset{ background:var(--danger); }
+
+    label{ font-size:0.7rem; font-weight:800; display:block; margin-bottom:2px; color:var(--primary); }
+    input,select,textarea{
+      width:100%; padding:8px; border:1px solid #dcdde1; border-radius:6px; font-size:16px;
+      box-sizing:border-box; height:38px; -webkit-text-size-adjust:100%; font-family:inherit;
+    }
+    /* v3-58: compact numeric inputs */
+    #colT,#colV,#colM{ padding:6px; }
+    #colM{ text-align:center; }
+    .currency-side select{width:100%; min-width:0; text-align:center; text-align-last:center;}
+
+
+    .date-input-container{
+      display:flex; align-items:center; gap:5px; background:#fff; border:1px solid #dcdde1;
+      border-radius:6px; padding:0 8px; height:38px;
+    }
+    .date-input-container input[type="date"]{
+      border:none; padding:0; height:100%; font-size:14px; flex-grow:1; outline:none; background:transparent;
     }
 
-    .branding-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:10px 12px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:12px;
-      margin-bottom:12px;
+    .flow-display{
+      font-size:0.85rem; font-weight: 400; color:var(--primary); text-align:center;
+      height:38px; line-height:36px; border:1px solid #dcdde1; border-radius:6px;
+      background:#f1f2f6; box-sizing:border-box;
     }
-    .branding-row b{font-size:16px}
-    .branding-row span{color:var(--muted); font-weight:600}
+    /* v3-58: Total + Chk row (single dashed total; single circle) */
+    
+    .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
+    .cur-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; top:-4px; width:74px;}
+    .cur-wrap label{width:100%; text-align:center; font-size:10px;}
+    .cur-wrap select{width:68px; text-align-last:center; font-size:13px; height:30px; padding:5px 6px; margin:0 auto;}
 
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-    }
-    .card h3{
-      margin:0 0 10px 0;
-      font-size:14px;
-      color:var(--muted);
-      letter-spacing:.2px;
-    }
 
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
-      align-items:end;
-      margin-bottom:10px;
-    }
-    .row2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      align-items:end;
-      margin-bottom:10px;
-    }
-    .row4{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr 1fr;
-      gap:12px;
-      align-items:end;
-      margin-bottom:10px;
-    }
+    .currency-side{width:84px; margin-left:6px;}
+    .currency-side label{ text-align:center; }
+    .currency-side select{ text-align-last:center; }
+    .currency-side select{ padding:8px 6px; }
 
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin:0 0 6px 0;
-      font-weight:600;
-      letter-spacing:.2px;
-    }
 
-    select, input[type="text"], input[type="number"], input[type="date"], textarea{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#fff;
-      font-size:16px;
-      outline:none;
+    /* v3-58: Chk flag = single circle, no outer box outline; full area remains tappable */
+    .chk-wrap{
+      width:92px; flex:0 0 92px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:0; background:transparent; border:none;
+      -webkit-tap-highlight-color: transparent;
     }
+    .chk-txt{ font-size:0.68rem; font-weight:900; color:var(--primary); line-height:1; }
+    .chk-txt.chk-top{ margin-bottom:4px; }
+    .chk-txt.chk-bottom{ margin-top:4px; }
 
-    textarea{
-      min-height:42px;
-      resize:vertical;
-    }
-
-    .amount-box{
-      border:2px dashed #48b16a;
-      border-radius:12px;
-      padding:12px;
-      text-align:center;
-      font-weight:800;
-      color:#0c7a2e;
-      font-size:34px;
-      background:#e8f6ee;
-    }
-
-    .mini{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .btnRow{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-    button{
-      appearance:none;
-      border:0;
-      border-radius:12px;
-      padding:14px 12px;
-      font-size:16px;
-      font-weight:800;
-      color:var(--btnText);
+    .chk-toggle{
+      width:14px; height:14px;
+      border-radius:50%;
+      border:2px solid #9aa7b3;
+      background:transparent;
       cursor:pointer;
+      padding:0;
+      display:flex; align-items:center; justify-content:center;
+      transition: background 120ms ease, border-color 120ms ease;
     }
-    .btnGreen{background:var(--green)}
-    .btnBlue{background:var(--blue)}
-    .btnRed{background:var(--red)}
-    button:active{transform:translateY(1px)}
-    button:disabled{opacity:.6; cursor:not-allowed}
+    .chk-toggle[aria-pressed="true"]{
+      background: var(--bridge);
+      border-color: var(--bridge);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.35), inset 0 -1px 2px rgba(255,255,255,.25);
+    }
 
-    .tableWrap{
-      margin-top:12px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
+    /* v3-58: Staging table chk toggle (dot only) */
+    .stg-chk-toggle{
+      width:14px; height:14px; border-radius:50%;
+      border:2px solid #9aa7b3; background:transparent;
+      display:inline-block; cursor:pointer; padding:0; margin:0;
+      box-sizing:border-box;
     }
+    .stg-chk-toggle[aria-pressed="true"]{
+      background:var(--bridge); border-color:var(--bridge);
+      box-shadow:inset 0 2px 4px rgba(0,0,0,0.22);
+    }
+
+    /* v3-58: Total box shorter */
+    .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
+    .total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
+
+
+
+button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weight:900; cursor:pointer; color:#fff; font-size:0.72rem; -webkit-font-smoothing:antialiased; min-height:52px; }
+
+    .preview-wrap{ width:100%; overflow-x:auto; margin-top:15px; border:1px solid #ddd; border-radius:6px; }
     table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px;
+      min-width:1500px; width:1500px; border-collapse:collapse; font-size:0.58rem; table-layout:fixed; font-family:inherit;
     }
-    thead th{
-      background:#f1f5f9;
-      color:#111827;
-      text-align:left;
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      font-weight:800;
-    }
-    tbody td{
-      padding:10px 10px;
-      border-bottom:1px solid #e5e7eb;
-      vertical-align:middle;
-    }
-    tbody tr:last-child td{border-bottom:0}
+    th,td{ border:1px solid #eee; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    th{ padding:6px 4px; }
+    td{ padding:2px 3px; }
+    th{ background:#f2f2f2; font-weight:900 !important; color:var(--primary); font-size:0.58rem !important; }
 
-    .center{text-align:center}
-    .right{text-align:right}
-    .muted{color:var(--muted)}
+    /* v3-58 sizing in ch units based on longest observed option strings. */
+    .w-edit{ width:38px; text-align:center; }
+    .w-group{ width:12ch; }
+    .w-type{ width:14ch; }
+    .w-day{ width:4ch; text-align:center; }
+    .w-date{ width:9ch; }
+    .w-flow{ width:6ch; text-align:center; }
+    .w-cat{ width:22ch; }
+    .w-sort{ width:5ch; text-align:center; }
+    .w-acc{ width:22ch; }
+    .w-note{ width:44px; text-align:center; cursor:pointer; font-size:1rem; }
+    .w-freq{ width:14ch; }
+    .w-stat{ width:12ch; }
+    .w-cur{ width:7ch; text-align:center; }
+    .w-chk{ width:4ch; text-align:center; font-weight:900; }
+    .w-tot{ width:10ch; text-align:right; }
+    .w-mnth{ width:6ch; text-align:center; }
+    .w-who{ width:10ch; }
+    .w-del{ width:44px; text-align:center; }
 
-    .note-cell{
-      cursor:pointer;
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:26px;
+    #auth_status{ font-size:0.75rem; margin-top:10px; text-align:center; color:var(--primary); font-weight:800; }
+    #log_btn{ margin-top:15px; width:100%; background:var(--primary); color:#fff; font-size:0.7rem; border-radius:6px; padding:8px; border:none; font-weight:700; display:block; }
+    #trace_log{
+      display:none; margin-top:15px; padding:10px; background:#2c3e50; color:#00ff00;
+      font-family:"Courier New", monospace; font-size:0.6rem; border-radius:6px; max-height:170px; overflow-y:auto; white-space:pre-wrap;
+      white-space:pre-wrap; cursor:pointer;
     }
 
+    .calc-input-wrap{ display:flex; align-items:center; gap:6px; }
+    .calc-input-wrap input{ flex:1 1 auto; min-width:0; position:relative; z-index:1; }
+    .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-4px;}
+
+    .btn-calc-trigger svg{ width:18px; height:18px; display:block; }
+
+    /* v3-74: SVG icons (avoid iOS charset mojibake for emoji) */
+    .ico{display:inline-flex; align-items:center; justify-content:center; color:var(--primary);}
+    .cal-svg{width:16px; height:16px; display:block; fill:currentColor;}
     .note-svg{width:16px; height:16px; display:inline-block; vertical-align:middle; fill:currentColor;}
-    .note-svg-empty{width:12px; height:12px; display:inline-block; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:2px;}
 
-    .calcIconBtn{
-      width:34px;
-      height:34px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:10px;
-      cursor:pointer;
-    }
-    .calcSvg{width:18px; height:18px; fill:#1d73b7}
+    
+    /* v3-58: lock grid widths to container (prevents overflow on iPhone/desktop) */
+    #row_each_grid{ width:100%; grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.8fr) !important; }
+    #row_each_grid .calc-input-wrap{ min-width:0; }
+    #row_each_grid input, #row_each_grid select{ min-width:0; }
+.btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-4px;}
 
-    .small{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:10px;
-      text-align:center;
-      font-weight:700;
-    }
-
-    .traceBtn{
-      width:100%;
-      margin-top:12px;
-      background:#3c4a59;
-      border-radius:12px;
-      padding:14px 12px;
-      font-size:16px;
-      font-weight:900;
-      color:#fff;
-    }
-
-    .hidden{display:none !important}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
-
-    @media (max-width: 780px){
-      .grid{grid-template-columns:1fr}
-      .row, .row2, .row4{grid-template-columns:1fr 1fr}
-      .btnRow{grid-template-columns:1fr}
-    }
-    @media (max-width: 460px){
-      .row, .row2, .row4{grid-template-columns:1fr}
-    }
-
-    /* Modal */
-    .modalBackdrop{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.45);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px;
-      z-index:9999;
-    }
+    /* v3-58: iPhone layout tuning */
+@media (max-width: 430px){
+  #row_each_grid{ grid-template-columns:2.6fr 1.3fr 0.9fr; gap:6px; }
+  .calc-input-wrap{ gap:5px; }
+  .btn-calc-trigger{background:transparent; color:var(--bridge); border:none; height:30px; width:30px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:-4px;}
+  .total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
+  .total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
+  .chk-dot{width:28px; height:28px; border-radius:50%; border:2px solid #95a5a6; background:#fff; box-sizing:border-box; transition:transform .08s ease, background .08s ease, border-color .08s ease;}
+  .actions{ gap:6px; }
+  button.action-main{ min-height:54px; padding:8px 10px; }
+}
+/* v3-58: modal overlay (Flow + Calculator + Note) */
     .modal{
-      width:min(720px, 100%);
-      background:#fff;
-      border-radius:14px;
-      border:1px solid var(--line);
-      overflow:hidden;
-      box-shadow:0 10px 40px rgba(0,0,0,.18);
+      display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
     }
-    .modalHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 12px;
-      background:#f8fafc;
-      border-bottom:1px solid var(--line);
-      font-weight:900;
+    .modal-content{
+      background:#fff; width:100%; max-width:520px; border-radius:14px; padding:16px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.25);
     }
-    .modalBody{padding:12px}
-    .modalBody textarea{min-height:180px}
-    .modalFooter{
-      display:flex;
-      gap:10px;
-      padding:12px;
-      border-top:1px solid var(--line);
-      background:#f8fafc;
-      justify-content:flex-end;
-    }
-    .btnGhost{
-      background:#e5e7eb;
-      color:#111827;
-      font-weight:900;
-    }
-    .btnPrimary{
-      background:#1d73b7;
+    .modal-title{ font-size:1.2rem; font-weight:900; color:var(--primary); margin:0 0 10px 0; }
+    .modal-actions{ display:flex; gap:10px; margin-top:12px; }
+    .btn-modal{
+      flex:1; border:none; border-radius:10px; padding:12px 10px; font-weight:900; cursor:pointer; font-size:1rem;
       color:#fff;
-      font-weight:900;
     }
-    .btnDanger{
-      background:#c0392b;
-      color:#fff;
-      font-weight:900;
+    .btn-green{ background:var(--accent); }
+    .btn-grey{ background:#7f8c8d; }
+
+    /* Calculator */
+    #calc_display{
+      width:100%; height:46px; font-size:1.4rem; padding:10px 12px; border:1px solid #dcdde1; border-radius:10px;
+      box-sizing:border-box; margin-bottom:12px;
     }
-  </style>
+    .calc-grid{
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+    }
+    .calc-key{
+      height:54px; border:none; border-radius:12px; font-size:1.2rem; font-weight:900; cursor:pointer;
+      background:#eef2f7; color:#2c3e50;
+    }
+    .calc-key.op{ background:#e9f0fb; }
+    .calc-key.danger{ background:#f7e6e3; color:#8b2f24; }
+    .calc-key.eq{ background:#4f7fb8; color:#fff; grid-column:3 / span 2; width:100%; }
+      
+    /* v3-58: Searchable picker modal (From/To/Category on iPhone) */
+    #pick_list{
+      margin-top:10px; border:1px solid #dcdde1; border-radius:10px; max-height:55vh; overflow-y:auto;
+    }
+    .pick-item{
+      padding:12px 10px; border-bottom:1px solid #eef2f7; font-weight:500; color:var(--primary);
+      cursor:pointer; user-select:none;
+    }
+    .pick-item.current{ font-weight:800; }
+
+    .pick-item:last-child{ border-bottom:none; }
+    .pick-item mark{
+      background:#fff3b0; padding:0 2px; border-radius:4px;
+    }
+    #pick_search{
+      width:100%; height:44px; font-size:16px; padding:10px 12px; border:1px solid #dcdde1; border-radius:10px;
+      box-sizing:border-box;
+    }
+    #pick_empty{
+      padding:14px 10px; color:#7f8c8d; font-weight:800; text-align:center;
+    }
+
+/* v3-58: Chk toggle dot-only */
+/* v3-58 UI restore + chk + note delete */
+#colK{ height:38px; resize:none; overflow-x:auto; overflow-y:hidden; white-space:pre; }
+.note-row{ display:flex; gap:8px; align-items:stretch; }
+.del-stack{ height:38px; width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.del-top,.del-bottom{ font-size:10px; line-height:1; font-weight:700; color:#333; }
+.del-btn-small{ height:14px; width:14px; border:none; border-radius:50%; background:var(--danger); color:#fff; font-weight:900; font-size:11px; line-height:14px; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.stg-del-btn{ margin:0 auto; }
+.note-del-btn:not(.del-btn-small){ all:unset; display:flex; align-items:center; justify-content:center; }
+
+
+
+/* v3-58: actions sizing restored to v3-58 */
+.actions{ display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:8px; width:100%; }
+button.action-main{ padding:8px 10px; border:none; border-radius:6px; font-weight:900; cursor:pointer; color:#fff; font-size:0.72rem; -webkit-font-smoothing:antialiased; min-height:52px; }
+
+/* v3-58: Total display centred */
+/* v3-58: Chk control text inside box */
+.chk-txt{ font-size:0.62rem; font-weight:900; color:#4d5a66; line-height:1.0; }
+.chk-top{ font-size:0.7rem; font-weight:800; line-height:1; }
+.chk-bottom{ font-size:0.7rem; font-weight:800; line-height:1; }
+
+/* v3-58: Note modal delete button positioned like input Note field */
+.note-modal-body{
+  display:flex;
+  gap:10px;
+  align-items:stretch;
+  margin-top:8px;
+}
+.note-modal-body textarea{
+  flex:1;
+}
+.note-del-btn:not(.del-btn-small){ height:38px; width:44px; border:none; border-radius:10px; background:var(--danger); color:#fff; font-weight:900; font-size:1.1rem; cursor:pointer; }
+
+
+    /* v3-58: compact single-line Note fields */
+    .note-input{ height:38px; resize:none; overflow-y:auto; overflow-x:hidden; }
+    .note-input::-webkit-scrollbar{ height:6px; }
+  
+/* v3-58: tighten Total + chk row to standard control height */
+.total-row{display:grid; grid-template-columns: 72px 1fr 74px; column-gap:8px; align-items:center; margin:6px 0 6px 0;}
+.total-box{background:#e8f5e9; border:1px dashed var(--accent); border-radius:10px; height:38px; display:flex; align-items:center; justify-content:center; padding:0 10px; box-sizing:border-box; margin:0; }
+.total-val{font-size:1.15rem; font-weight:900; color:var(--accent); line-height:1;}
+
+/* v3-58: compact chk flag control (single circle, pressed blue) */
+.chk-wrap{
+  width:78px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+}
+.chk-top,.chk-bottom{
+  font-size:10px;
+  font-weight:800;
+  color:var(--primary);
+  line-height:1;
+}
+.chk-top{ margin-bottom:1px; }
+.chk-bottom{ margin-top:1px; }
+
+.chk-toggle{
+      width:14px; height:14px;
+      border-radius:50%;
+      border:2px solid #9aa7b3;
+      background:transparent;
+      cursor:pointer;
+      padding:0;
+      display:flex; align-items:center; justify-content:center;
+      transition: background 120ms ease, border-color 120ms ease;
+      -webkit-tap-highlight-color:transparent;
+      box-sizing:border-box;
+    }
+    .chk-toggle[aria-pressed="true"]{
+      background: var(--bridge);
+      border-color: var(--bridge);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.35), inset 0 -1px 2px rgba(255,255,255,.25);
+    }
+/* v3-58: keep Currency value centered */
+#colX{ text-align:center; text-align-last:center; }
+
+/* v3-58: slightly increase spacing after total row without changing other rows */
+.total-row + .actions{ margin-top:10px; }
+
+/* v3-72: visual balance - shift Currency + Total right edge left */
+.cur-wrap{ transform: translateX(-4px); }
+.total-box{ margin-right:4px; }
+
+
+/* v3-74: iOS double-tap zoom guard (Reset + Clear Staging records) */
+#resetBtn,
+#wipeBtn{
+  touch-action: manipulation;
+}
+
+
+</style>
 </head>
-
 <body>
-  <div class="page">
-    <div class="branding-row"><b>EBS Input</b> <span>v3-74.1</span></div>
+<div class="container">
+<div class="header-wrap">
+<div class="branding-row"><b>EBS Input</b> <span>v3-74</span></div>
+<div class="header-btns">
+<button class="btn-lookup btn-pull" onclick="checkEditState(() =&gt; cachePull())">Pull local<br/>Lookups</button>
+<button class="btn-lookup btn-refresh" id="refresh_btn" onclick="checkEditState(() =&gt; initRefresh())">Refresh<br/>Lookups<br/>from Sheets</button>
+<button class="btn-lookup btn-save" onclick="checkEditState(() =&gt; cacheSave())">Save to<br/>local Lookups</button>
+<button class="btn-lookup btn-test" onclick="checkEditState(() =&gt; useTestData())">Pull test<br/>Lookups</button>
+<button class="btn-lookup btn-reset" id="resetBtn" onclick="handleResetConfirm()">Reset</button>
+</div>
+</div>
+<div style="display:grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap:10px;">
+<div><label>Type</label><select id="colB" onchange="handleManualType()"></select></div>
+<div><label>Grouping</label><select id="colA"></select></div>
+<div>
+<label>Date</label>
+<div class="date-input-container" onclick="document.getElementById('colC').showPicker()">
+<span class="ico" aria-hidden="true">
+<svg class="cal-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+<path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8H4.5v9.5c0 .276.224.5.5.5h14.5c.276 0 .5-.224.5-.5V10ZM6 6H4.5a.5.5 0 0 0-.5.5V8h16V6.5a.5.5 0 0 0-.5-.5H18v1a1 1 0 1 1-2 0V6H8v1a1 1 0 1 1-2 0V6Z"></path>
+</svg>
+</span><input id="colC" onchange="handleDateChange()" type="date"/>
+</div>
+<div id="colCDisp" style="font-size:0.65rem; color:#7f8c8d; text-align:center; margin-top:2px;"></div>
+</div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 0.4fr 0.3fr; gap:10px; margin-top:10px;">
+<div><label>Category</label><select id="colF" onchange="handleCatTrigger()" required=""></select></div>
+<div><label style="text-align:center;">Flow</label><div class="flow-display" id="flowDisplay">--</div></div>
+<div><label>Sort</label><input id="colG" placeholder="0" type="number"/></div>
+</div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+<div><label>From</label><select id="colH" onchange="handleAccTrigger()" required=""></select></div>
+<div><label>To</label><select id="colI" onchange="handleAccTrigger()" required=""></select></div>
+</div>
+<div style="margin-top:10px;"><label>Note</label>
+<div class="note-row">
+  <textarea id="colK" rows="1" style="font-size:16px;" class="note-input" wrap="off"></textarea>
+  <div class="del-stack" aria-label="Delete note">
+    <div class="del-top">DEL</div>
+    <button type="button" class="note-del-btn del-btn-small" onclick="clearNoteConfirm()" title="Delete Note">x</button>
+    <div class="del-bottom">text</div>
+  </div>
+</div>
+</div>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
+  <div><label>Frequency</label><select id="colFreq"></select></div>
+  <div><label>Status</label><select id="colStatus"></select></div>
+  <div><label>Month</label><select id="colZ"></select></div>
+</div>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Header</h3>
-
-        <div class="row">
-          <div>
-            <label for="typeSel">Type</label>
-            <select id="typeSel"></select>
-          </div>
-          <div>
-            <label for="groupSel">Grouping</label>
-            <select id="groupSel"></select>
-          </div>
-          <div>
-            <label for="dateInp">Date</label>
-            <input id="dateInp" type="date"/>
-            <div class="small" id="dateHuman"></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div style="grid-column:1/3">
-            <label for="catSel">Category</label>
-            <select id="catSel"></select>
-          </div>
-          <div>
-            <label for="flowSel">Flow</label>
-            <select id="flowSel"></select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label for="sortInp">Sort</label>
-            <input id="sortInp" type="number" step="1" value="0"/>
-          </div>
-          <div>
-            <label for="fromSel">From</label>
-            <select id="fromSel"></select>
-          </div>
-          <div>
-            <label for="toSel">To</label>
-            <select id="toSel"></select>
-          </div>
-        </div>
-
-        <div class="row2">
-          <div style="grid-column:1/2">
-            <label for="noteInp">Note</label>
-            <input id="noteInp" type="text" placeholder=""/>
-          </div>
-          <div class="mini" style="justify-content:flex-end">
-            <div class="muted" style="font-weight:900">DEL</div>
-            <button id="btnDelNote" class="btnRed" style="padding:10px 10px;border-radius:10px; width:auto">✕</button>
-            <div class="muted" style="font-weight:900">text</div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label for="freqSel">Frequency</label>
-            <select id="freqSel"></select>
-          </div>
-          <div>
-            <label for="statusSel">Status</label>
-            <select id="statusSel"></select>
-          </div>
-          <div>
-            <label for="monthSel">Month</label>
-            <select id="monthSel"></select>
-          </div>
-        </div>
-
-        <div class="row4">
-          <div>
-            <label for="eachInp">Each</label>
-            <div style="display:flex; gap:8px; align-items:center">
-              <input id="eachInp" type="number" step="0.01" value="0.00"/>
-              <div class="calcIconBtn" title="Calculator">
-                <svg class="calcSvg" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v4h10V4H7zm2 7h2v2H9v-2zm4 0h2v2h-2v-2zM9 15h2v2H9v-2zm4 0h2v2h-2v-2z"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label for="feesInp">Fees</label>
-            <div style="display:flex; gap:8px; align-items:center">
-              <input id="feesInp" type="number" step="0.01" value="0.00"/>
-              <div class="calcIconBtn" title="Calculator">
-                <svg class="calcSvg" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v4h10V4H7zm2 7h2v2H9v-2zm4 0h2v2h-2v-2zM9 15h2v2H9v-2zm4 0h2v2h-2v-2z"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label for="multInp">Multiplier</label>
-            <div style="display:flex; gap:8px; align-items:center">
-              <input id="multInp" type="number" step="1" value="1"/>
-              <div class="calcIconBtn" title="Calculator">
-                <svg class="calcSvg" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v4h10V4H7zm2 7h2v2H9v-2zm4 0h2v2h-2v-2zM9 15h2v2H9v-2zm4 0h2v2h-2v-2z"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label for="currSel">Currency</label>
-            <select id="currSel"></select>
-          </div>
-        </div>
-
-        <div class="row2">
-          <div class="mini">
-            <div class="muted" style="font-weight:900">Amount</div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:6px">
-              <div class="muted" style="font-weight:900">Chk flag</div>
-              <input id="chkFlag" type="checkbox" style="transform:scale(1.25)"/>
-            </div>
-          </div>
-          <div class="amount-box" id="amountBox">£ 0.00</div>
-        </div>
-
-        <div class="btnRow">
-          <button id="btnCreate" class="btnGreen">Create Staging record</button>
-          <button id="btnSend" class="btnBlue">Send Staging records to<br/>Sheets</button>
-          <button id="btnClear" class="btnRed">Clear Staging records</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Staging</h3>
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Grouping</th>
-                <th class="center">Note</th>
-                <th>Frequency</th>
-                <th>Status</th>
-                <th>Currency</th>
-              </tr>
-            </thead>
-            <tbody id="stagingBody"></tbody>
-          </table>
-        </div>
-
-        <div class="small" style="margin-top:14px; font-size:16px; color:#1f2937">
-          <span style="font-weight:900">iOS Sync Status:</span> <span id="syncStatus">Idle</span>
-        </div>
-
-        <button class="traceBtn" id="btnTrace">Display Trace Log</button>
-      </div>
-
-      <div class="card">
-        <h3>Trace</h3>
-        <div class="mono" id="traceLog" style="white-space:pre-wrap; font-size:12px; line-height:1.35; color:#111827; background:#0b1020; color:#dbeafe; padding:10px; border-radius:12px; border:1px solid #1f2a44; min-height:260px;">
-Trace: v3-74.1 Logic Circuit Breaker active.
-        </div>
-      </div>
+<div id="row_each_grid" style="display:grid; grid-template-columns:1.8fr 1fr 0.8fr; gap:8px; margin-top:10px;">
+  <div>
+    <label>Each</label>
+    <div class="calc-input-wrap">
+      <input id="colT" type="number" placeholder="0.00" step="0.01" onfocus="handleEachFocus()" oninput="calc()" />
+      <button type="button" class="btn-calc-trigger" onclick="openCalculator('colT')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z" />
+</svg></button>
     </div>
   </div>
 
-  <!-- Note Modal -->
-  <div id="noteModal" class="modalBackdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal">
-      <div class="modalHeader">
-        <div>Staging Note</div>
-        <button id="noteCloseX" class="btnGhost" style="padding:8px 10px;border-radius:10px;">✕</button>
-      </div>
-      <div class="modalBody">
-        <div class="muted" style="font-size:12px; font-weight:800; margin-bottom:8px" id="noteRowHint"></div>
-        <textarea id="noteModalText"></textarea>
-      </div>
-      <div class="modalFooter">
-        <button id="noteDelete" class="btnDanger">Delete</button>
-        <button id="noteCancel" class="btnGhost">Cancel</button>
-        <button id="noteSave" class="btnPrimary">Save</button>
-      </div>
+  <div>
+    <label>Fees</label>
+    <div class="calc-input-wrap">
+      <input id="colV" type="number" placeholder="0.00" step="0.01" onfocus="handleFeesFocus()" oninput="calc()" />
+      <button type="button" class="btn-calc-trigger" onclick="openCalculator('colV')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z" />
+</svg></button>
     </div>
   </div>
 
+  <div>
+    <label>Multiplier</label>
+    <div class="calc-input-wrap">
+      <input id="colM" type="number" value="1" step="0.01" onfocus="handleMultiplierFocus()" oninput="calc()" />
+      <button type="button" class="btn-calc-trigger" onclick="openCalculator('colM')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z" />
+</svg></button>
+    </div>
+  </div>
+
+  
+</div>
+
+
+
+    <div class="total-row">
+      <div class="chk-wrap" role="button" tabindex="0" onclick="toggleChk()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleChk();}">
+        <div class="chk-top">Amount</div>
+        <button type="button" id="chkToggle" class="chk-toggle" aria-pressed="false" onclick="toggleChk(); event.stopPropagation();"></button>
+        <div class="chk-bottom">Chk flag</div>
+      </div>
+
+      <div class="total-box">
+        <div class="total-val"><span id="symbol">&pound;</span> <span id="totalDisp">0.00</span></div>
+      </div>
+
+      <div class="cur-wrap">
+        <label style="text-align:center;">Currency</label>
+        <select id="colX" onchange="calc()"></select>
+      </div>
+    </div>
+
+
+    <div class="actions">
+<button class="action-main" onclick="handleMainAction()" style="background:var(--accent);">Create Staging record</button>
+<button class="action-main" id="sync_btn" onclick="checkEditState(() =&gt; handleSync())" style="background:var(--bridge);">Send Staging records to Sheets</button>
+<button class="action-main" id="wipeBtn" onclick="checkEditState(() => handleWipeConfirm())" style="background:var(--danger); opacity:0.85;">Clear Staging records</button>
+</div>
+<div class="preview-wrap" id="previewArea"></div>
+<div id="auth_status">iOS Sync Status: Idle</div>
+<button id="log_btn" onclick="toggleLog(true)">Display Trace Log</button>
+<div id="trace_log" onclick="toggleLog(false)">Trace: v3-74 Logic Circuit Breaker active.</div>
+</div>
+<!-- v3-58 Flow modal (forced overlay) -->
+<div class="modal" id="flow_modal">
+<div class="modal-content">
+<div class="modal-title">Flow cannot be determined</div>
+<div style="font-size:0.95rem; color:#5f6b75; margin-bottom:10px; font-weight:700;">Select manually:</div>
+<select id="modal_flow_select" style="margin-bottom:12px;">
+<option value="xfer">xfer</option>
+<option value="In">In</option>
+<option value="zOut">zOut</option>
+</select>
+<div class="modal-actions">
+<button class="btn-modal btn-green" onclick="commitFlowSelection()" type="button">OK</button>
+<button class="btn-modal btn-grey" onclick="closeFlowModal()" type="button">Cancel</button>
+</div>
+</div>
+</div>
+<!-- Note modal -->
+<div class="modal" id="note_modal">
+  <div class="modal-content">
+    <div class="modal-title">Edit Transaction Note</div>
+    <div class="note-modal-body">
+      <textarea id="modal_note_text" rows="1" class="note-input" wrap="off"></textarea>
+      <div class="del-stack" aria-label="Delete note">
+        <div class="del-top">DEL</div>
+        <button class="note-del-btn del-btn-small" type="button" onclick="clearModalNoteConfirm()" aria-label="Delete note">x</button>
+        <div class="del-bottom">text</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-green" onclick="commitNote()" type="button">Save</button>
+      <button class="btn-modal btn-grey" onclick="closeNote()" type="button">Close</button>
+    </div>
+  </div>
+</div>
+<!-- v3-58 Calculator modal -->
+<div class="modal" id="calc_modal">
+<div class="modal-content">
+<div class="modal-title">Calculator</div>
+<input id="calc_display" inputmode="decimal"/>
+<div class="calc-grid">
+<button class="calc-key danger" onclick="calcKey('C')" type="button">C</button>
+<button class="calc-key op" onclick="calcKey('BK')" type="button">⌫</button>
+<button class="calc-key op" onclick="calcKey('%')" type="button">%</button>
+<button class="calc-key op" onclick="calcKey('/')" type="button">÷</button>
+
+<button class="calc-key" onclick="calcKey('7')" type="button">7</button>
+<button class="calc-key" onclick="calcKey('8')" type="button">8</button>
+<button class="calc-key" onclick="calcKey('9')" type="button">9</button>
+<button class="calc-key op" onclick="calcKey('*')" type="button">×</button>
+
+<button class="calc-key" onclick="calcKey('4')" type="button">4</button>
+<button class="calc-key" onclick="calcKey('5')" type="button">5</button>
+<button class="calc-key" onclick="calcKey('6')" type="button">6</button>
+<button class="calc-key op" onclick="calcKey('-')" type="button">−</button>
+
+<button class="calc-key" onclick="calcKey('1')" type="button">1</button>
+<button class="calc-key" onclick="calcKey('2')" type="button">2</button>
+<button class="calc-key" onclick="calcKey('3')" type="button">3</button>
+<button class="calc-key op" onclick="calcKey('+')" type="button">+</button>
+
+<button class="calc-key" onclick="calcKey('0')" type="button">0</button>
+<button class="calc-key" onclick="calcKey('.')" type="button">.</button>
+<button class="calc-key eq" onclick="calcKey('=')" type="button">=</button>
+</div>
+<div class="modal-actions" >
+<button class="btn-modal btn-grey" onclick="closeCalculator()" type="button">Close</button>
+<button class="btn-modal btn-green" onclick="applyCalculator()" type="button">Apply</button>
+</div>
+</div>
+</div>
+<!-- v3-58: Searchable picker modal (From / To / Category on iPhone) -->
+<div class="modal" id="pick_modal">
+<div class="modal-content">
+<div class="modal-title" id="pick_title">Select</div>
+<input autocomplete="off" id="pick_search" type="search" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+<div id="pick_list"></div>
+<div class="modal-actions">
+<button class="btn-modal btn-grey" onclick="closePickModal()" type="button">Close</button>
+</div>
+</div>
+</div>
 <script>
-/* ======================
-   Version / constants
-====================== */
-const VER = "Excel Budget Sheet Input (v3-74.1)";
 
-const ICON_NOTE = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M14 2v6h6"/></svg>';
-const ICON_NOTE_EMPTY = '<svg class="note-svg-empty" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>';
+  const SHEET_ID = "1DdjG4B8wB9llk7yOoRRO72G0XqHEgFkMIlLuusShA6E";
+  const SHEET_TAB = "EBSinput";
+  const VER = "Excel Budget Sheet Input (v3-74)";
+  // v3-58: Support category detection must be dynamic and strict.
+  // A Category is a Support category ONLY if its label starts with "Support" (case-sensitive, no trimming).
+  function isSupportCategory(cat){ return (cat || "").startsWith("Support"); }
 
-/* ======================
-   UI refs
-====================== */
-const elType = document.getElementById("typeSel");
-const elGroup = document.getElementById("groupSel");
-const elDate = document.getElementById("dateInp");
-const elDateHuman = document.getElementById("dateHuman");
-const elCat = document.getElementById("catSel");
-const elFlow = document.getElementById("flowSel");
-const elSort = document.getElementById("sortInp");
-const elFrom = document.getElementById("fromSel");
-const elTo = document.getElementById("toSel");
-const elNote = document.getElementById("noteInp");
-const btnDelNote = document.getElementById("btnDelNote");
-const elFreq = document.getElementById("freqSel");
-const elStatus = document.getElementById("statusSel");
-const elMonth = document.getElementById("monthSel");
-const elEach = document.getElementById("eachInp");
-const elFees = document.getElementById("feesInp");
-const elMult = document.getElementById("multInp");
-const elCurr = document.getElementById("currSel");
-const elChk = document.getElementById("chkFlag");
-const elAmountBox = document.getElementById("amountBox");
 
-const btnCreate = document.getElementById("btnCreate");
-const btnSend = document.getElementById("btnSend");
-const btnClear = document.getElementById("btnClear");
-const btnTrace = document.getElementById("btnTrace");
-const elTrace = document.getElementById("traceLog");
-const elSync = document.getElementById("syncStatus");
+  let AA_LIST = [];
+  let coordinateMap = {};
+  let rawLookupData = [];
+  let tokenClient;
 
-const stagingBody = document.getElementById("stagingBody");
+  let editIndex = -1;
+  let pendingEdit = -1;
+  let activeNoteIdx = -1;
 
-/* Note modal */
-const noteModal = document.getElementById("noteModal");
-const noteModalText = document.getElementById("noteModalText");
-const noteRowHint = document.getElementById("noteRowHint");
-const noteCloseX = document.getElementById("noteCloseX");
-const noteCancel = document.getElementById("noteCancel");
-const noteSave = document.getElementById("noteSave");
-const noteDelete = document.getElementById("noteDelete");
+  let wipeConfirmed = false;
+  let resetConfirmed = false;
+  let isRestoring = false;
 
-/* ======================
-   Data dictionaries
-====================== */
-const TYPE_OPTS = [
-  ["V variable","V variable"],
-  ["F fixed","F fixed"],
-  ["T transfer","T transfer"]
-];
+  // v3-58: Chk toggle state (stored into column S when staging)
+  let chkFlag = false;
 
-const GROUP_OPTS = ["Roy","Galore","House","Work","Other"];
+  // v3-58: Calculator state (supports Each + Fees)
+  let calcTargetFieldId = "colT";
+  let calcLastApplied = "0";
 
-const CAT_OPTS = [
-  "--Select--",
-  "Bills",
-  "Food",
-  "Transport",
-  "Health",
-  "Entertainment",
-  "Savings",
-  "Other"
-];
+  // v3-58: Flow modal context to ensure first selection is committed reliably
+  let flowPendingAction = null; // "create" | "edit"
 
-const FLOW_OPTS = ["--","In","Out"];
+  const symbolsHtml = { "GBP":"&pound;","EUR":"&euro;","USD":"$","ZAR":"R","CHF":"Fr","THB":"&#3647;","RUR":"&#8381;","COP":"COL$" };
 
-const FROM_OPTS = ["--Select--","HSBC","Monzo","Cash","Card"];
-const TO_OPTS   = ["--Select--","HSBC","Monzo","Cash","Card"];
+  const ICON_NOTE = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0-8a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H8Z"></path></svg>';
+  const ICON_NOTE_EMPTY = '<svg class="note-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 1.5V7h3.5L14 3.5ZM8 11a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z"></path></svg>';
 
-const FREQ_OPTS = [
-  ["A Ad-hoc","A Ad-hoc"],
-  ["W Weekly","W Weekly"],
-  ["M Monthly","M Monthly"],
-  ["Q Quarterly","Q Quarterly"],
-  ["Y Yearly","Y Yearly"],
-  ["2Yr 2 yearly","2Yr 2 yearly"]
-];
 
-const STATUS_OPTS = [
-  ["N Pending","N Pending"],
-  ["F Fixed","F Fixed"],
-  ["P Paid","P Paid"],
-  ["C Cancelled","C Cancelled"]
-];
-
-const MONTH_OPTS = ["NEW","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-const CURR_OPTS = ["GBP","EUR","USD"];
-
-/* ======================
-   State
-====================== */
-let staging = [];
-let activeNoteIndex = -1;
-
-/* ======================
-   Helpers
-====================== */
-function addOpts(sel, arr, asPairs=false){
-  sel.innerHTML = "";
-  if(asPairs){
-    arr.forEach(p=>{
-      const o=document.createElement("option");
-      o.value=p[0]; o.textContent=p[1];
-      sel.appendChild(o);
-    });
-  }else{
-    arr.forEach(v=>{
-      const o=document.createElement("option");
-      o.value=v; o.textContent=v;
-      sel.appendChild(o);
-    });
+  function logTrace(msg){
+    const log = document.getElementById("trace_log");
+    const now = new Date().toLocaleTimeString();
+    // v3-58: enforce newline separation from first append
+    const base = log.textContent && log.textContent.trim().length
+      ? log.textContent
+      : "Trace: v3-74 Logic Circuit Breaker active.";
+    log.textContent = base + "\n[" + now + "] " + msg;
+    log.scrollTop = log.scrollHeight;
+    console.log(msg);
   }
-}
 
-function fmtGBP(v){
-  const n = Number(v||0);
-  return "£ " + n.toFixed(2);
-}
-
-function calcAmount(){
-  const each = Number(elEach.value||0);
-  const fees = Number(elFees.value||0);
-  const mult = Number(elMult.value||1);
-  const amt = (each + fees) * mult;
-  elAmountBox.textContent = fmtGBP(amt);
-}
-
-function setHumanDate(){
-  if(!elDate.value){ elDateHuman.textContent=""; return; }
-  const d = new Date(elDate.value + "T00:00:00");
-  const opt = {weekday:"short", day:"2-digit", month:"short", year:"2-digit"};
-  elDateHuman.textContent = d.toLocaleDateString(undefined, opt);
-}
-
-function log(line){
-  const ts = new Date().toISOString();
-  elTrace.textContent += "\n[" + ts + "] " + line;
-  elTrace.scrollTop = elTrace.scrollHeight;
-}
-
-/* ======================
-   Render staging table
-====================== */
-function renderStaging(){
-  stagingBody.innerHTML = "";
-  staging.forEach((r, idx)=>{
-    const tr=document.createElement("tr");
-
-    const noteIcon = ((r.note || '').toString().trim().length > 0) ? ICON_NOTE : ICON_NOTE_EMPTY;
-
-    tr.innerHTML = `
-      <td>${r.group}</td>
-      <td class="center"><span class="note-cell" data-idx="${idx}" title="Edit note">${noteIcon}</span></td>
-      <td>${r.freq}</td>
-      <td>${r.status}</td>
-      <td>${r.curr}</td>
-    `;
-    stagingBody.appendChild(tr);
-  });
-
-  stagingBody.querySelectorAll(".note-cell").forEach(el=>{
-    el.addEventListener("click", (e)=>{
-      const i = Number(e.currentTarget.getAttribute("data-idx"));
-      openNoteModal(i);
-    });
-  });
-}
-
-/* ======================
-   Note modal
-====================== */
-function openNoteModal(i){
-  activeNoteIndex = i;
-  const r = staging[i];
-  noteRowHint.textContent = `Row ${i+1} • Grouping: ${r.group} • Frequency: ${r.freq}`;
-  noteModalText.value = r.note || "";
-  noteModal.classList.remove("hidden");
-  noteModalText.focus();
-}
-
-function closeNoteModal(){
-  activeNoteIndex = -1;
-  noteModal.classList.add("hidden");
-}
-
-noteCloseX.addEventListener("click", closeNoteModal);
-noteCancel.addEventListener("click", closeNoteModal);
-noteModal.addEventListener("click",(e)=>{
-  if(e.target === noteModal) closeNoteModal();
-});
-
-noteSave.addEventListener("click", ()=>{
-  if(activeNoteIndex < 0) return;
-  staging[activeNoteIndex].note = noteModalText.value || "";
-  renderStaging();
-  log(`Saved note for staging row ${activeNoteIndex+1}.`);
-  closeNoteModal();
-});
-
-noteDelete.addEventListener("click", ()=>{
-  if(activeNoteIndex < 0) return;
-  staging[activeNoteIndex].note = "";
-  renderStaging();
-  log(`Deleted note for staging row ${activeNoteIndex+1}.`);
-  closeNoteModal();
-});
-
-/* ======================
-   Init
-====================== */
-addOpts(elType, TYPE_OPTS, true);
-addOpts(elGroup, GROUP_OPTS, false);
-addOpts(elCat, CAT_OPTS, false);
-addOpts(elFlow, FLOW_OPTS, false);
-addOpts(elFrom, FROM_OPTS, false);
-addOpts(elTo, TO_OPTS, false);
-addOpts(elFreq, FREQ_OPTS, true);
-addOpts(elStatus, STATUS_OPTS, true);
-addOpts(elMonth, MONTH_OPTS, false);
-addOpts(elCurr, CURR_OPTS, false);
-
-elType.value = "V variable";
-elGroup.value = "Roy";
-elCat.value = "--Select--";
-elFlow.value = "--";
-elFrom.value = "--Select--";
-elTo.value = "--Select--";
-elFreq.value = "A Ad-hoc";
-elStatus.value = "N Pending";
-elMonth.value = "NEW";
-elCurr.value = "GBP";
-
-const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth()+1).padStart(2,"0");
-const dd = String(today.getDate()).padStart(2,"0");
-elDate.value = `${yyyy}-${mm}-${dd}`;
-setHumanDate();
-calcAmount();
-
-elEach.addEventListener("input", calcAmount);
-elFees.addEventListener("input", calcAmount);
-elMult.addEventListener("input", calcAmount);
-elDate.addEventListener("change", setHumanDate);
-
-btnDelNote.addEventListener("click", ()=>{
-  elNote.value = "";
-  log("Cleared input Note field text.");
-});
-
-/* ======================
-   Create staging record
-====================== */
-btnCreate.addEventListener("click", ()=>{
-  const rec = {
-    type: elType.value,
-    group: elGroup.value,
-    date: elDate.value,
-    cat: elCat.value,
-    flow: elFlow.value,
-    sort: Number(elSort.value||0),
-    from: elFrom.value,
-    to: elTo.value,
-    note: elNote.value || "",
-    freq: elFreq.value,
-    status: elStatus.value,
-    month: elMonth.value,
-    each: Number(elEach.value||0),
-    fees: Number(elFees.value||0),
-    mult: Number(elMult.value||1),
-    curr: elCurr.value,
-    chk: !!elChk.checked
+  // v3-58: fatal JS visibility
+  window.onerror = function(message, source, lineno, colno){
+    logTrace("FATAL: " + message + " @ " + (source||"") + ":" + lineno + ":" + colno + " (v3-58)");
+  };
+  window.onunhandledrejection = function(ev){
+    logTrace("FATAL PROMISE: " + (ev && ev.reason ? (ev.reason.message || ev.reason) : "unknown") + " (v3-58)");
   };
 
-  staging.push(rec);
-  renderStaging();
-  log(`Created staging record (#${staging.length}). Note length=${(rec.note||"").length}.`);
-  elSync.textContent = "Idle";
-});
-
-/* ======================
-   Send staging to sheets (placeholder)
-====================== */
-btnSend.addEventListener("click", ()=>{
-  if(staging.length === 0){
-    log("Send requested but staging is empty.");
-    return;
+  function toggleLog(show){
+    document.getElementById("log_btn").style.display = show ? "none" : "block";
+    document.getElementById("trace_log").style.display = show ? "block" : "none";
   }
-  elSync.textContent = "Sending...";
-  log(`Send requested for ${staging.length} staging record(s).`);
-  setTimeout(()=>{
-    elSync.textContent = "Idle";
-    log("Send completed (stub).");
-  }, 500);
-});
 
-/* ======================
-   Clear staging
-====================== */
-btnClear.addEventListener("click", ()=>{
-  staging = [];
-  renderStaging();
-  elSync.textContent = "Idle";
-  log("Cleared all staging records.");
-});
-
-/* ======================
-   Trace toggle
-====================== */
-btnTrace.addEventListener("click", ()=>{
-  const isHidden = elTrace.classList.contains("hidden");
-  if(isHidden){
-    elTrace.classList.remove("hidden");
-    log("Trace log shown.");
-  }else{
-    elTrace.classList.add("hidden");
+  function updateStatus(label, state){
+    const el = document.getElementById("auth_status");
+    el.innerText = "iOS Sync Status: " + label;
+    const colors = { idle:"#7f8c8d", active:"#27ae60", sync:"#e67e22", error:"#c0392b" };
+    el.style.color = colors[state] || colors.idle;
   }
-});
 
-/* Seed some staging rows resembling screenshot */
-staging.push({group:"Galore", note:"Weekly groceries", freq:"W Weekly", status:"N Pending", curr:"GBP"});
-staging.push({group:"Galore", note:"", freq:"A Ad-hoc", status:"N Pending", curr:"GBP"});
-staging.push({group:"Galore", note:"", freq:"A Ad-hoc", status:"N Pending", curr:"GBP"});
-staging.push({group:"Galore", note:"Insurance renewal note", freq:"2Yr 2 yearly", status:"F Fixed", curr:"GBP"});
-renderStaging();
-log("Loaded seeded staging records for UI preview.");
+  function checkEditState(onSuccess){
+    if (pendingEdit !== -1 || editIndex !== -1){
+      alert("Function locked during Edit.");
+      return;
+    }
+    onSuccess();
+  }
+
+  function updateDropdown(id, vals, def, prompt){
+    const s = document.getElementById(id);
+    let h = prompt ? '<option value="" disabled selected>' + prompt + '</option>' : "";
+    h += vals.map(v => '<option value="' + v + '">' + v + "</option>").join("");
+    s.innerHTML = h;
+
+    if (def){
+      const o = Array.from(s.options).find(opt => opt.value.startsWith(def));
+      if (o) s.value = o.value;
+    }
+  }
+
+  // ---------- Rule helpers (v3-58) ----------
+  function setSelectByCode(selectEl, code){
+    if (!selectEl) return;
+    const opt = Array.from(selectEl.options).find(o => ((o.value || "").trim().split(/\s+/)[0]) === code);
+    if (opt) selectEl.value = opt.value;
+  }
+
+  function colToIndex(col){
+    let idx = 0;
+    for (let i=0;i<col.length;i++) idx = idx*26 + (col.charCodeAt(i)-64);
+    return idx-1;
+  }
+
+  // ---------- Lookups ----------
+  function useTestData(){
+    if (!confirm("Load test set?")) return;
+    AA_LIST = ["Santander P (AA)", "Revolut P (AA)", "Starling B (AA)"];
+    coordinateMap = {"Grouping":{val:0},"Type":{val:1},"Category":{val:2},"From":{val:3},"To":{val:4},"Frequency":{val:5},"Status":{val:6},"Month":{val:7},"Currency":{val:8}};
+    rawLookupData = [["INIT"]];
+
+    updateDropdown("colA", ["Roy","Peter","Ev","John","Jose"], "Roy");
+    updateDropdown("colB", ["v variable","xf transfer","S Support","aj adjustment","zOut"], "v");
+    updateDropdown("colF", ["Card payment","Computer consumables","Support rent","Support Samara","Support","Adjustment"], null, "--Select--");
+    updateDropdown("colH", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU"]), null, "--Select--");
+    updateDropdown("colI", AA_LIST.concat(["@HomeStore","Acronis","Adjustment","FNB Smart","FNB Visa","1Password","Fluid MC","Bank AU"]), null, "--Select--");
+    updateDropdown("colFreq", ["A Ad-hoc","W Weekly","K Keep in credit","M Monthly"], "A");
+    updateDropdown("colStatus", ["N Pending","P Paid","aj adjustment"], "N");
+    updateDropdown("colZ", ["NEW","JAN","FEB"], "NEW");
+    updateDropdown("colX", ["GBP","EUR","USD","ZAR"], "GBP");
+
+    localReset();
+    logTrace("Test Lookups loaded. (v3-58)");
+  }
+
+  function cacheSave(){
+    if (rawLookupData.length === 0){ alert("Refresh Lookups First"); return; }
+    if (!confirm("Snapshot values?")) return;
+    localStorage.setItem("ebs_cache_data", JSON.stringify(rawLookupData));
+    localStorage.setItem("ebs_cache_coords", JSON.stringify(coordinateMap));
+    localStorage.setItem("ebs_cache_aa", JSON.stringify(AA_LIST));
+    logTrace("Lookup cache saved. (v3-58)");
+  }
+
+  function cachePull(){
+    if (!confirm("Load local Lookups?")) return;
+    const cached = localStorage.getItem("ebs_cache_data");
+    if (!cached){ alert("No local Lookups found."); return; }
+    rawLookupData = JSON.parse(cached);
+    coordinateMap = JSON.parse(localStorage.getItem("ebs_cache_coords") || "{}");
+    // v3-58: validate cached coords to avoid swapped Type/Flow lists
+    if (coordinateMap.Type && coordinateMap.Flow && coordinateMap.Type.val === coordinateMap.Flow.val){
+      alert("Local Lookups invalid (Type/Flow mapping). Use Refresh Lookups from Sheets.");
+      logTrace("Local cache rejected: Type/Flow mapping conflict. (v3-58)");
+      return;
+    }
+    AA_LIST = JSON.parse(localStorage.getItem("ebs_cache_aa") || "[]");
+    populateUI(rawLookupData);
+    logTrace("Lookup cache pulled. (v3-58)");
+  }
+
+  function populateUI(data){
+    const pop = (id, key, def, p=null) => {
+      const list = data
+        .filter(r => r[coordinateMap[key]?.val])
+        .map(r => {
+          const v = r[coordinateMap[key].val];
+          const d = (coordinateMap[key].desc !== null && coordinateMap[key].desc !== undefined)
+            ? r[coordinateMap[key].desc]
+            : null;
+          return d ? (v + " " + d) : v;
+        });
+      updateDropdown(id, list, def, p);
+    };
+
+
+    // v3-58: defensive swap if LookupRefs labels are inverted (Type showing Flow values).
+    if (coordinateMap["Type"] && coordinateMap["Flow"]){
+      const flowSet = new Set(["xfer","In","zOut"]);
+      const typeVals = (data || []).map(r => r[coordinateMap["Type"].val]).filter(v => v).slice(0, 80)
+        .map(v => String(v).split(" ")[0]);
+      const uniqType = Array.from(new Set(typeVals));
+      const typeLooksLikeFlow = uniqType.length > 0 && uniqType.every(v => flowSet.has(v));
+      if (typeLooksLikeFlow){
+        const tmp = coordinateMap["Type"];
+        coordinateMap["Type"] = coordinateMap["Flow"];
+        coordinateMap["Flow"] = tmp;
+      }
+    }
+
+    pop("colA","Grouping","Roy");
+    // v3-58: still using "Type" lookup key name from Lookups mapping; fallback to "F/U" if present
+    if (coordinateMap["Type"]) pop("colB","Type","v");
+    else pop("colB","F/U","v");
+
+    pop("colF","Category",null,"--Select--");
+    pop("colH","From",null,"--Select--");
+    pop("colI","To",null,"--Select--");
+    pop("colFreq","Frequency","A");
+    pop("colStatus","Status","N");
+    pop("colZ","Month","NEW");
+    pop("colX","Currency","GBP");
+
+    localReset();
+  }
+
+  // ---------- Reset / Init ----------
+  function localReset(){
+    // v3-58: apply defaults on app refresh same as Reset button
+    editIndex = -1;
+    pendingEdit = -1;
+    flowPendingAction = null;
+
+    ["colT","colV","colG","colK"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    document.getElementById("colM").value = "1";
+    document.getElementById("flowDisplay").innerText = "--";
+
+    const rS = (id, def) => {
+      const s = document.getElementById(id);
+      if (!s) return;
+      if (def){
+        const o = Array.from(s.options).find(opt => opt.value.startsWith(def));
+        if (o) s.value = o.value;
+      } else {
+        s.selectedIndex = 0;
+      }
+    };
+
+    rS("colA","Roy");
+    rS("colB","v");
+    rS("colF",null);
+    rS("colH",null);
+    rS("colI",null);
+    rS("colFreq","A");
+    rS("colStatus","N");
+    rS("colZ","NEW");
+    rS("colX","GBP");
+
+    // v3-58: ensure modals are closed on reset/refresh
+    closeFlowModal();
+    closeCalculator();
+    closeNote();
+
+    setChkState(false);
+
+    calc();
+    renderPreview();
+    logTrace("UI Fields Reset. (v3-58)");
+  
+  }
+
+  
+  function setChkState(on){
+    chkFlag = !!on;
+    const btn = document.getElementById("chkToggle");
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", chkFlag ? "true" : "false");
+  }
+
+  function toggleChk(){
+    setChkState(!chkFlag);
+  }
+
+  function handleResetConfirm(){
+    const btn = document.getElementById("resetBtn");
+    if (!resetConfirmed){
+      resetConfirmed = true;
+      btn.innerText = "CONFIRM?";
+      setTimeout(() => { resetConfirmed = false; btn.innerText = "Reset"; }, 3000);
+      return;
+    }
+    resetConfirmed = false;
+    btn.innerText = "Reset";
+    localReset();
+  }
+
+  function handleWipeConfirm(){
+    const btn = document.getElementById("wipeBtn");
+    if (!wipeConfirmed){
+      wipeConfirmed = true;
+      btn.innerText = "CONFIRM?";
+      setTimeout(() => { wipeConfirmed = false; btn.innerText = "Clear Staging records"; }, 3000);
+      return;
+    }
+    wipeConfirmed = false;
+    btn.innerText = "Clear Staging records";
+    localStorage.removeItem("ebs_trf");
+    renderPreview();
+    logTrace("Staging wiped manually. (v3-58)");
+  }
+
+  // ---------- Field logic ----------
+  function handleDateChange(){
+    const dStr = document.getElementById("colC").value;
+    if (!dStr){ document.getElementById("colCDisp").innerText = ""; return; }
+    const [y,m,d] = dStr.split("-").map(Number);
+    const dt = new Date(y, m-1, d);
+    const day = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
+    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][dt.getMonth()];
+    document.getElementById("colCDisp").innerText = day + " " + dt.getDate() + " " + mon + " '" + String(dt.getFullYear()).slice(-2);
+  }
+
+  function calc(){
+    const t = parseFloat(document.getElementById("colT").value) || 0;
+    const u = parseFloat(document.getElementById("colM").value) || 1;
+    const v = parseFloat(document.getElementById("colV").value) || 0;
+    const tot = ((t*u) + v).toFixed(2);
+
+    const curCode = (document.getElementById("colX").value || "GBP").split(" ")[0];
+    document.getElementById("symbol").innerHTML = symbolsHtml[curCode] || "&pound;";
+    document.getElementById("totalDisp").innerText = tot;
+    return tot;
+  }
+
+  function handleEachFocus(){
+    const el = document.getElementById("colT");
+    const raw = (el.value || "").trim();
+    const num = parseFloat(raw);
+    // v3-58: clear if empty OR numeric zero; else keep and move cursor to end
+    if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
+      el.value = "";
+      return;
+    }
+    setTimeout(() => {
+      try{
+        const n = el.value.length;
+        el.setSelectionRange(n, n);
+      }catch(_){}
+    }, 0);
+  }
+
+  function handleFeesFocus(){
+    const el = document.getElementById("colV");
+    const raw = (el.value || "").trim();
+    const num = parseFloat(raw);
+    if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
+      el.value = "";
+      return;
+    }
+    setTimeout(() => {
+      try{
+        const n = el.value.length;
+        el.setSelectionRange(n, n);
+      }catch(_){}
+    }, 0);
+  }
+
+  function handleMultiplierFocus(){
+    const el = document.getElementById("colM");
+    const raw = (el.value || "").trim();
+    const num = parseFloat(raw);
+    if (!raw || (!isNaN(num) && Math.abs(num) < 1e-12)){
+      el.value = "";
+      return;
+    }
+    setTimeout(() => {
+      try{
+        const n = el.value.length;
+        el.setSelectionRange(n, n);
+      }catch(_){}
+    }, 0);
+  }
+
+
+  function handleAccTrigger(){
+    if (isRestoring) return;
+
+    const from = document.getElementById("colH").value;
+    const to = document.getElementById("colI").value;
+    if (!from || !to || from.includes("--") || to.includes("--")) return;
+
+    const fAA = AA_LIST.includes(from);
+    const tAA = AA_LIST.includes(to);
+
+    let flow = "zOut";
+    if (fAA && tAA) flow = "xfer";
+    else if (!fAA && tAA) flow = "In";
+
+    document.getElementById("flowDisplay").innerText = flow;
+
+// v3-58: auto-set Type based on Flow (trigger: From/To change)
+// - If Flow is In  => Type = I (income)
+// - If Flow is zOut => Type = v (variable)
+// Support Category keeps Type=S (set by Category rule) and must not be overwritten here.
+const catNow = document.getElementById("colF").value || "";
+const typeSel = document.getElementById("colB");
+if (!isSupportCategory(catNow) && typeSel){
+  if (flow === "In"){
+    setSelectByCode(typeSel, "I");
+  } else if (flow === "zOut"){
+    setSelectByCode(typeSel, "v");
+  }
+}
+
+    // Transfer rule triggers ONLY when From/To change.
+    if (fAA && tAA){
+      const typeSel = document.getElementById("colB");
+      const catSel  = document.getElementById("colF");
+      const freqSel = document.getElementById("colFreq");
+
+      // Type = xf (option code prefix "xf")
+      setSelectByCode(typeSel, "xf");
+
+      // Category = Transfer (prefer existing option that equals/contains Transfer)
+      const transferOpt =
+        Array.from(catSel.options).find(o => (o.value || "") === "Transfer") ||
+        Array.from(catSel.options).find(o => (o.value || "").toLowerCase().includes("transfer"));
+      catSel.value = transferOpt ? transferOpt.value : "Transfer";
+
+      // Frequency = K (option code prefix "K")
+      const k = Array.from(freqSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "K");
+      if (k) freqSel.value = k.value;
+    }
+  }
+
+
+  function handleCatTrigger(){
+    if (isRestoring) return;
+
+    // Support rule triggers ONLY when Category changes to Support*
+    const cat = (document.getElementById("colF").value || "");
+    if (!cat) return;
+
+    if (isSupportCategory(cat)){
+      const typeSel = document.getElementById("colB");
+      const freqSel = document.getElementById("colFreq");
+
+      // Type = S (option code prefix "S")
+      const s = Array.from(typeSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "S");
+      if (s) typeSel.value = s.value;
+
+      // Frequency = A (option code prefix "A")
+      const a = Array.from(freqSel.options).find(o => ((o.value || "").trim().split(/\s+/)[0].toUpperCase()) === "A");
+      if (a) freqSel.value = a.value;
+    }
+  }
+
+
+  function handleManualType(){
+    // reserved for future
+  }
+
+  // ---------- Edit / Staging ----------
+  function buildRecordFromUI(){
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+
+    const grouping = document.getElementById("colA").value;
+    const typeV = document.getElementById("colB").value;
+    const dateISO = document.getElementById("colC").value;
+    const category = document.getElementById("colF").value;
+    const from = document.getElementById("colH").value;
+    const to = document.getElementById("colI").value;
+
+    // v3-58: Who only for support categories
+    const who = isSupportCategory(category) ? grouping : ""; // v3-58 explicit Support membership
+
+    const rec = Array(35).fill("");
+    rec[0] = grouping;
+    rec[1] = typeV;
+    rec[2] = dateISO;
+    rec[4] = flowV;
+    rec[5] = category;
+    rec[6] = document.getElementById("colG").value;
+    rec[7] = from;
+    rec[8] = to;
+    rec[10] = document.getElementById("colK").value;
+    rec[11] = document.getElementById("colFreq").value;
+    rec[14] = document.getElementById("colStatus").value;
+
+    rec[18] = chkFlag ? "x" : "";
+
+    rec[19] = parseFloat(document.getElementById("colT").value || 0).toFixed(2);
+    rec[20] = document.getElementById("colM").value;
+    rec[21] = parseFloat(document.getElementById("colV").value || 0).toFixed(2);
+    rec[22] = calc();
+    rec[23] = document.getElementById("colX").value;
+    rec[25] = document.getElementById("colZ").value;
+
+    rec[33] = who;
+    rec[34] = VER;
+
+    return rec;
+  }
+
+  function guidanceIfNoLookups(){
+    // v3-58: message policy
+    // - if required dropdowns are empty/unpopulated after refresh, provide guidance
+    const colF = document.getElementById("colF");
+    const colH = document.getElementById("colH");
+    const colI = document.getElementById("colI");
+    const lookupsAppearEmpty = (!colF || colF.options.length === 0) || (!colH || colH.options.length === 0) || (!colI || colI.options.length === 0);
+    if (rawLookupData.length === 0 || lookupsAppearEmpty){
+      alert("First Pull local Lookups, or Refresh Lookups from Sheets.");
+      return true;
+    }
+    return false;
+  }
+
+  function handleMainAction(){
+logTrace("Action Triggered. (v3-58)");
+
+    if (guidanceIfNoLookups()) return;
+
+    // v3-72: Create is allowed during edit states:
+// - If confirm pending ("..."): clone that staging row and abandon edit.
+// - If active edit ("C"): create NEW row from current UI values (after validation) and abandon edit.
+    const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+
+    if (pendingEdit !== -1){
+      if (masterList[pendingEdit]){
+        masterList.push([...masterList[pendingEdit]]);
+        localStorage.setItem("ebs_trf", JSON.stringify(masterList));
+        logTrace("Edit abandoned; record cloned into new staged row. (v3-72)");
+        localReset();
+        return;
+      }
+    }
+
+    if (editIndex !== -1){
+      const fv = document.getElementById("colF").value;
+      const hv = document.getElementById("colH").value;
+      const iv = document.getElementById("colI").value;
+
+      if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")){
+        alert("Missing data.");
+        return;
+      }
+
+      const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+      if (!flowV || flowV === "--"){
+        flowPendingAction = "create"; // v3-72
+        openFlowModal();
+        return;
+      }
+
+      const finalPackage = buildRecordFromUI(); // uses current UI (edited) values
+      masterList.push(finalPackage);
+      localStorage.setItem("ebs_trf", JSON.stringify(masterList));
+      logTrace("Edit abandoned; NEW record created from current UI values. (v3-72)");
+      localReset();
+      return;
+    }
+const fv = document.getElementById("colF").value;
+    const hv = document.getElementById("colH").value;
+    const iv = document.getElementById("colI").value;
+
+    if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")){
+      alert("Missing data.");
+      return;
+    }
+
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+    if (!flowV || flowV === "--"){
+      flowPendingAction = "create"; // v3-58
+      openFlowModal();
+      return;
+    }
+
+    const finalPackage = buildRecordFromUI();
+    masterList.push(finalPackage);
+
+    localStorage.setItem("ebs_trf", JSON.stringify(masterList));
+    logTrace("Logic Update: New Record Appended. (v3-58)");
+    logTrace("Storage Synced. (v3-58)");
+
+    localReset();
+  }
+
+  function initiateEdit(idx){
+    if (guidanceIfNoLookups()) return;
+
+    // First press = pending confirm
+    if (pendingEdit !== idx){
+      pendingEdit = idx;
+      editIndex = -1;
+      renderPreview();
+      logTrace("Edit confirm armed for row " + (idx+1) + ". (v3-58)");
+      return;
+    }
+
+    // Second press = load into edit
+    pendingEdit = -1;
+    editIndex = idx;
+
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]")[idx];
+    if (!d){ editIndex = -1; renderPreview(); return; }
+
+    isRestoring = true;
+
+    const setDrop = (id, val) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const exact = Array.from(el.options).find(o => o.value === val);
+      if (exact){ el.value = exact.value; return; }
+      const code = (val || "").split(" ")[0];
+      const starts = Array.from(el.options).find(o => o.value.startsWith(code));
+      if (starts) el.value = starts.value;
+    };
+
+    setDrop("colA", d[0]);
+    setDrop("colB", d[1]);
+    document.getElementById("colC").value = d[2] || document.getElementById("colC").value;
+    setDrop("colF", d[5]);
+    document.getElementById("colG").value = d[6] || "";
+    setDrop("colH", d[7]);
+    setDrop("colI", d[8]);
+    document.getElementById("colK").value = d[10] || "";
+    setDrop("colFreq", d[11] || "A");
+    setDrop("colStatus", d[14] || "N");
+    setDrop("colZ", d[25] || "NEW");
+    setDrop("colX", d[23] || "GBP");
+    document.getElementById("colT").value = d[19] || "";
+    document.getElementById("colM").value = d[20] || "1";
+    document.getElementById("colV").value = d[21] || "";
+    document.getElementById("flowDisplay").innerText = (d[4] && String(d[4]).trim().length) ? d[4] : "--";
+
+    setChkState((d[18] || "") === "x");
+
+    handleDateChange();
+    calc();
+
+    isRestoring = false;
+    renderPreview();
+    logTrace("Active Edit: row " + (idx+1) + ". (v3-58)");
+  }
+
+  function commitEdit(){
+    if (editIndex === -1) return;
+
+    const fv = document.getElementById("colF").value;
+    const hv = document.getElementById("colH").value;
+    const iv = document.getElementById("colI").value;
+
+    if (!fv || !hv || !iv || fv.includes("--") || hv.includes("--") || iv.includes("--")){
+      alert("Missing data.");
+      return;
+    }
+
+    const flowV = (document.getElementById("flowDisplay").innerText || "").trim();
+    if (!flowV || flowV === "--"){
+      flowPendingAction = "edit"; // v3-58
+      openFlowModal();
+      return;
+    }
+
+    const masterList = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    const existing = masterList[editIndex];
+
+    const updated = buildRecordFromUI();
+
+    // v3-58: preserve Who on overwrite when category is not support
+    if (!isSupportCategory(updated[5]) && existing){ // v3-58 explicit Support membership
+      updated[33] = existing[33] || "";
+    }
+
+    masterList[editIndex] = updated;
+    localStorage.setItem("ebs_trf", JSON.stringify(masterList));
+    logTrace("Logic Update: Row " + editIndex + " Overwritten. (v3-58)");
+
+    localReset();
+  }
+
+  
+  function buildChkBtn(idx, r){
+    const on = ((r[18] || "").toString().trim().toLowerCase() === "x");
+    const pressed = on ? "true" : "false";
+    return '<button class="stg-chk-toggle" aria-pressed="' + pressed + '" onclick="toggleStagingChk(' + idx + ', event)"></button>';
+  }
+
+  function toggleStagingChk(idx, ev){
+    if (ev){ try{ ev.stopPropagation(); ev.preventDefault(); }catch(_){ } }
+
+    if (pendingEdit !== -1 || editIndex !== -1){
+      alert("Function locked during Edit.");
+      return;
+    }
+
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    if (!d[idx]) return;
+
+    d[idx][18] = (String(d[idx][18] || "").trim().toLowerCase() === "x") ? "" : "x";
+    localStorage.setItem("ebs_trf", JSON.stringify(d));
+    renderPreview();
+    logTrace("Chk flag toggled for row " + (idx+1) + ". (v3-58)");
+  }
+
+function renderPreview(){
+    const storageData = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+
+    let h = "<table><tr>"
+      + '<th class="w-edit">Edit</th>'
+      + '<th class="w-group">Grouping</th>'
+      + '<th class="w-type">Type</th>'
+      + '<th class="w-day">Day</th>'
+      + '<th class="w-date">Date</th>'
+      + '<th class="w-flow">Flow</th>'
+      + '<th class="w-cat">Category</th>'
+      + '<th class="w-sort">Sort</th>'
+      + '<th class="w-acc">From</th>'
+      + '<th class="w-acc">To</th>'
+      + '<th class="w-note">Note</th>'
+      + '<th class="w-freq">Frequency</th>'
+      + '<th class="w-stat">Status</th>'
+      + '<th class="w-cur">Currency</th>'
+      + '<th class="w-chk">Chk</th>'
+      + '<th class="w-tot">Total</th>'
+      + '<th class="w-mnth">Month</th>'
+      + '<th class="w-who">Who</th>'
+      + '<th class="w-del">DEL</th>'
+      + "</tr>";
+
+    storageData.forEach((r, idx) => {
+      const isPending = (pendingEdit === idx);
+      const isEditing = (editIndex === idx);
+
+      let bS = isPending ? "background:#c0392b" : (isEditing ? "background:#f39c12" : "background:#3498db");
+      let bL = isPending ? "..." : (isEditing ? "C" : "E");
+      let clickFn = isEditing ? "commitEdit()" : ("initiateEdit(" + idx + ")");
+
+      // Date display
+      let dNam = "";
+      let dStr = "";
+      if (r[2]){
+        const [y, m, dn] = String(r[2]).split("-").map(Number);
+        const dt = new Date(y, m-1, dn);
+        dNam = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
+        dStr = String(dn).padStart(2,"0") + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][dt.getMonth()] + " '" + String(dt.getFullYear()).slice(-2);
+      }
+
+      const curCode = (r[23] || "").split(" ")[0];
+      const noteIcon = r[10] ? ICON_NOTE : ICON_NOTE_EMPTY;
+
+      h += "<tr>"
+        + '<td class="w-edit"><button type="button" onclick="' + clickFn + '" style="' + bS + ';color:white;border:none;border-radius:6px;padding:2px 0;width:100%;font-size:0.6rem;font-weight:900;">' + bL + "</button></td>"
+        + '<td class="w-group">' + (r[0] || "") + "</td>"
+        + '<td class="w-type">' + (r[1] || "") + "</td>"
+        + '<td class="w-day">' + dNam + "</td>"
+        + '<td class="w-date">' + dStr + "</td>"
+        + '<td class="w-flow">' + (r[4] || "") + "</td>"
+        + '<td class="w-cat">' + (r[5] || "") + "</td>"
+        + '<td class="w-sort">' + (r[6] || "") + "</td>"
+        + '<td class="w-acc">' + (r[7] || "") + "</td>"
+        + '<td class="w-acc">' + (r[8] || "") + "</td>"
+        + '<td class="w-note" onclick="openNote(' + idx + ')">' + noteIcon + "</td>"
+        + '<td class="w-freq">' + (r[11] || "") + "</td>"
+        + '<td class="w-stat">' + (r[14] || "") + "</td>"
+        + '<td class="w-cur">' + curCode + "</td>"
+        + '<td class="w-chk">' + buildChkBtn(idx, r) + "</td>"
+        + '<td class="w-tot">' + (r[22] || "") + "</td>"
+        + '<td class="w-mnth">' + (r[25] || "") + "</td>"
+        + '<td class="w-who">' + (r[33] || "") + "</td>"
+        + '<td class="w-del"><button type="button" class="del-btn-small stg-del-btn" onclick="deleteRow(' + idx + ')">x</button></td>'
+        + "</tr>";
+    });
+
+    document.getElementById("previewArea").innerHTML = h + "</table>";
+    logTrace("Table Rendered. Active Rows: " + storageData.length + " (v3-58)");
+  }
+
+  function deleteRow(i){
+    if (pendingEdit !== -1 || editIndex !== -1){
+      alert("Function locked during Edit.");
+      return;
+    }
+
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    d.splice(i, 1);
+    localStorage.setItem("ebs_trf", JSON.stringify(d));
+    editIndex = -1;
+    pendingEdit = -1;
+    renderPreview();
+    logTrace("Row deleted: " + (i+1) + " (v3-58)");
+  }
+
+  // ---------- Note modal ----------
+  function openNote(idx){
+    // v3-58: prevent staging-note edits during Edit mode
+    if (editIndex !== -1){
+      if (idx === editIndex){
+        alert("Notes cannot be edited in the Staging table during edit; change Note only possible on the input screen during edit.");
+      } else {
+        alert("Only the selected record notes can be edited (on the input screen).");
+      }
+      return;
+    }
+    if (pendingEdit !== -1){
+      if (idx === pendingEdit){
+        alert("Notes cannot be edited in the Staging table during edit; change Note only possible on the input screen during edit.");
+      } else {
+        alert("Only the selected record notes can be edited (on the input screen).");
+      }
+      return;
+    }
+
+    activeNoteIdx = idx;
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    document.getElementById("modal_note_text").value = (d[idx] && d[idx][10]) ? d[idx][10] : "";
+    document.getElementById("note_modal").style.display = "flex";
+  }
+
+  function closeNote(){
+    document.getElementById("note_modal").style.display = "none";
+    activeNoteIdx = -1;
+  }
+  function commitNote(){
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    if (!d[activeNoteIdx]){ closeNote(); return; }
+    d[activeNoteIdx][10] = document.getElementById("modal_note_text").value;
+    localStorage.setItem("ebs_trf", JSON.stringify(d));
+    closeNote();
+    renderPreview();
+    logTrace("Note updated. (v3-58)");
+  }
+
+  function clearModalNoteConfirm(){
+    const t = document.getElementById("modal_note_text");
+    if (!t) return;
+    if (!t.value || t.value.trim().length===0) return;
+    if (confirm("Delete Note text?")){ t.value = ""; }
+  }
+
+
+  // ---------- Flow modal ----------
+  function openFlowModal(){ document.getElementById("flow_modal").style.display = "flex"; }
+  function closeFlowModal(){ document.getElementById("flow_modal").style.display = "none"; }
+  function commitFlowSelection(){
+    const selected = document.getElementById("modal_flow_select").value;
+    document.getElementById("flowDisplay").innerText = selected;
+    closeFlowModal();
+
+    // v3-58: resume pending action deterministically
+    if (flowPendingAction === "edit"){
+      flowPendingAction = null;
+      commitEdit();
+      return;
+    }
+    if (flowPendingAction === "create"){
+      flowPendingAction = null;
+      handleMainAction();
+      return;
+    }
+
+    // fallback
+    if (editIndex !== -1) commitEdit();
+    else handleMainAction();
+  }
+
+  // ---------- Calculator ----------
+  function openCalculator(targetFieldId){
+    // v3-58: supports Each (colT) and Fees (colV)
+    calcTargetFieldId = targetFieldId || "colT";
+    const targetEl = document.getElementById(calcTargetFieldId);
+    const cur = (targetEl && targetEl.value ? String(targetEl.value) : "").trim();
+    calcLastApplied = cur ? cur : "0";
+    document.getElementById("calc_display").value = calcLastApplied;
+    document.getElementById("calc_modal").style.display = "flex";
+    logTrace("Calculator opened. Target=" + calcTargetFieldId + " Seed=" + calcLastApplied + " (v3-58)");
+  }
+  function closeCalculator(){
+    document.getElementById("calc_modal").style.display = "none";
+  }
+  function calcKey(k){
+    const el = document.getElementById("calc_display");
+    let v = el.value || "";
+
+    if (k === "C"){ el.value = "0"; return; }
+    if (k === "BK"){ el.value = v.length > 1 ? v.slice(0,-1) : "0"; return; }
+    if (k === "%"){ v = v + "/100"; el.value = v; return; }
+
+    if (k === "="){
+      const res = safeEval(el.value);
+      if (res === null) return;
+      el.value = String(res);
+      return;
+    }
+
+    // append tokens
+    if (v === "0" && "0123456789".includes(k)) v = "";
+    el.value = v + k;
+  }
+
+  function safeEval(expr){
+    try{
+      const cleaned = (expr || "")
+        .replace(/×/g,"*")
+        .replace(/÷/g,"/")
+        .replace(/[^0-9+\-*/.%(). ]/g,"");
+      // eslint-disable-next-line no-new-func
+      const out = Function('"use strict"; return (' + cleaned + ')')();
+      if (typeof out !== "number" || !isFinite(out)){ alert("Invalid expression."); return null; }
+      const fixed = Number(out.toFixed(2));
+      logTrace("Calculator = " + fixed + " (v3-58)");
+      return fixed;
+    }catch(_){
+      alert("Invalid expression.");
+      return null;
+    }
+  }
+
+  function applyCalculator(){
+    const el = document.getElementById("calc_display");
+    const res = safeEval(el.value);
+    if (res === null) return;
+
+    const tgt = document.getElementById(calcTargetFieldId || "colT");
+    if (tgt){
+      tgt.value = (calcTargetFieldId === "colM") ? String(res) : res.toFixed(2);
+    }
+    calc();
+    closeCalculator();
+    logTrace("Calculator applied to " + (calcTargetFieldId || "colT") + ": " + res.toFixed(2) + " (v3-58)");
+  }
+
+
+  // ---------- Searchable picker modal (v3-58) ----------
+  let pickTargetId = null;
+  let pickDebounce = null;
+
+  if (!(window.CSS && CSS.escape)){
+    // Minimal CSS.escape fallback
+    window.CSS = window.CSS || {};
+    CSS.escape = function(v){
+      return String(v).replace(/["\\]/g, "\\$&");
+    };
+  }
+
+
+  function isIPhoneModalPickerEnabled(){
+    // v3-58: enable searchable modal picker on all platforms (desktop + mobile)
+    return true;
+  }
+
+  function foldStr(s){
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
+  }
+
+  function buildFoldIndexMap(original){
+    // Map each folded-string index to the corresponding original-string index
+    const map = [];
+    let foldedPos = 0;
+    for (let i = 0; i < original.length; i++){
+      const foldedChunk = foldStr(original[i]);
+      const n = foldedChunk.length;
+      for (let k = 0; k < n; k++){
+        map[foldedPos + k] = i;
+      }
+      foldedPos += n;
+    }
+    return map;
+  }
+
+  function highlightAllOccurrences(label, query){
+    const qFold = foldStr(query);
+    if (!qFold) return escapeHtml(label);
+
+    const o = String(label || "");
+    const oFold = foldStr(o);
+
+    const map = buildFoldIndexMap(o);
+    const ranges = [];
+    let start = 0;
+
+    while (true){
+      const idx = oFold.indexOf(qFold, start);
+      if (idx === -1) break;
+      const endFold = idx + qFold.length - 1;
+
+      const origStart = map[idx];
+      const origEnd = map[endFold];
+
+      if (origStart !== undefined && origEnd !== undefined){
+        ranges.push([origStart, origEnd + 1]); // [start, endExclusive]
+      }
+      start = idx + Math.max(1, qFold.length);
+    }
+
+    if (!ranges.length) return escapeHtml(o);
+
+    // merge overlapping ranges
+    ranges.sort((a,b) => a[0]-b[0]);
+    const merged = [];
+    for (const r of ranges){
+      if (!merged.length || r[0] > merged[merged.length-1][1]){
+        merged.push(r);
+      }else{
+        merged[merged.length-1][1] = Math.max(merged[merged.length-1][1], r[1]);
+      }
+    }
+
+    let out = "";
+    let cursor = 0;
+    for (const [a,b] of merged){
+      out += escapeHtml(o.slice(cursor, a));
+      out += "<mark>" + escapeHtml(o.slice(a, b)) + "</mark>";
+      cursor = b;
+    }
+    out += escapeHtml(o.slice(cursor));
+    return out;
+  }
+
+  function escapeHtml(s){
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function initSearchPickers(){
+    if (!isIPhoneModalPickerEnabled()) return;
+
+    const selects = Array.from(document.querySelectorAll("select"))
+      // exclude any selects that might be added in modals (none currently, but safe)
+      .filter(s => !s.closest("#pick_modal") && !s.closest("#calc_modal") && !s.closest("#note_modal"));
+
+    selects.forEach(sel => {
+      const id = sel.id || "";
+      if (!id) return;
+
+      // Derive a reasonable title from the associated label if present
+      let title = "Select";
+      const label = sel.closest("div") ? sel.closest("div").querySelector("label") : null;
+      if (label && label.innerText) title = "Select " + label.innerText.trim();
+      else title = "Select " + id;
+
+      // Use a consistent searchable modal picker across devices.
+      // Touch/pointer devices (phones/tablets): pointerdown/touchstart.
+      // Non-touch desktops: mousedown.
+      const isTouchDevice = (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || ("ontouchstart" in window);
+
+      if (window.PointerEvent){
+        sel.addEventListener("pointerdown", (ev) => {
+          ev.preventDefault();
+          openPickModal(id, title);
+        }, { passive:false });
+      } else {
+        sel.addEventListener("touchstart", (ev) => {
+          ev.preventDefault();
+          openPickModal(id, title);
+        }, { passive:false });
+      }
+
+      sel.addEventListener("mousedown", (ev) => {
+        if (isTouchDevice) return; // avoid duplicate open on hybrid/touch devices
+        ev.preventDefault();
+        openPickModal(id, title);
+      });
+
+      sel.addEventListener("keydown", (ev) => {
+        const key = ev.key || "";
+        if (key === "Enter" || key === " "){
+          ev.preventDefault();
+          openPickModal(id, title);
+        }
+      });
+    });
+  }
+
+  function focusPickSearch(){
+    try{
+      const inp = document.getElementById("pick_search");
+      if (!inp) return;
+      inp.focus({ preventScroll:true });
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    }catch(_){}
+  }
+
+  function openPickModal(selectId, title){
+    pickTargetId = selectId;
+
+    const modal = document.getElementById("pick_modal");
+    document.getElementById("pick_title").innerText = title;
+
+    const inp = document.getElementById("pick_search");
+    inp.value = ""; // do not retain query
+
+    modal.style.display = "flex";
+
+    // Render full list first
+    renderPickList("");
+
+    // Bind input filtering (overwrite, avoid accumulating listeners)
+    inp.oninput = () => renderPickList(inp.value || "");
+
+    // Focus search box (must be synchronous for iOS Safari)
+    try{
+      inp.focus({ preventScroll:true });
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    }catch(_){
+      try{ inp.focus(); }catch(_2){}
+    }
+
+    // Scroll to current selection after paint
+    setTimeout(scrollPickToSelection, 0);
+  }
+
+  function closePickModal(){
+    document.getElementById("pick_modal").style.display = "none";
+    pickTargetId = null;
+    const inp = document.getElementById("pick_search");
+    inp.oninput = null;
+  }
+
+  
+  function scrollPickToSelection(){
+    const sel = document.getElementById(pickTargetId);
+    const list = document.getElementById("pick_list");
+    if (!sel || !list) return;
+
+    // If no selection, ensure top
+    if (!sel.value || String(sel.value).includes("--")){
+      list.scrollTop = 0;
+      return;
+    }
+
+    const item = list.querySelector('.pick-item[data-val="' + CSS.escape(sel.value) + '"]');
+    if (item && item.scrollIntoView){
+      item.scrollIntoView({ block:"center" });
+    }else{
+      list.scrollTop = 0;
+    }
+  }
+
+function renderPickList(query){
+    const sel = document.getElementById(pickTargetId);
+    const list = document.getElementById("pick_list");
+    if (!sel || !list) return;
+
+    const qFold = foldStr(query);
+
+    // candidate options (skip disabled prompt entries)
+    const opts = Array.from(sel.options)
+      .filter(o => !o.disabled && o.value !== "" && !(o.value || "").includes("--"));
+
+    const items = opts.map(o => ({ value:o.value, label:o.value, fold:foldStr(o.value) }));
+
+    let filtered = items;
+    if (qFold){
+      filtered = items.filter(it => it.fold.includes(qFold));
+
+      // prefix prioritisation (stable within groups)
+      const prefix = filtered.filter(it => it.fold.startsWith(qFold));
+      const contains = filtered.filter(it => !it.fold.startsWith(qFold));
+      filtered = prefix.concat(contains);
+    }
+
+    if (!filtered.length){
+      list.innerHTML = '<div id="pick_empty">No results</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(it => {
+      const isCurrent = sel.value && it.value === sel.value;
+      return (
+        '<div class="pick-item' + (isCurrent ? ' current' : '') + '" data-val="' + escapeHtml(it.value) + '">' +
+          highlightAllOccurrences(it.label, query) +
+        "</div>"
+      );
+    }).join("");
+
+    Array.from(list.querySelectorAll(".pick-item")).forEach(el => {
+      el.onclick = () => {
+        const val = el.getAttribute("data-val");
+        sel.value = val;
+
+        // Fire change handlers consistently
+        sel.dispatchEvent(new Event("change", { bubbles:true }));
+
+        closePickModal();
+      };
+    });
+  }
+  
+
+  // v3-74: iOS Safari double-tap zoom guard for Reset + Clear Staging records
+  // Goal: allow fast double-tap to register as 2 button presses (confirm flows) instead of zooming the page.
+  function installDoubleTapGuard(){
+    const ids = ["resetBtn","wipeBtn"];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // Redundant with CSS, but ensures inline precedence if CSS is overridden
+      try{ el.style.touchAction = "manipulation"; }catch(_){}
+
+      let lastTouchEnd = 0;
+      el.addEventListener("touchend", function(e){
+        const now = Date.now();
+
+        // If 2nd tap occurs quickly, prevent Safari zoom and force a normal click.
+        if (now - lastTouchEnd <= 350){
+          e.preventDefault();
+          try{ el.click(); }catch(_){}
+        }
+        lastTouchEnd = now;
+      }, { passive:false });
+    });
+  }
+
+
+// ---------- Google auth / sync ----------
+  function gapiLoaded(){
+    gapi.load("client", async () => {
+      await gapi.client.init({ apiKey: "AIzaSyDvZ1XZw5bZgWSB9zaU7h9Vtn7MhDGFMSM" });
+      await gapi.client.load("sheets", "v4");
+      logTrace("GAPI Ready. (v3-58)");
+    });
+  }
+
+  function gisLoaded(){
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: "23231735212-jtgur3sn2ndh798ke00pm2a1d5rkd4eu.apps.googleusercontent.com",
+      scope: "https://www.googleapis.com/auth/spreadsheets",
+      callback: () => {}
+    });
+    logTrace("GIS Ready. (v3-58)");
+  }
+
+  function initRefresh(){
+    // Standard refresh: obtain token and then load lookup refs
+    requestToken(true, () => fetchLookupRefs());
+  }
+
+  function requestToken(forcePrompt, onOk){
+    tokenClient.callback = (resp) => {
+      if (!resp || !resp.access_token) return;
+      const issuedAt = Date.now();
+      const expiresIn = resp.expires_in ? Number(resp.expires_in) : 3600;
+      localStorage.setItem("g_token", resp.access_token);
+      localStorage.setItem("g_token_issued_at", String(issuedAt));
+      localStorage.setItem("g_token_expires_in", String(expiresIn));
+
+      gapi.client.setToken({ access_token: resp.access_token });
+      onOk();
+    };
+
+    const args = forcePrompt ? { prompt: "consent" } : { prompt: "" };
+    tokenClient.requestAccessToken(args);
+  }
+
+  function ensureTokenThen(onOk){
+    const tok = localStorage.getItem("g_token");
+    const issuedAt = Number(localStorage.getItem("g_token_issued_at") || "0");
+    const exp = Number(localStorage.getItem("g_token_expires_in") || "0");
+    const age = (Date.now() - issuedAt) / 1000;
+
+    // v3-58: only prompt if missing/expired
+    if (tok && issuedAt && exp && age < (exp - 60)){
+      gapi.client.setToken({ access_token: tok });
+      onOk();
+      return;
+    }
+    requestToken(true, onOk);
+  }
+
+  async function fetchLookupRefs(){
+    updateStatus("Fetching Refs...", "sync");
+    const res = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: "LookupRefs!A2:C15"
+    });
+
+    coordinateMap = {};
+    (res.result.values || []).forEach(r => {
+      const k = String(r[0] || "").trim();
+      if (!k) return;
+      coordinateMap[k] = {
+        val: (function(){const m=String(r[1]||"").toUpperCase().match(/[A-Z]+/); return m?colToIndex(m[0]):null;})(),
+        desc: (function(){if(!(r[2] && String(r[2]).toLowerCase()!=="n/a")) return null; const m=String(r[2]||"").toUpperCase().match(/[A-Z]+/); return m?colToIndex(m[0]):null;})()
+      };
+    });
+
+    await fetchActiveAccounts();
+  }
+
+  async function fetchActiveAccounts(){
+    const res = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: "ActiveAccounts!A2:A500"
+    });
+    AA_LIST = res.result.values ? res.result.values.flat().filter(v => v) : [];
+    await fetchActualData();
+  }
+
+  async function fetchActualData(){
+    const res = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: "Lookups!A2:AC1000"
+    });
+    rawLookupData = res.result.values || [];
+    populateUI(rawLookupData);
+    updateStatus("Token Active", "active");
+    alert("Refresh complete.");
+  }
+
+  async function handleSync(){
+    const d = JSON.parse(localStorage.getItem("ebs_trf") || "[]");
+    if (!d.length){ alert("No Staging records."); return; }
+
+    updateStatus("Syncing...", "sync");
+    logTrace("Sync started. Rows=" + d.length + " Target=" + SHEET_TAB + " (v3-58)");
+
+    ensureTokenThen(async () => {
+      try{
+        // v3-58: first empty A from A2 downward
+        const meta = await gapi.client.sheets.spreadsheets.values.get({
+          spreadsheetId: SHEET_ID,
+          range: "'" + SHEET_TAB + "'!A2:A"
+        });
+        const used = meta.result.values ? meta.result.values.length : 0;
+        const startRow = 2 + used;
+
+        const vls = d.map(r => {
+          const rc = [...r];
+
+          // date ISO -> dd/mm/yyyy
+          if (rc[2]){
+            const dp = String(rc[2]).split("-");
+            if (dp.length === 3) rc[2] = dp[2] + "/" + dp[1] + "/" + dp[0];
+          }
+
+          // code fields: keep first token
+          [1,5,11,14,23,25].forEach(i => { rc[i] = (rc[i] || "").split(" ")[0]; });
+
+          // accounts: remove (AA)
+          [7,8].forEach(i => { rc[i] = String(rc[i] || "").replace(/ \\(AA\\)/g, ""); });
+
+          // numeric
+          [19,21,22].forEach(i => { rc[i] = parseFloat(rc[i] || 0); });
+
+          return rc;
+        });
+
+        await gapi.client.sheets.spreadsheets.values.update({
+          spreadsheetId: SHEET_ID,
+          range: "'" + SHEET_TAB + "'!A" + startRow + ":AI" + (startRow + vls.length - 1),
+          valueInputOption: "USER_ENTERED",
+          resource: { values: vls }
+        });
+
+        updateStatus("Token Active", "active");
+        logTrace("Sync complete. StartRow=" + startRow + " (v3-58)");
+        alert("Sync completed.");
+      }catch(e){
+        updateStatus("Sync error", "error");
+        logTrace("Sync error: " + (e && e.message ? e.message : String(e)) + " (v3-58)");
+        alert("Sync failed. Trace log contains details.");
+      }
+    });
+  }
+
+  // ---------- Boot ----------
+  async function waitFor(cond, timeoutMs){
+    const t0 = Date.now();
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        if (cond()) return resolve(true);
+        if (Date.now() - t0 > timeoutMs) return reject(new Error("Timeout"));
+        setTimeout(tick, 50);
+      };
+      tick();
+    });
+  }
+
+  async function boot(){
+    document.getElementById("colC").value = new Date().toISOString().split("T")[0];
+    handleDateChange();
+
+    // v3-58: ensure UI starts usable even before lookups are pulled
+    localReset();
+    renderPreview();
+    initSearchPickers();
+    installDoubleTapGuard();
+    // v3-58: allow closing selection popups by clicking outside the dialog (Close button still available)
+    const bindBackdropClose = (id, closeFn) => {
+      const m = document.getElementById(id);
+      if (!m || m.dataset.backdropBound) return;
+      m.dataset.backdropBound = "1";
+      const handler = (ev) => {
+        if (m.style.display !== "flex") return;
+        if (ev.target !== m) return;
+        try{ ev.preventDefault(); }catch(_){}
+        closeFn();
+      };
+      ["pointerdown","touchstart","mousedown","click"].forEach((t) => {
+        try{ m.addEventListener(t, handler, { passive:false }); }
+        catch(_){ m.addEventListener(t, handler); }
+      });
+    };
+
+    bindBackdropClose("pick_modal", closePickModal);
+    bindBackdropClose("calc_modal", closeCalculator);
+    bindBackdropClose("note_modal", closeNote);
+    bindBackdropClose("flow_modal", closeFlowModal);
+
+    try{
+      await waitFor(() => typeof gapi !== "undefined", 8000);
+      gapiLoaded();
+    }catch(_){
+      logTrace("GAPI not available. (v3-58)");
+    }
+
+    try{
+      await waitFor(() => typeof google !== "undefined" && google.accounts && google.accounts.oauth2, 8000);
+      gisLoaded();
+    }catch(_){
+      logTrace("GIS not available. (v3-58)");
+    }
+  }
+
+  window.addEventListener("load", boot);
+
+  // v3-58: Note clear with confirm
+  function clearNoteConfirm(){
+    const t = document.getElementById("colK");
+    if (!t) return;
+    if (!t.value || t.value.trim().length === 0) return;
+    if (confirm("Delete Note text?")){
+      t.value = "";
+    }
+  }
+
 </script>
 </body>
 </html>
